@@ -1,0 +1,38 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__icon">
+        <app-icon name="alert-triangle" [size]="24" />
+      </div>
+
+      <h2 class="modal__title">Confirmar Anulación del Día</h2>
+
+      <p class="modal__description">
+        Está a punto de anular completamente el ciclo correspondiente a:
+        <strong>{{ date }}</strong>.
+        Este es el mismo ciclo que usa Agentes Bancarios (Cuadre de Agentes) — anularlo aquí también lo
+        anula allá. Las operaciones de Transaccionar ya registradas para esta fecha no se eliminan ni se
+        modifican, solo el estado del ciclo del día.
+        La información histórica será conservada para auditoría — ningún registro se elimina físicamente.
+        ¿Desea continuar?
+      </p>
+
+      <label class="modal__field">
+        <span>Motivo de anulación <em>(obligatorio)</em></span>
+        <textarea
+          rows="3"
+          placeholder="Ej: Ciclo abierto por error, se anula."
+          [ngModel]="reason()"
+          (ngModelChange)="reason.set($event)"
+        ></textarea>
+      </label>
+
+      <div class="modal__actions">
+        <app-button variant="ghost" [disabled]="isSaving" (click)="onCancel()">Cancelar</app-button>
+        <app-button variant="danger" [disabled]="!canConfirm || isSaving" (click)="onConfirm()">
+          {{ isSaving ? 'Anulando…' : 'Confirmar Anulación' }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,31 @@
+<app-section tone="muted" spacing="lg">
+  <app-section-heading
+    eyebrow="Catálogo"
+    title="Explora nuestras categorías más buscadas"
+    subtitle="Un vistazo rápido a lo que encuentras en tienda. Ingresa al catálogo completo para ver todo el detalle."
+  />
+
+  <div class="catalog__grid">
+    @for (category of categories$ | async; track category.id; let i = $index) {
+      <app-card [revealDelay]="i * 60" appRevealOnScroll tone="light">
+        <div class="catalog-card">
+          <div class="catalog-card__icon">
+            <app-icon [name]="category.icon" [size]="24" />
+          </div>
+          <div class="catalog-card__body">
+            <h3 class="catalog-card__title">{{ category.name }}</h3>
+            <p class="catalog-card__description">{{ category.description }}</p>
+          </div>
+          <span class="catalog-card__count">{{ category.itemCount }}</span>
+        </div>
+      </app-card>
+    }
+  </div>
+
+  <div class="catalog__cta">
+    <app-button variant="primary" size="lg" routerLink="/catalogo">
+      Ver catálogo completo
+      <app-icon name="arrow-right" [size]="18" />
+    </app-button>
+  </div>
+</app-section>

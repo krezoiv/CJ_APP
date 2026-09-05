@@ -1,0 +1,147 @@
+@if (items.length === 0) {
+  <app-empty-state
+    icon="receipt"
+    title="La compra está vacía"
+    description="Busca un helado por SKU o nombre para agregarlo a la compra."
+  />
+} @else {
+  <div class="table-wrapper table-wrapper--desktop">
+    <table class="purchase-table">
+      <thead>
+        <tr>
+          <th class="align-center">Cantidad</th>
+          <th>SKU</th>
+          <th>Producto</th>
+          <th class="align-right">Precio costo</th>
+          <th class="align-right">Subtotal</th>
+          <th class="align-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of items; track item.iceCreamId) {
+          <tr>
+            <td class="align-center">
+              <div class="qty-stepper">
+                <button
+                  type="button"
+                  class="qty-btn"
+                  [disabled]="item.quantity <= 1"
+                  (click)="decrement(item)"
+                  aria-label="Disminuir cantidad"
+                >
+                  <app-icon name="minus" [size]="14" />
+                </button>
+                <input
+                  type="text"
+                  inputmode="numeric"
+                  class="qty-input"
+                  [appDecimalInput]="0"
+                  [value]="item.quantity"
+                  (change)="onQuantityInput(item, $any($event.target).value)"
+                  [attr.aria-label]="'Cantidad de ' + item.product"
+                />
+                <button type="button" class="qty-btn" (click)="increment(item)" aria-label="Aumentar cantidad">
+                  <app-icon name="plus" [size]="14" />
+                </button>
+              </div>
+            </td>
+            <td class="purchase-table__sku">{{ item.sku }}</td>
+            <td class="purchase-table__name">{{ item.product }}</td>
+            <td class="align-right">
+              <div class="price-input">
+                <span>Q</span>
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  appDecimalInput
+                  [value]="item.costPrice"
+                  (change)="onCostPriceInput(item, $any($event.target).value)"
+                  [attr.aria-label]="'Precio costo de ' + item.product"
+                />
+              </div>
+            </td>
+            <td class="align-right purchase-table__total">{{ formatCurrency(calculateItemTotal(item)) }}</td>
+            <td class="align-right">
+              <button
+                type="button"
+                class="remove-btn"
+                (click)="removeItem.emit(item.iceCreamId)"
+                [attr.aria-label]="'Quitar ' + item.product"
+              >
+                <app-icon name="trash-2" [size]="16" />
+                Quitar
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-list">
+    @for (item of items; track item.iceCreamId) {
+      <div class="purchase-card">
+        <div class="purchase-card__header">
+          <div>
+            <p class="purchase-card__name">{{ item.product }}</p>
+            <p class="purchase-card__sku">{{ item.sku }}</p>
+          </div>
+          <span class="purchase-card__total">{{ formatCurrency(calculateItemTotal(item)) }}</span>
+        </div>
+
+        <div class="purchase-card__prices">
+          <label>
+            Costo
+            <div class="price-input">
+              <span>Q</span>
+              <input
+                type="text"
+                inputmode="decimal"
+                appDecimalInput
+                [value]="item.costPrice"
+                (change)="onCostPriceInput(item, $any($event.target).value)"
+                [attr.aria-label]="'Precio costo de ' + item.product"
+              />
+            </div>
+          </label>
+        </div>
+
+        <div class="purchase-card__footer">
+          <div class="qty-stepper">
+            <button
+              type="button"
+              class="qty-btn"
+              [disabled]="item.quantity <= 1"
+              (click)="decrement(item)"
+              aria-label="Disminuir cantidad"
+            >
+              <app-icon name="minus" [size]="14" />
+            </button>
+            <input
+              type="text"
+              inputmode="numeric"
+              class="qty-input"
+              [appDecimalInput]="0"
+              [value]="item.quantity"
+              (change)="onQuantityInput(item, $any($event.target).value)"
+              [attr.aria-label]="'Cantidad de ' + item.product"
+            />
+            <button type="button" class="qty-btn" (click)="increment(item)" aria-label="Aumentar cantidad">
+              <app-icon name="plus" [size]="14" />
+            </button>
+          </div>
+
+          <button
+            type="button"
+            class="remove-btn"
+            (click)="removeItem.emit(item.iceCreamId)"
+            [attr.aria-label]="'Quitar ' + item.product"
+          >
+            <app-icon name="trash-2" [size]="16" />
+            Quitar
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+}

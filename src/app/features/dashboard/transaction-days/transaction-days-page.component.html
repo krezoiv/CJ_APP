@@ -1,0 +1,139 @@
+<div class="transaction-days">
+  <header class="transaction-days__header">
+    <h1 class="transaction-days__title">Gestión de Transacciones</h1>
+    <p class="transaction-days__subtitle">
+      Consulta, reabre y administra los ciclos de día de Transaccionar — comparte el mismo ciclo que
+      Agentes Bancarios (Gestión de Días Cerrados).
+    </p>
+  </header>
+
+  <app-card [hoverable]="false" class="transaction-days__filters-card">
+    <h2 class="section-title">
+      <app-icon name="filter" [size]="18" />
+      Filtros
+    </h2>
+
+    <div class="filters-grid">
+      <label class="field">
+        <span>Desde</span>
+        <input type="date" [ngModel]="draftDateFrom()" (ngModelChange)="draftDateFrom.set($event)" />
+      </label>
+
+      <label class="field">
+        <span>Hasta</span>
+        <input type="date" [ngModel]="draftDateTo()" (ngModelChange)="draftDateTo.set($event)" />
+      </label>
+
+      <label class="field">
+        <span>Estado</span>
+        <select [ngModel]="draftStatus()" (ngModelChange)="draftStatus.set($event)">
+          <option value="">Todos</option>
+          <option value="CLOSED">Cerrado</option>
+          <option value="REOPENED">Reabierto</option>
+          <option value="CANCELLED">Anulado</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="filters-actions">
+      <button
+        type="button"
+        class="filters-actions__clear"
+        [disabled]="!hasActiveFilters()"
+        (click)="clearFilters()"
+      >
+        Limpiar filtros
+      </button>
+      <app-button variant="primary" size="sm" (click)="applyFilters()">Aplicar filtros</app-button>
+    </div>
+  </app-card>
+
+  <app-card [hoverable]="false" class="transaction-days__table-card">
+    @if (loading()) {
+      <p class="loading-note">
+        <app-icon name="clock" [size]="16" />
+        Cargando días…
+      </p>
+    } @else if (rows().length === 0) {
+      <app-empty-state
+        icon="lock"
+        title="No hay días que coincidan"
+        description="Ajusta los filtros o espera a que se cierre el primer ciclo del día."
+      />
+    } @else {
+      <div class="table-wrapper">
+        <table class="transaction-days-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Estado</th>
+              <th>Apertura</th>
+              <th>Cierre</th>
+              <th>Abrió</th>
+              <th>Cerró</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.date) {
+              <tr>
+                <td class="transaction-days-table__date">{{ row.date | date: 'dd/MM/yyyy' }}</td>
+                <td>
+                  <span class="status-badge" [class]="'status-badge--' + row.status">
+                    <app-icon [name]="statusIcon[row.status]" [size]="13" />
+                    {{ statusLabel[row.status] }}
+                  </span>
+                </td>
+                <td>{{ row.openedAt | date: 'dd/MM/yy HH:mm' }}</td>
+                <td>{{ row.closedAt ? (row.closedAt | date: 'dd/MM/yy HH:mm') : '—' }}</td>
+                <td>{{ row.openedByUsername }}</td>
+                <td>{{ row.closedByUsername ?? '—' }}</td>
+                <td class="transaction-days-table__actions">
+                  <button type="button" class="action-btn" title="Ver detalle" (click)="openDetail(row.date)">
+                    <app-icon name="eye" [size]="16" />
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn"
+                    title="Reabrir día"
+                    [disabled]="!canReopen(row)"
+                    (click)="openReopenModal(row.date)"
+                  >
+                    <app-icon name="rotate-ccw" [size]="16" />
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn action-btn--danger"
+                    title="Anular día"
+                    [disabled]="!canCancel(row)"
+                    (click)="openCancelModal(row.date)"
+                  >
+                    <app-icon name="x-circle" [size]="16" />
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-card>
+</div>
+
+<app-transaction-day-detail-modal [open]="isDetailOpen()" [date]="selectedDate()" (closed)="closeDetail()" />
+
+<app-reopen-confirm-modal
+  [open]="isReopenModalOpen()"
+  [date]="selectedDate()"
+  [isSaving]="isSavingAction()"
+  (confirmed)="confirmReopen($event)"
+  (cancelled)="cancelReopenModal()"
+/>
+
+<app-cancel-confirm-modal
+  [open]="isCancelModalOpen()"
+  [date]="selectedDate()"
+  [isSaving]="isSavingAction()"
+  (confirmed)="confirmCancel($event)"
+  (cancelled)="cancelCancelModal()"
+/>

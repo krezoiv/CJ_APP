@@ -1,0 +1,39 @@
+<div class="tickets">
+  <header class="tickets__header">
+    <div>
+      <h1 class="tickets__title">Tickets</h1>
+      <p class="tickets__subtitle">
+        Un ticket es un comprobante rápido — nunca afecta el inventario ni se registra como una venta real.
+      </p>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button
+      type="button"
+      role="tab"
+      class="tab"
+      [class.tab--active]="activeTab() === 'crear'"
+      [attr.aria-selected]="activeTab() === 'crear'"
+      (click)="selectTab('crear')"
+    >
+      Crear
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class="tab"
+      [class.tab--active]="activeTab() === 'historial'"
+      [attr.aria-selected]="activeTab() === 'historial'"
+      (click)="selectTab('historial')"
+    >
+      Historial
+    </button>
+  </div>
+
+  @if (activeTab() === 'crear') {
+    <app-create-ticket-tab />
+  } @else {
+    <app-ticket-history-tab />
+  }
+</div>

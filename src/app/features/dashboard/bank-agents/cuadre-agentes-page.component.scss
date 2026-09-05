@@ -1,0 +1,517 @@
+@use 'mixins' as *;
+@use 'breakpoints' as bp;
+
+.cuadre-agentes__header {
+  margin-bottom: var(--space-6);
+}
+
+.cuadre-agentes__title {
+  font-size: var(--fs-2xl);
+  color: var(--color-text-on-light);
+  margin-bottom: var(--space-2);
+}
+
+.cuadre-agentes__subtitle {
+  font-size: var(--fs-md);
+  color: var(--color-text-on-light-muted);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-md);
+  color: var(--color-text-on-light);
+  margin-bottom: var(--space-5);
+}
+
+// ---- Sección 1: Resumen de Bancos -------------------------------------------
+
+.cuadre-agentes__banks-card {
+  display: block;
+  margin-bottom: var(--space-6);
+}
+
+.banks-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-5);
+
+  .section-title {
+    margin-bottom: 0;
+  }
+}
+
+.loading-note,
+.empty-note {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-content: center;
+  padding: var(--space-6);
+  font-size: var(--fs-sm);
+  color: var(--color-text-on-light-subtle);
+}
+
+// ---- Acceso bloqueado: "Día no aperturado" / "Saldos pendientes" -----------
+// Reemplaza TODO el contenido normal de la página (no un modal ni un banner
+// encima) mientras la secuencia obligatoria de "Apertura del Día" no se
+// haya completado — ver `CuadreAgentesPageComponent.canAccessReconciliation`.
+
+.cuadre-agentes__access-card {
+  display: block;
+}
+
+.access-blocked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+  padding: var(--space-10) var(--space-6);
+}
+
+.access-blocked__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--radius-full);
+  background: rgba(245, 166, 35, 0.12);
+  color: var(--color-accent-gold);
+  margin-bottom: var(--space-2);
+}
+
+.access-blocked__title {
+  font-size: var(--fs-lg);
+  color: var(--color-text-on-light);
+}
+
+.access-blocked__description {
+  font-size: var(--fs-sm);
+  color: var(--color-text-on-light-muted);
+  max-width: 28rem;
+}
+
+.access-blocked__missing {
+  text-align: left;
+  background: var(--color-bg-light-muted);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  max-width: 22rem;
+  width: 100%;
+}
+
+.access-blocked__missing-title {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  color: var(--color-text-on-light-muted);
+  margin-bottom: var(--space-2);
+}
+
+.access-blocked__missing ul {
+  list-style: disc;
+  padding-left: var(--space-5);
+  font-size: var(--fs-sm);
+  color: var(--color-text-on-light);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+// Same compact, dark-navy ledger style as Conteo de Efectivo (Sección 3) —
+// not capped to a narrow width here, though: with a real bank list this
+// can run to a couple dozen rows, so it uses the card's full width rather
+// than the teller-slip-sized cash table.
+.banks-table-wrapper {
+  overflow-x: auto;
+  background: var(--color-surface-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+}
+
+.banks-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 30rem;
+
+  th,
+  td {
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    font-size: var(--fs-xs);
+    line-height: 1.3;
+  }
+
+  thead {
+    background: #1e3a5f;
+  }
+
+  thead th {
+    font-size: 0.65rem;
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: rgba(255, 255, 255, 0.85);
+    padding-block: var(--space-2);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--color-border-light);
+
+    &:nth-child(even) {
+      background: var(--color-bg-light-muted);
+    }
+  }
+
+  tfoot tr {
+    border-top: 1px solid var(--color-border-light);
+  }
+
+  td {
+    color: var(--color-text-on-light-muted);
+  }
+}
+
+.banks-table__name {
+  color: var(--color-text-on-light);
+  font-weight: var(--fw-medium);
+}
+
+.banks-table__value {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-on-light);
+}
+
+.account-type-badge {
+  display: inline-block;
+  padding: 0.1rem var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: 0.65rem;
+  font-weight: var(--fw-medium);
+  color: var(--color-primary-700);
+  background: rgba(47, 131, 224, 0.12);
+}
+
+.account-type-badge--credit {
+  color: #b42318;
+  background: rgba(220, 68, 68, 0.12);
+}
+
+.banks-table__subtotal-row td {
+  padding-block: var(--space-2);
+  font-size: var(--fs-xs);
+  color: var(--color-text-on-light-muted);
+  background: var(--color-bg-light-muted);
+}
+
+.banks-table__total-row td {
+  padding-block: var(--space-3);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  color: var(--color-text-on-light);
+  background: var(--color-bg-light-muted);
+  border-top: 2px solid #1e3a5f;
+
+  &.align-right {
+    font-size: var(--fs-md);
+    color: #1e3a5f;
+  }
+}
+
+// ---- Sección 2: Total de Activos / Cuentas por Cobrar -----------------------
+
+.cuadre-agentes__totals-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+  margin-bottom: var(--space-6);
+
+  @include bp.respond(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.summary-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.summary-tile__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-md);
+  background: var(--gradient-brand-soft);
+  color: var(--color-primary-600);
+  margin-bottom: var(--space-2);
+}
+
+.summary-tile__title {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--color-text-on-light-muted);
+}
+
+.summary-tile__value {
+  font-family: var(--font-heading);
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-bold);
+  color: var(--color-text-on-light);
+}
+
+// ---- Sección 3: Conteo de Efectivo -------------------------------------------
+// Deliberately narrow and dense — a teller's cash-count slip, not a
+// full-width app table. Header/total rows reuse the same dark-navy
+// (`#1e3a5f`) this system's own PDF statements already use for a table
+// header (see `report-pdf.builder.ts`), so the on-screen ledger reads as
+// the same "official financial document" style the printed ones do.
+
+.cuadre-agentes__cash-card {
+  display: block;
+}
+
+.cash-table-wrapper {
+  overflow-x: auto;
+  max-width: 26rem;
+  background: var(--color-surface-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+}
+
+.cash-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 22rem;
+  font-variant-numeric: tabular-nums;
+
+  th,
+  td {
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    font-size: var(--fs-xs);
+    line-height: 1.3;
+  }
+
+  thead {
+    background: #1e3a5f;
+  }
+
+  thead th {
+    font-size: 0.65rem;
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: rgba(255, 255, 255, 0.85);
+    padding-block: var(--space-2);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--color-border-light);
+
+    &:nth-child(even) {
+      background: var(--color-bg-light-muted);
+    }
+  }
+
+  tfoot tr {
+    border-top: 2px solid #1e3a5f;
+  }
+
+  td {
+    color: var(--color-text-on-light-muted);
+  }
+}
+
+.align-right {
+  text-align: right;
+}
+
+.cash-table__denomination {
+  color: var(--color-text-on-light);
+  font-weight: var(--fw-medium);
+}
+
+.cash-table__row-total {
+  color: var(--color-text-on-light);
+  font-weight: var(--fw-semibold);
+}
+
+.cash-table td input {
+  width: 4rem;
+  background: var(--color-surface-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  color: var(--color-text-on-light);
+  font-size: var(--fs-xs);
+  font-family: var(--font-body);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  @include focus-ring;
+
+  &:focus {
+    border-color: var(--color-primary-500);
+  }
+}
+
+.cash-table__total-row td {
+  padding-block: var(--space-3);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  color: var(--color-text-on-light);
+  background: var(--color-bg-light-muted);
+
+  &.align-right {
+    font-size: var(--fs-md);
+    color: #1e3a5f;
+  }
+}
+
+// ---- Sección 4: Resumen del Cuadre -------------------------------------------
+
+.cuadre-agentes__result-card {
+  display: block;
+  margin-top: var(--space-6);
+}
+
+.result-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.result-summary__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  font-size: var(--fs-sm);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border-light);
+
+  dt {
+    color: var(--color-text-on-light-muted);
+  }
+
+  dd {
+    color: var(--color-text-on-light);
+    font-weight: var(--fw-medium);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.result-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-6);
+  border-radius: var(--radius-md);
+  text-align: center;
+  background: var(--color-bg-light-muted);
+}
+
+.result-block__label {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--color-text-on-light-muted);
+}
+
+.result-block__value {
+  font-family: var(--font-heading);
+  font-size: var(--fs-3xl);
+  font-weight: var(--fw-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.result-block__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.15rem var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+}
+
+.result-block--zero {
+  .result-block__value {
+    color: var(--color-accent-green);
+  }
+
+  .result-block__badge {
+    color: var(--color-accent-green);
+    background: rgba(46, 160, 67, 0.12);
+  }
+}
+
+.result-block--positive {
+  .result-block__value {
+    color: var(--color-accent-gold);
+  }
+
+  .result-block__badge {
+    color: var(--color-accent-gold);
+    background: rgba(212, 160, 23, 0.12);
+  }
+}
+
+.result-block--negative {
+  .result-block__value {
+    color: #dc4444;
+  }
+
+  .result-block__badge {
+    color: #dc4444;
+    background: rgba(220, 68, 68, 0.12);
+  }
+}
+
+.cuadre-agentes__save-action {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-6);
+}
+
+.info-banner {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  margin-top: var(--space-5);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-sm);
+}
+
+.info-banner--warning {
+  background: rgba(245, 166, 35, 0.1);
+  border: 1px solid rgba(245, 166, 35, 0.35);
+  color: var(--color-text-on-light);
+}
+
+.info-banner__link {
+  margin-left: auto;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: var(--fw-medium);
+  color: var(--color-primary-600);
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--color-primary-700);
+  }
+}

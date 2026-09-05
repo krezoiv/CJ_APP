@@ -1,0 +1,116 @@
+@use 'mixins' as *;
+
+:host {
+  display: inline-flex;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out),
+    color var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+  @include focus-ring;
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+// ---- Sizes -----------------------------------------------------------------
+.btn--sm {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--fs-sm);
+}
+
+.btn--md {
+  padding: var(--space-3) var(--space-6);
+  font-size: var(--fs-sm);
+}
+
+.btn--lg {
+  padding: var(--space-4) var(--space-8);
+  font-size: var(--fs-md);
+}
+
+// ---- Variants ----------------------------------------------------------------
+.btn--primary {
+  background: var(--gradient-brand);
+  color: var(--color-white);
+  box-shadow: var(--shadow-glow-primary);
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+}
+
+.btn--secondary {
+  background: var(--gradient-gold);
+  color: var(--color-ink-950);
+  box-shadow: var(--shadow-glow-gold);
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.05);
+  }
+}
+
+.btn--outline {
+  background: transparent;
+  border-color: var(--color-border-dark-strong);
+  color: var(--color-text-on-dark);
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-accent-cyan);
+    color: var(--color-accent-cyan);
+  }
+}
+
+.btn--danger {
+  background: #dc4444;
+  color: var(--color-white);
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--color-text-on-light);
+
+  &:hover:not(:disabled) {
+    background: var(--color-surface-light-hover);
+  }
+}
+
+// Same transparent/ghost surface as .btn--ghost, but for a "Cancelar"-type
+// action — red text instead of the default ink color, no red background
+// (that's what .btn--danger is for, on an actual destructive confirm).
+.btn--ghost-danger {
+  background: transparent;
+  color: #dc4444;
+
+  &:hover:not(:disabled) {
+    background: rgba(220, 68, 68, 0.08);
+  }
+}
+
+.btn--full {
+  width: 100%;
+}

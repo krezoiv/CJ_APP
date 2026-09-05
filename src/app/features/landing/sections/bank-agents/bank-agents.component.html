@@ -1,0 +1,36 @@
+<app-section sectionId="agentes-bancarios" tone="dark" spacing="lg">
+  <div class="bank-agents__layout">
+    <div class="bank-agents__intro">
+      <app-section-heading
+        align="left"
+        eyebrow="Agente bancario"
+        title="Haz tus operaciones bancarias sin ir al banco"
+        subtitle="Somos agente bancario autorizado: realiza tus operaciones más comunes de forma rápida, segura y cerca de casa."
+      />
+
+      <ul class="bank-agents__trust">
+        @for (point of trustPoints$ | async; track point.id) {
+          <li class="bank-agents__trust-item">
+            <app-icon [name]="point.icon" [size]="20" />
+            {{ point.text }}
+          </li>
+        }
+      </ul>
+
+      <app-button variant="secondary" size="lg" [href]="site.whatsappHref" target="_blank">
+        Consultar una operación
+      </app-button>
+    </div>
+
+    <div class="bank-agents__operations">
+      @for (operation of operations$ | async; track operation.id; let i = $index) {
+        <app-card [revealDelay]="i * 50" appRevealOnScroll tone="glass" padding="sm">
+          <div class="operation">
+            <app-icon [name]="operation.icon" [size]="20" />
+            <span>{{ operation.label }}</span>
+          </div>
+        </app-card>
+      }
+    </div>
+  </div>
+</app-section>

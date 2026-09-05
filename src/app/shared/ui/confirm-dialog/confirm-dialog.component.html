@@ -1,0 +1,26 @@
+@if (pending(); as dialog) {
+  <div class="modal-backdrop">
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="confirm-dialog-title"
+      (click)="$event.stopPropagation()"
+      (keydown)="onKeydown($event)"
+    >
+      <div class="modal__icon" [class]="iconToneClass(dialog.options.variant)">
+        <app-icon [name]="dialog.options.icon" [size]="24" />
+      </div>
+
+      <h2 class="modal__title" id="confirm-dialog-title">{{ dialog.options.title }}</h2>
+      <p class="modal__description">{{ dialog.options.message }}</p>
+
+      <div class="modal__actions">
+        <app-button variant="ghost" (click)="cancel()">{{ dialog.options.cancelText }}</app-button>
+        <app-button [variant]="dialog.options.variant" (click)="confirm()">
+          {{ dialog.options.confirmText }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

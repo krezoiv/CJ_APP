@@ -1,0 +1,35 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__icon">
+        <app-icon name="alert-triangle" [size]="24" />
+      </div>
+
+      <h2 class="modal__title">Anular Transacción</h2>
+
+      <p class="modal__description">
+        Está a punto de anular esta transacción de Transaccionar. No se elimina ni se modifica el registro
+        — quedará visible en el historial marcada como <strong>Anulada</strong> y dejará de sumar en los
+        totales del reporte. Si el error fue en el monto, el banco o el desglose, registre una nueva
+        transacción correcta desde Transaccionar después de anular esta.
+      </p>
+
+      <label class="modal__field">
+        <span>Motivo de anulación <em>(obligatorio)</em></span>
+        <textarea
+          rows="3"
+          placeholder="Ej: Se registró en el banco agente equivocado."
+          [ngModel]="reason()"
+          (ngModelChange)="reason.set($event)"
+        ></textarea>
+      </label>
+
+      <div class="modal__actions">
+        <app-button variant="ghost" [disabled]="isSaving" (click)="onCancel()">Cancelar</app-button>
+        <app-button variant="danger" [disabled]="!canConfirm || isSaving" (click)="onConfirm()">
+          {{ isSaving ? 'Anulando…' : 'Confirmar Anulación' }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

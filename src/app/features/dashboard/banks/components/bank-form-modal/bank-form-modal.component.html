@@ -1,0 +1,97 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">{{ isEditMode ? 'Editar banco' : 'Agregar banco' }}</h2>
+        <button type="button" class="modal__close" (click)="close()" aria-label="Cerrar">
+          <app-icon name="close" [size]="18" />
+        </button>
+      </div>
+
+      <form class="modal__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="field">
+          <label for="bank-name">Nombre del banco</label>
+          <input id="bank-name" type="text" formControlName="name" placeholder="Ej. Banco Industrial" />
+          @if (form.controls.name.invalid && form.controls.name.touched) {
+            <span class="field__error">Ingresa un nombre de al menos 2 caracteres.</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="bank-account-number">Número de cuenta</label>
+          <!-- type="text" on purpose — an account number is an identifier (leading zeros/dashes are significant), never a number input. -->
+          <input
+            id="bank-account-number"
+            type="text"
+            inputmode="numeric"
+            formControlName="accountNumber"
+            placeholder="Ej. 001234567890"
+          />
+          @if (form.controls.accountNumber.invalid && form.controls.accountNumber.touched) {
+            <span class="field__error">El número de cuenta es obligatorio.</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="bank-account-type">Tipo de cuenta</label>
+          <select id="bank-account-type" formControlName="accountTypeId">
+            <option value="" disabled>Selecciona un tipo de cuenta</option>
+            @for (accountType of accountTypes; track accountType.id) {
+              <option [value]="accountType.id">{{ accountType.name }}</option>
+            }
+          </select>
+          @if (form.controls.accountTypeId.invalid && form.controls.accountTypeId.touched) {
+            <span class="field__error">El tipo de cuenta es obligatorio.</span>
+          }
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="bank-previous-balance">Saldo anterior inicial</label>
+            <input
+              id="bank-previous-balance"
+              type="text"
+              inputmode="decimal"
+              appDecimalInput
+              formControlName="previousBalance"
+              placeholder="0.00"
+            />
+            @if (form.controls.previousBalance.invalid && form.controls.previousBalance.touched) {
+              <span class="field__error">Ingresa un valor de 0 o más.</span>
+            }
+          </div>
+
+          <div class="field">
+            <label for="bank-final-balance">Saldo final inicial</label>
+            <input
+              id="bank-final-balance"
+              type="text"
+              inputmode="decimal"
+              appDecimalInput
+              formControlName="finalBalance"
+              placeholder="0.00"
+            />
+            @if (form.controls.finalBalance.invalid && form.controls.finalBalance.touched) {
+              <span class="field__error">Ingresa un valor de 0 o más.</span>
+            }
+          </div>
+        </div>
+        <p class="field-hint">
+          Estos valores solo aplican como saldo anterior de referencia para el primer cuadre del banco en Agentes
+          Bancarios — los cuadres posteriores se calculan automáticamente.
+        </p>
+
+        @if (errorMessage()) {
+          <p class="modal__error">{{ errorMessage() }}</p>
+        }
+
+        <div class="modal__actions">
+          <app-button variant="ghost" type="button" [disabled]="isSubmitting()" (click)="close()">Cancelar</app-button>
+          <app-button variant="primary" type="submit" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Guardando…' : isEditMode ? 'Guardar cambios' : 'Agregar banco' }}
+          </app-button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

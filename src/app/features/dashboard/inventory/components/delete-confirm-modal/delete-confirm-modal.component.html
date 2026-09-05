@@ -1,0 +1,25 @@
+@if (open && product) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__icon">
+        <app-icon name="alert-triangle" [size]="24" />
+      </div>
+
+      <h2 class="modal__title">¿Estás seguro de eliminar este producto?</h2>
+      <p class="modal__description">
+        <strong>{{ product.name }}</strong> se desactivará y dejará de aparecer en el inventario. No se elimina
+        permanentemente: el historial se conserva y puede reactivarse más adelante.
+      </p>
+
+      <div class="modal__actions">
+        <app-button variant="ghost-danger" [disabled]="isDeleting" (click)="cancelled.emit()">
+          <app-icon name="close" [size]="16" />
+          Cancelar
+        </app-button>
+        <app-button variant="danger" [disabled]="isDeleting" (click)="confirmed.emit()">
+          {{ isDeleting ? 'Desactivando…' : 'Sí, desactivar' }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

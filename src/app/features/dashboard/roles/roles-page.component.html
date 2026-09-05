@@ -1,0 +1,43 @@
+<div class="roles">
+  <header class="roles__header">
+    <div>
+      <h1 class="roles__title">Roles</h1>
+      <p class="roles__subtitle">Gestiona los roles y permisos del sistema.</p>
+    </div>
+  </header>
+
+  <app-role-summary [data]="roles()" />
+
+  <app-role-toolbar
+    [searchTerm]="searchTerm()"
+    [statusFilter]="statusFilter()"
+    (searchTermChange)="searchTerm.set($event)"
+    (statusFilterChange)="statusFilter.set($event)"
+    (addRole)="openCreateForm()"
+  />
+
+  <app-role-table
+    [roles]="filteredRoles()"
+    [loading]="loading()"
+    [hasActiveFilters]="hasActiveFilters()"
+    (edit)="openEditForm($event)"
+    (delete)="requestDelete($event)"
+    (clearFilters)="clearFilters()"
+    (addRole)="openCreateForm()"
+  />
+</div>
+
+<app-role-form-modal
+  [open]="isFormOpen()"
+  [role]="editingRole()"
+  (closed)="closeForm()"
+  (saved)="onRoleSaved($event)"
+/>
+
+<app-role-delete-confirm-modal
+  [open]="isDeleteOpen()"
+  [role]="deletingRole()"
+  [isDeleting]="isDeleting()"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>

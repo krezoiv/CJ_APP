@@ -1,0 +1,146 @@
+@use 'mixins' as *;
+@use 'breakpoints' as bp;
+
+.recharges__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+
+  @include bp.respond(md) {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+}
+
+.recharges__title {
+  font-size: var(--fs-2xl);
+  color: var(--color-text-on-light);
+  margin-bottom: var(--space-2);
+}
+
+.recharges__subtitle {
+  font-size: var(--fs-md);
+  color: var(--color-text-on-light-muted);
+}
+
+.recharges__header-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.info-banner {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-light-muted);
+  border: 1px solid var(--color-border-light);
+  font-size: var(--fs-sm);
+  color: var(--color-text-on-light-muted);
+}
+
+.info-banner--locked {
+  color: var(--color-text-on-light-subtle);
+}
+
+.recharges__date-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex-shrink: 0;
+
+  span {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--color-text-on-light-muted);
+  }
+
+  input {
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    color: var(--color-text-on-light);
+    font-size: var(--fs-sm);
+    font-family: var(--font-body);
+    box-shadow: var(--shadow-sm);
+    @include focus-ring;
+
+    &:focus {
+      border-color: var(--color-primary-500);
+    }
+  }
+}
+
+.recharges__sales-section {
+  margin-bottom: var(--space-8);
+}
+
+.recharges__sales-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.recharges__sales-title {
+  font-size: var(--fs-lg);
+  color: var(--color-text-on-light);
+}
+
+app-recharge-table {
+  display: block;
+  margin-bottom: var(--space-6);
+}
+
+.recharges__cards-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+  align-items: start;
+
+  @include bp.respond(lg) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.recharges__purchase-card,
+.recharges__summary-card {
+  display: block;
+}
+
+// ---- SIM — visually distinct block, never mixed with the saldo electrónico above ----
+
+.recharges__sim-section {
+  margin-top: var(--space-8);
+  padding-top: var(--space-8);
+  border-top: 2px dashed var(--color-border-light);
+}
+
+.recharges__sim-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-lg);
+  color: var(--color-text-on-light);
+  margin-bottom: var(--space-2);
+}
+
+.recharges__sim-subtitle {
+  font-size: var(--fs-sm);
+  color: var(--color-text-on-light-subtle);
+  margin-bottom: var(--space-5);
+}
+
+app-sim-stock-table {
+  display: block;
+  margin-bottom: var(--space-6);
+}

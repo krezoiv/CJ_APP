@@ -1,0 +1,36 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__icon">
+        <app-icon name="rotate-ccw" [size]="24" />
+      </div>
+
+      <h2 class="modal__title">Reabrir Día de Recargas</h2>
+
+      <p class="modal__description">
+        Está a punto de reabrir el día de recargas correspondiente a:
+        <strong>{{ date }}</strong>.
+        Esta operación permitirá registrar correcciones (compras, ventas, saldo final y un nuevo cuadre) para esta
+        fecha. El historial anterior será conservado.
+        ¿Desea continuar?
+      </p>
+
+      <label class="modal__field">
+        <span>Motivo de reapertura <em>(obligatorio)</em></span>
+        <textarea
+          rows="3"
+          placeholder="Ej: Se detectó un error en el saldo final de Claro."
+          [ngModel]="reason()"
+          (ngModelChange)="reason.set($event)"
+        ></textarea>
+      </label>
+
+      <div class="modal__actions">
+        <app-button variant="ghost" [disabled]="isSaving" (click)="onCancel()">Cancelar</app-button>
+        <app-button variant="primary" [disabled]="!canConfirm || isSaving" (click)="onConfirm()">
+          {{ isSaving ? 'Reabriendo…' : 'Confirmar Reapertura' }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

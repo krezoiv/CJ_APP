@@ -1,0 +1,137 @@
+<div class="create-quotation">
+  <div class="create-quotation__fields">
+    <div class="field">
+      <span class="field__label">Cliente <span class="field__required">*</span></span>
+      <app-client-search-select
+        [selectedClientId]="selectedClientId()"
+        [selectedClientName]="selectedClientName()"
+        placeholder="Buscar cliente…"
+        (selectionChange)="onClientSelectionChange($event)"
+      />
+      @if (clientError()) {
+        <span class="field__error">Debe seleccionar un cliente.</span>
+      }
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="expiration-date">Válida hasta <span class="field__required">*</span></label>
+      <input
+        id="expiration-date"
+        type="date"
+        class="field__input"
+        [min]="today"
+        [ngModel]="expirationDate()"
+        (ngModelChange)="onExpirationDateChange($event)"
+      />
+      @if (dateError()) {
+        <span class="field__error">La fecha de vencimiento no puede ser anterior a hoy.</span>
+      }
+    </div>
+  </div>
+
+  <app-quotation-product-search (productSelected)="onProductSelected($event)" />
+
+  @if (items().length === 0) {
+    <app-empty-state
+      icon="tag"
+      title="La cotización está vacía"
+      description="Busca un producto por SKU o nombre para agregarlo a la cotización."
+    />
+  } @else {
+    <div class="table-wrapper">
+      <table class="quotation-table">
+        <thead>
+          <tr>
+            <th class="align-center">Cantidad</th>
+            <th>Producto</th>
+            <th>Presentación</th>
+            <th class="align-right">Precio</th>
+            <th class="align-right">Descuento</th>
+            <th class="align-right">Total</th>
+            <th class="align-right">Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of items(); track item.productId) {
+            <tr>
+              <td class="align-center">
+                <div class="qty-stepper">
+                  <button type="button" class="qty-btn" [disabled]="item.quantity <= 1" (click)="decrement(item)" aria-label="Disminuir cantidad">
+                    <app-icon name="minus" [size]="14" />
+                  </button>
+                  <span class="qty-value">{{ item.quantity }}</span>
+                  <button type="button" class="qty-btn" (click)="increment(item)" aria-label="Aumentar cantidad">
+                    <app-icon name="plus" [size]="14" />
+                  </button>
+                </div>
+              </td>
+              <td class="quotation-table__name">{{ item.name }}</td>
+              <td>Unidad</td>
+              <td class="align-right">{{ formatCurrency(item.unitPrice) }}</td>
+              <td class="align-right">
+                <input
+                  type="number"
+                  class="discount-input"
+                  min="0"
+                  step="0.01"
+                  [ngModel]="item.discount"
+                  (ngModelChange)="updateDiscount(item.productId, $event)"
+                />
+              </td>
+              <td class="align-right quotation-table__total">{{ formatCurrency(calculateItemTotal(item)) }}</td>
+              <td class="align-right">
+                <button type="button" class="remove-btn" (click)="removeItem(item.productId)" [attr.aria-label]="'Quitar ' + item.name">
+                  <app-icon name="trash-2" [size]="16" />
+                  Quitar
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <div class="create-quotation__notes">
+    <label class="field">
+      <span class="field__label">Observaciones</span>
+      <textarea
+        rows="2"
+        maxlength="500"
+        [ngModel]="observations()"
+        (ngModelChange)="observations.set($event)"
+        placeholder="Notas adicionales para el cliente…"
+      ></textarea>
+    </label>
+    <label class="field">
+      <span class="field__label">Condiciones comerciales</span>
+      <textarea
+        rows="2"
+        maxlength="500"
+        [ngModel]="commercialTerms()"
+        (ngModelChange)="commercialTerms.set($event)"
+        placeholder="Ej. Precios sujetos a cambio sin previo aviso, vigencia de 15 días…"
+      ></textarea>
+    </label>
+  </div>
+
+  <div class="create-quotation__footer">
+    <div class="create-quotation__totals">
+      <div class="totals-row">
+        <span>Subtotal</span>
+        <span>{{ formatCurrency(subtotal) }}</span>
+      </div>
+      <div class="totals-row">
+        <span>Descuento</span>
+        <span>{{ formatCurrency(discountTotal) }}</span>
+      </div>
+      <div class="totals-row totals-row--total">
+        <span>Total</span>
+        <strong>{{ formatCurrency(total) }}</strong>
+      </div>
+    </div>
+    <app-button [disabled]="items().length === 0 || isSaving()" (click)="saveQuotation()">
+      {{ isSaving() ? 'Guardando…' : 'Guardar Cotización' }}
+    </app-button>
+  </div>
+</div>

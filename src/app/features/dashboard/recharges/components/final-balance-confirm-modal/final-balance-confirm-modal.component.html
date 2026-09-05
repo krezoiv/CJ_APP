@@ -1,0 +1,35 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__icon">
+        <app-icon name="file-check" [size]="24" />
+      </div>
+
+      <h2 class="modal__title">¿Confirmas el saldo final de {{ rechargeTypeName }}?</h2>
+
+      <dl class="modal__summary">
+        <div class="modal__summary-row">
+          <dt>Saldo del día</dt>
+          <dd>{{ formatCurrency(dailyBalance) }}</dd>
+        </div>
+        <div class="modal__summary-row">
+          <dt>Saldo final</dt>
+          <dd>{{ formatCurrency(finalBalance) }}</dd>
+        </div>
+        <div class="modal__summary-row modal__summary-row--total">
+          <dt>Venta calculada</dt>
+          <dd>{{ formatCurrency(sale) }}</dd>
+        </div>
+      </dl>
+
+      <p class="modal__hint">La venta se calcula como saldo del día menos saldo final, y no podrá recalcularse editando estos valores por separado.</p>
+
+      <div class="modal__actions">
+        <app-button variant="ghost" [disabled]="isSaving" (click)="cancelled.emit()">Volver</app-button>
+        <app-button variant="primary" [disabled]="isSaving" (click)="confirmed.emit()">
+          {{ isSaving ? 'Guardando…' : 'Confirmar saldo final' }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

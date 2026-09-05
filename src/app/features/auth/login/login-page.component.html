@@ -1,0 +1,48 @@
+<section class="login">
+  <div class="login__card">
+    <a class="login__brand" routerLink="/">
+      <img src="assets/images/logo.png" alt="{{ site.name }}" width="48" height="48" />
+      <span>{{ site.name }}</span>
+    </a>
+
+    <h1 class="login__title">Inicia sesión</h1>
+    <p class="login__subtitle">Accede al panel de administración de Comercial Jhoel.</p>
+
+    <form class="login__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="field">
+        <label for="identifier">Usuario o teléfono</label>
+        <input
+          id="identifier"
+          type="text"
+          formControlName="identifier"
+          placeholder="usuario123 o 55551234"
+          autocomplete="username"
+        />
+      </div>
+
+      <div class="field">
+        <label for="password">Contraseña</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="••••••••"
+          autocomplete="current-password"
+        />
+      </div>
+
+      @if (errorMessage()) {
+        <p class="login__error">{{ errorMessage() }}</p>
+      }
+
+      <app-button variant="primary" size="lg" type="submit" fullWidth [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Iniciando sesión…' : 'Iniciar sesión' }}
+      </app-button>
+    </form>
+
+    <a class="login__back" routerLink="/">
+      <app-icon name="arrow-right" [size]="14" />
+      Volver al inicio
+    </a>
+  </div>
+</section>

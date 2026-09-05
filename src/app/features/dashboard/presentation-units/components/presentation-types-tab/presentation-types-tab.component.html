@@ -1,0 +1,208 @@
+<div class="summary-row">
+  <app-card padding="md" class="summary-tile">
+    <span class="summary-tile__label">Total</span>
+    <span class="summary-tile__value">{{ totalCount() }}</span>
+  </app-card>
+  <app-card padding="md" class="summary-tile">
+    <span class="summary-tile__label">Activas</span>
+    <span class="summary-tile__value">{{ activeCount() }}</span>
+  </app-card>
+  <app-card padding="md" class="summary-tile">
+    <span class="summary-tile__label">Inactivas</span>
+    <span class="summary-tile__value">{{ inactiveCount() }}</span>
+  </app-card>
+</div>
+
+<div class="toolbar">
+  <div class="toolbar__search">
+    <app-icon name="search" [size]="16" />
+    <input
+      type="text"
+      placeholder="Buscar por nombre o código…"
+      [value]="searchTerm()"
+      (input)="searchTerm.set($any($event.target).value)"
+    />
+  </div>
+
+  <div class="toolbar__filters">
+    <button
+      type="button"
+      class="filter-chip"
+      [class.filter-chip--active]="statusFilter() === 'all'"
+      (click)="statusFilter.set('all')"
+    >
+      Todos
+    </button>
+    <button
+      type="button"
+      class="filter-chip"
+      [class.filter-chip--active]="statusFilter() === 'active'"
+      (click)="statusFilter.set('active')"
+    >
+      Activos
+    </button>
+    <button
+      type="button"
+      class="filter-chip"
+      [class.filter-chip--active]="statusFilter() === 'inactive'"
+      (click)="statusFilter.set('inactive')"
+    >
+      Inactivos
+    </button>
+  </div>
+
+  @if (isAdmin()) {
+    <app-button variant="primary" (click)="openCreateForm()">
+      <app-icon name="plus" [size]="16" />
+      Nueva presentación
+    </app-button>
+  }
+</div>
+
+@if (loading()) {
+  <div class="table-wrapper" aria-hidden="true">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Código</th>
+          <th>Estado</th>
+          <th>Uso</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of skeletonRows; track $index) {
+          <tr class="skeleton-row">
+            <td><span class="skeleton skeleton--lg"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else if (filteredItems().length === 0) {
+  <app-empty-state
+    icon="layers"
+    [title]="hasActiveFilters() ? 'No se encontraron presentaciones' : 'Aún no tienes tipos de presentación'"
+    [description]="
+      hasActiveFilters()
+        ? 'Intenta con otro término de búsqueda o ajusta los filtros aplicados.'
+        : 'Registra tu primer tipo de presentación (Caja, Paquete, Bolsa…) para usarlo en los productos.'
+    "
+  >
+    @if (hasActiveFilters()) {
+      <app-button variant="ghost" (click)="clearFilters()">Limpiar filtros</app-button>
+    } @else if (isAdmin()) {
+      <app-button variant="primary" (click)="openCreateForm()">
+        <app-icon name="plus" [size]="16" />
+        Nueva presentación
+      </app-button>
+    }
+  </app-empty-state>
+} @else {
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Código</th>
+          <th>Estado</th>
+          <th>Uso</th>
+          @if (isAdmin()) {
+            <th>Acciones</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of filteredItems(); track item.id) {
+          <tr>
+            <td class="data-table__name">{{ item.name }}</td>
+            <td>{{ item.code || '—' }}</td>
+            <td>
+              <app-badge [tone]="item.isActive ? 'success' : 'danger'">
+                {{ item.isActive ? 'Activo' : 'Inactivo' }}
+              </app-badge>
+            </td>
+            <td>{{ item.usageCount }} producto{{ item.usageCount === 1 ? '' : 's' }}</td>
+            @if (isAdmin()) {
+              <td>
+                <div class="actions">
+                  <button type="button" class="action-btn" (click)="openEditForm(item)" [attr.aria-label]="'Editar ' + item.name">
+                    <app-icon name="edit-2" [size]="16" />
+                  </button>
+                  @if (item.isActive) {
+                    <button
+                      type="button"
+                      class="action-btn action-btn--danger"
+                      (click)="toggleActive(item)"
+                      [attr.aria-label]="'Desactivar ' + item.name"
+                    >
+                      <app-icon name="trash-2" [size]="16" />
+                    </button>
+                  } @else {
+                    <button
+                      type="button"
+                      class="action-btn action-btn--success"
+                      (click)="toggleActive(item)"
+                      [attr.aria-label]="'Activar ' + item.name"
+                    >
+                      <app-icon name="rotate-ccw" [size]="16" />
+                    </button>
+                  }
+                </div>
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+
+@if (isFormOpen()) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">{{ isEditMode ? 'Editar presentación' : 'Nueva presentación' }}</h2>
+        <button type="button" class="modal__close" (click)="closeForm()" aria-label="Cerrar">
+          <app-icon name="close" [size]="18" />
+        </button>
+      </div>
+
+      <form class="modal__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="field">
+          <label for="pt-name">Nombre *</label>
+          <input id="pt-name" type="text" formControlName="name" placeholder="Ej. Caja, Paquete, Bolsa" />
+          @if (form.controls.name.invalid && form.controls.name.touched) {
+            <span class="field__error">Ingresa un nombre de al menos 2 caracteres.</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="pt-code">Código (opcional)</label>
+          <input id="pt-code" type="text" formControlName="code" placeholder="Ej. CAJ" />
+        </div>
+
+        <div class="field">
+          <label for="pt-description">Descripción (opcional)</label>
+          <textarea id="pt-description" formControlName="description" rows="2"></textarea>
+        </div>
+
+        @if (formError()) {
+          <p class="modal__error">{{ formError() }}</p>
+        }
+
+        <div class="modal__actions">
+          <app-button variant="ghost" type="button" [disabled]="isSubmitting()" (click)="closeForm()">Cancelar</app-button>
+          <app-button variant="primary" type="submit" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Guardando…' : isEditMode ? 'Guardar cambios' : 'Crear presentación' }}
+          </app-button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

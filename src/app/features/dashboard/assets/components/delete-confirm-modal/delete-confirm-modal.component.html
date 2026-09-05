@@ -1,0 +1,22 @@
+@if (open && record) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__icon">
+        <app-icon name="alert-triangle" [size]="24" />
+      </div>
+
+      <h2 class="modal__title">¿Está seguro que desea desactivar este registro?</h2>
+      <p class="modal__description">
+        El activo de <strong>{{ record.clientName }}</strong> se desactivará y dejará de aparecer en los listados
+        normales. No se elimina permanentemente: se conserva en el historial.
+      </p>
+
+      <div class="modal__actions">
+        <app-button variant="ghost" [disabled]="isDeleting" (click)="cancelled.emit()">Cancelar</app-button>
+        <app-button variant="danger" [disabled]="isDeleting" (click)="confirmed.emit()">
+          {{ isDeleting ? 'Desactivando…' : 'Confirmar' }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

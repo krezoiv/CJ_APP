@@ -1,0 +1,36 @@
+<div class="table-wrapper">
+  <table class="sim-table">
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th class="align-right">Stock Inicial</th>
+        <th class="align-right">Compras</th>
+        <th class="align-right">Ventas</th>
+        <th class="align-right">Stock Final</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (loading) {
+        @for (row of [0, 1]; track row) {
+          <tr class="skeleton-row">
+            <td><span class="skeleton skeleton--lg"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+          </tr>
+        }
+      } @else {
+        @for (stock of stocks; track stock.id) {
+          <tr>
+            <td class="sim-table__type">{{ stock.simTypeName }}</td>
+            <td class="align-right">{{ formatQuantity(stock.previousStock) }}</td>
+            <td class="align-right">{{ formatQuantity(stock.purchasedQuantity) }}</td>
+            <td class="align-right">{{ formatQuantity(stock.soldQuantity) }}</td>
+            <td class="align-right sim-table__final">{{ formatQuantity(stock.currentStock) }}</td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>

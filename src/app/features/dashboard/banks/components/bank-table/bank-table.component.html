@@ -1,0 +1,160 @@
+@if (loading) {
+  <div class="table-wrapper table-wrapper--desktop" aria-hidden="true">
+    <table class="bank-table">
+      <thead>
+        <tr>
+          <th>Banco</th>
+          <th>Número de Cuenta</th>
+          <th>Tipo de Cuenta</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of skeletonRows; track $index) {
+          <tr class="skeleton-row">
+            <td><span class="skeleton skeleton--lg"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="loading-note">
+    <app-icon name="clock" [size]="16" />
+    Cargando bancos…
+  </p>
+} @else if (sortedBanks().length === 0) {
+  <app-empty-state
+    icon="bank"
+    [title]="hasActiveFilters ? 'No se encontraron bancos' : 'Aún no tienes bancos registrados'"
+    [description]="
+      hasActiveFilters
+        ? 'Intenta con otro término de búsqueda o ajusta los filtros aplicados.'
+        : 'Agrega tu primer banco para comenzar a usar Agentes Bancarios.'
+    "
+  >
+    @if (hasActiveFilters) {
+      <app-button variant="ghost" (click)="clearFilters.emit()">Limpiar filtros</app-button>
+    } @else if (canManage) {
+      <app-button variant="primary" (click)="addBank.emit()">
+        <app-icon name="plus" [size]="16" />
+        Agregar banco
+      </app-button>
+    }
+  </app-empty-state>
+} @else {
+  <div class="table-wrapper table-wrapper--desktop">
+    <table class="bank-table">
+      <thead>
+        <tr>
+          <th>
+            <button type="button" class="sort-btn" (click)="toggleSort('name')">
+              Banco
+              <app-icon [name]="sortIcon('name')" [size]="14" />
+            </button>
+          </th>
+          <th>
+            <button type="button" class="sort-btn" (click)="toggleSort('accountNumber')">
+              Número de Cuenta
+              <app-icon [name]="sortIcon('accountNumber')" [size]="14" />
+            </button>
+          </th>
+          <th>
+            <button type="button" class="sort-btn" (click)="toggleSort('accountTypeName')">
+              Tipo de Cuenta
+              <app-icon [name]="sortIcon('accountTypeName')" [size]="14" />
+            </button>
+          </th>
+          <th>
+            <button type="button" class="sort-btn" (click)="toggleSort('isActive')">
+              Estado
+              <app-icon [name]="sortIcon('isActive')" [size]="14" />
+            </button>
+          </th>
+          @if (canManage) {
+            <th>Acciones</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (bank of sortedBanks(); track bank.id) {
+          <tr>
+            <td class="bank-table__name">{{ bank.name }}</td>
+            <td class="bank-table__account-number">{{ bank.accountNumber }}</td>
+            <td>{{ bank.accountTypeName }}</td>
+            <td>
+              <app-badge [tone]="bank.isActive ? 'success' : 'danger'">
+                {{ bank.isActive ? 'Activo' : 'Inactivo' }}
+              </app-badge>
+            </td>
+            @if (canManage) {
+              <td>
+                <div class="actions">
+                  <button
+                    type="button"
+                    class="action-btn"
+                    (click)="edit.emit(bank)"
+                    [attr.aria-label]="'Editar ' + bank.name"
+                  >
+                    <app-icon name="edit-2" [size]="16" />
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn action-btn--danger"
+                    [disabled]="!bank.isActive"
+                    (click)="delete.emit(bank)"
+                    [attr.aria-label]="'Eliminar ' + bank.name"
+                  >
+                    <app-icon name="trash-2" [size]="16" />
+                  </button>
+                </div>
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-list">
+    @for (bank of sortedBanks(); track bank.id) {
+      <div class="bank-card">
+        <div class="bank-card__header">
+          <div>
+            <p class="bank-card__name">{{ bank.name }}</p>
+            <p class="bank-card__account-number">{{ bank.accountNumber }} · {{ bank.accountTypeName }}</p>
+          </div>
+          <app-badge [tone]="bank.isActive ? 'success' : 'danger'">
+            {{ bank.isActive ? 'Activo' : 'Inactivo' }}
+          </app-badge>
+        </div>
+
+        @if (canManage) {
+          <div class="actions">
+            <button
+              type="button"
+              class="action-btn"
+              (click)="edit.emit(bank)"
+              [attr.aria-label]="'Editar ' + bank.name"
+            >
+              <app-icon name="edit-2" [size]="16" />
+            </button>
+            <button
+              type="button"
+              class="action-btn action-btn--danger"
+              [disabled]="!bank.isActive"
+              (click)="delete.emit(bank)"
+              [attr.aria-label]="'Eliminar ' + bank.name"
+            >
+              <app-icon name="trash-2" [size]="16" />
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}

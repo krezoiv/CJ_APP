@@ -1,0 +1,7 @@
+@if (hasItems()) {
+  <div class="pagination">
+    <app-button variant="ghost" size="sm" [disabled]="!canGoPrevious()" (click)="previous()">Anterior</app-button>
+    <span class="pagination__label">Página {{ currentPage() }} de {{ totalPages() }}</span>
+    <app-button variant="ghost" size="sm" [disabled]="!canGoNext()" (click)="next()">Siguiente</app-button>
+  </div>
+}

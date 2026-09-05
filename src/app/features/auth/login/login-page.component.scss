@@ -1,0 +1,126 @@
+@use 'mixins' as *;
+
+.login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gradient-dark-fade);
+  color: var(--color-text-on-dark);
+  padding: var(--space-10) var(--container-pad);
+}
+
+.login__card {
+  width: 100%;
+  max-width: 26rem;
+  background: var(--color-surface-dark);
+  border: 1px solid var(--color-border-dark);
+  border-radius: var(--radius-xl);
+  padding: var(--space-10);
+  box-shadow: var(--shadow-lg);
+}
+
+.login__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
+
+  img {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-sm);
+  }
+
+  span {
+    font-family: var(--font-heading);
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-md);
+  }
+}
+
+.login__title {
+  font-size: var(--fs-xl);
+  margin-bottom: var(--space-2);
+}
+
+.login__subtitle {
+  font-size: var(--fs-sm);
+  color: var(--color-text-on-dark-muted);
+  margin-bottom: var(--space-6);
+}
+
+.login__notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  font-size: var(--fs-xs);
+  color: var(--color-accent-gold);
+  background: rgba(245, 166, 35, 0.1);
+  border: 1px solid rgba(245, 166, 35, 0.25);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.login__error {
+  font-size: var(--fs-sm);
+  color: #ff8080;
+  background: rgba(255, 97, 97, 0.1);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+.login__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin-bottom: var(--space-6);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  label {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--color-text-on-dark-muted);
+  }
+
+  input {
+    background: var(--color-bg-dark);
+    border: 1px solid var(--color-border-dark-strong);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    color: var(--color-text-on-dark);
+    font-size: var(--fs-sm);
+    @include focus-ring;
+
+    &::placeholder {
+      color: var(--color-text-on-dark-subtle);
+    }
+
+    &:focus {
+      border-color: var(--color-accent-cyan);
+    }
+  }
+}
+
+.login__back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-size: var(--fs-sm);
+  color: var(--color-text-on-dark-muted);
+
+  &:hover {
+    color: var(--color-accent-cyan);
+  }
+}
+
+.login__back app-icon {
+  transform: rotate(180deg);
+}

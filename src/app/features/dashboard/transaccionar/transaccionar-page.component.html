@@ -1,0 +1,136 @@
+@if (view() === 'dashboard') {
+  <div class="transaccionar">
+    <header class="transaccionar__header">
+      <h1 class="transaccionar__title">Transaccionar</h1>
+      <p class="transaccionar__subtitle">Selecciona el tipo de transacción que deseas registrar.</p>
+    </header>
+
+    @if (loadingTypes()) {
+      <p class="type-grid__loading">Cargando tipos de transacción…</p>
+    } @else if (transactionTypes().length === 0) {
+      <div class="type-grid__empty">
+        <app-icon name="arrow-left-right" [size]="32" />
+        <p>Aún no hay tipos de transacción activos.</p>
+        <p class="type-grid__empty-hint">Un administrador puede crearlos en Sistema → Tipo de Transacción.</p>
+      </div>
+    } @else {
+      <div class="type-grid">
+        @for (type of transactionTypes(); track type.id) {
+          <button type="button" class="type-card" (click)="selectType(type)">
+            <span class="type-card__icon">
+              <app-icon [name]="type.icon" [size]="28" />
+            </span>
+            <span class="type-card__name">{{ type.name }}</span>
+          </button>
+        }
+      </div>
+    }
+  </div>
+} @else {
+  <div class="transaccionar">
+    <header class="transaccionar__header">
+      <button type="button" class="back-link" (click)="changeType()">
+        <app-icon name="arrow-left-right" [size]="16" />
+        Cambiar tipo de transacción
+      </button>
+      <h1 class="transaccionar__title">
+        <app-icon [name]="selectedTypeIcon()" [size]="24" />
+        {{ draft.transactionTypeName() }}
+      </h1>
+      <p class="transaccionar__subtitle">Registra un depósito bancario: monto, banco agente, desglose de efectivo y las transacciones en que se reparte.</p>
+    </header>
+
+    <section class="transaccionar__card">
+      <div class="transaccionar__row">
+        <div class="field">
+          <label for="transaction-bank">Banco Agente</label>
+          <select
+            id="transaction-bank"
+            [ngModel]="draft.transactionBankId()"
+            (ngModelChange)="onBankChange($event)"
+            [disabled]="loadingBanks()"
+          >
+            <option value="" disabled>Seleccionar banco agente</option>
+            @for (bank of transactionBanks(); track bank.id) {
+              <option [value]="bank.id">{{ bank.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="total-amount">Monto Total a Depositar</label>
+          <input
+            id="total-amount"
+            type="text"
+            inputmode="decimal"
+            appDecimalInput
+            [value]="draft.totalAmount()"
+            (change)="onTotalAmountInput($any($event.target).value)"
+          />
+        </div>
+
+        <div class="field">
+          <label for="client-name">Nombre de Cliente <span class="field__optional">(opcional)</span></label>
+          <input
+            id="client-name"
+            type="text"
+            maxlength="150"
+            placeholder="Ej. Juan Pérez"
+            [ngModel]="draft.clientName()"
+            (ngModelChange)="onClientNameInput($event)"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="transaccionar__card">
+      <div class="transaccionar__split">
+        <div class="transaccionar__split-col">
+          <h2 class="transaccionar__section-title">Desglose de Efectivo</h2>
+          <app-cash-breakdown-table
+            [cashCounts]="draft.cashCounts()"
+            [totalCash]="draft.totalCash()"
+            [totalAmount]="draft.totalAmount()"
+            [status]="draft.cashStatus()"
+            (quantityChange)="onCashQuantityChange($event)"
+          />
+        </div>
+
+        <div class="transaccionar__split-divider"></div>
+
+        <div class="transaccionar__split-col">
+          <h2 class="transaccionar__section-title">Distribución de Transacciones</h2>
+          <app-transaction-distribution
+            [transactionAmounts]="draft.transactionAmounts()"
+            [totalDistributed]="draft.totalDistributed()"
+            [totalAmount]="draft.totalAmount()"
+            [status]="draft.transactionsStatus()"
+            (transactionCountRequested)="onTransactionCountRequested($event)"
+            (amountChange)="onTransactionAmountChange($event)"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="transaccionar__footer">
+      <app-cuadre-status-indicator [status]="draft.overallStatus()" [text]="overallStatusText()" />
+
+      <app-button variant="primary" [disabled]="!draft.canSave() || isSaving()" (click)="requestSave()">
+        Confirmar y Guardar
+      </app-button>
+    </section>
+  </div>
+
+  <app-bank-deposit-save-confirm-modal
+    [open]="isConfirmOpen()"
+    [transactionTypeName]="draft.transactionTypeName()"
+    [transactionBankName]="selectedBankName()"
+    [clientName]="draft.clientName()"
+    [totalAmount]="draft.totalAmount()"
+    [cashCounts]="draft.cashCounts()"
+    [transactionAmounts]="draft.transactionAmounts()"
+    [isSaving]="isSaving()"
+    (confirmed)="confirmSave()"
+    (cancelled)="dismissConfirm()"
+  />
+}

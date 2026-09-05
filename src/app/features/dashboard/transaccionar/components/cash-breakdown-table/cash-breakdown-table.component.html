@@ -1,0 +1,29 @@
+<div class="cash-grid">
+  @for (row of rows; track row.denomination) {
+    <div class="cash-row" [class.cash-row--filled]="row.quantity > 0">
+      <span class="cash-row__label">{{ formatDenomination(row.denomination) }}</span>
+      <span class="cash-row__times">×</span>
+      <input
+        type="text"
+        inputmode="numeric"
+        class="cash-row__input"
+        [appDecimalInput]="0"
+        [value]="row.quantity"
+        [disabled]="disabled"
+        placeholder="0"
+        (change)="onQuantityInput(row.denomination, $any($event.target).value)"
+        [attr.aria-label]="'Cantidad de billetes/monedas de ' + formatDenomination(row.denomination)"
+      />
+      <span class="cash-row__subtotal">{{ formatCurrency(row.subtotal) }}</span>
+    </div>
+  }
+</div>
+
+<div class="cash-total">
+  <span class="cash-total__label">Total Efectivo</span>
+  <span class="cash-total__value">{{ formatCurrency(totalCash) }}</span>
+</div>
+
+<div class="cash-table__status">
+  <app-cuadre-status-indicator [status]="status" [text]="statusText" />
+</div>

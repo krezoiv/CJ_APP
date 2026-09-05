@@ -1,0 +1,112 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">Trasladar inventario</h2>
+        <button type="button" class="modal__close" (click)="close()" aria-label="Cerrar">
+          <app-icon name="close" [size]="18" />
+        </button>
+      </div>
+
+      <form class="modal__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="field">
+          <label for="transfer-product">Producto</label>
+          <select id="transfer-product" formControlName="productId">
+            <option value="" disabled>Selecciona un producto</option>
+            @for (product of products; track product.id) {
+              <option [value]="product.id">{{ product.name }}</option>
+            }
+          </select>
+          @if (form.controls.productId.invalid && form.controls.productId.touched) {
+            <span class="field__error">Selecciona un producto.</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="transfer-presentation">Presentación</label>
+          <select id="transfer-presentation" formControlName="presentationId">
+            <option value="" disabled>{{ loadingPresentations() ? 'Cargando…' : 'Selecciona una presentación' }}</option>
+            @for (presentation of presentations(); track presentation.id) {
+              <option [value]="presentation.id">
+                {{ presentation.name }} (1 {{ presentation.name }} = {{ presentation.conversionFactor }} unidades)
+              </option>
+            }
+          </select>
+          @if (form.controls.presentationId.invalid && form.controls.presentationId.touched) {
+            <span class="field__error">Selecciona una presentación.</span>
+          }
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="transfer-from">Origen</label>
+            <select id="transfer-from" formControlName="fromLocationId">
+              <option value="" disabled>Selecciona origen</option>
+              @for (location of locations(); track location.id) {
+                <option [value]="location.id">{{ location.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="transfer-to">Destino</label>
+            <select id="transfer-to" formControlName="toLocationId">
+              <option value="" disabled>Selecciona destino</option>
+              @for (location of locations(); track location.id) {
+                <option [value]="location.id">{{ location.name }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        @if (sameLocation) {
+          <span class="field__error">El origen y el destino deben ser distintos.</span>
+        }
+
+        <div class="field">
+          <label for="transfer-quantity">Cantidad</label>
+          <input
+            id="transfer-quantity"
+            type="text"
+            inputmode="numeric"
+            [appDecimalInput]="0"
+            formControlName="quantity"
+            placeholder="1"
+          />
+          @if (form.controls.quantity.invalid && form.controls.quantity.touched) {
+            <span class="field__error">Ingresa una cantidad mayor a 0.</span>
+          }
+        </div>
+
+        @if (selectedPresentation) {
+          <div class="conversion-preview">
+            <app-icon name="arrow-right" [size]="16" />
+            <span>
+              1 {{ selectedPresentation.name }} = {{ conversionFactor }} unidades — total a trasladar:
+              <strong>{{ formatQuantity(totalBaseUnits) }} unidades</strong>
+            </span>
+          </div>
+        }
+
+        <div class="field">
+          <label for="transfer-reason">Motivo (opcional)</label>
+          <input id="transfer-reason" type="text" formControlName="reason" placeholder="Ej. Reposición de vitrina" />
+        </div>
+
+        @if (errorMessage()) {
+          <p class="modal__error">{{ errorMessage() }}</p>
+        }
+
+        <div class="modal__actions">
+          <app-button variant="ghost-danger" type="button" [disabled]="isSubmitting()" (click)="close()">
+            <app-icon name="close" [size]="16" />
+            Cancelar
+          </app-button>
+          <app-button variant="primary" type="submit" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Trasladando…' : 'Trasladar inventario' }}
+          </app-button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

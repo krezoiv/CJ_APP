@@ -1,0 +1,56 @@
+.accounts-receivable__header {
+  margin-bottom: var(--space-6);
+}
+
+.accounts-receivable__title {
+  font-size: var(--fs-2xl);
+  color: var(--color-text-on-light);
+  margin-bottom: var(--space-2);
+}
+
+.accounts-receivable__subtitle {
+  font-size: var(--fs-md);
+  color: var(--color-text-on-light-muted);
+}
+
+.balance-summary {
+  margin-bottom: var(--space-6);
+  max-width: 24rem;
+}
+
+.balance-summary__tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.balance-summary__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-md);
+  background: var(--gradient-brand-soft);
+  color: var(--color-primary-600);
+  margin-bottom: var(--space-2);
+}
+
+.balance-summary__title {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--color-text-on-light-muted);
+}
+
+.balance-summary__value {
+  font-family: var(--font-heading);
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-bold);
+  color: var(--color-text-on-light);
+}
+
+.balance-summary__description {
+  font-size: var(--fs-xs);
+  color: var(--color-text-on-light-subtle);
+}

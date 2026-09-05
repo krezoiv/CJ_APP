@@ -1,0 +1,152 @@
+@if (open && client) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <div>
+          <h2 class="modal__title">{{ title }}</h2>
+          <p class="modal__subtitle">{{ client.name }}</p>
+        </div>
+        <button type="button" class="modal__close" (click)="close()" aria-label="Cerrar">
+          <app-icon name="close" [size]="18" />
+        </button>
+      </div>
+
+      @if (loading()) {
+        <p class="modal__loading">Cargando…</p>
+      } @else if (statement()) {
+        <div class="balance-row">
+          <div class="balance-row__figure">
+            <span>Saldo actual</span>
+            <strong>{{ formatCurrency(statement()!.closingBalance) }}</strong>
+          </div>
+          @if (isSaldado()) {
+            <app-badge tone="success">SALDADO</app-badge>
+          }
+        </div>
+
+        @if (canManage) {
+          <div class="actions-row">
+            <app-button variant="primary" type="button" (click)="openMovementForm('CARGO')">Registrar Cargo</app-button>
+            <app-button variant="secondary" type="button" (click)="openMovementForm('ABONO')">Registrar Abono</app-button>
+          </div>
+        }
+
+        @if (activeMovementType()) {
+          <form class="movement-form" [formGroup]="form" (ngSubmit)="submitMovement()" novalidate>
+            <h3 class="movement-form__title">
+              {{ activeMovementType() === 'CARGO' ? 'Registrar Cargo' : 'Registrar Abono' }}
+            </h3>
+
+            <div class="movement-form__row">
+              <div class="field">
+                <label for="movement-date">Fecha</label>
+                <input id="movement-date" type="date" formControlName="date" />
+              </div>
+              <div class="field">
+                <label for="movement-amount">Monto</label>
+                <div class="amount-input">
+                  <span>Q</span>
+                  <input id="movement-amount" type="text" inputmode="decimal" appDecimalInput formControlName="amount" placeholder="0.00" />
+                </div>
+                @if (form.controls.amount.invalid && form.controls.amount.touched) {
+                  <span class="field__error">El monto debe ser mayor a cero.</span>
+                }
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="movement-description">Descripción</label>
+              <textarea id="movement-description" formControlName="description" rows="2" placeholder="Opcional"></textarea>
+            </div>
+
+            <div class="preview">
+              <span>Saldo anterior: <strong>{{ formatCurrency(statement()!.closingBalance) }}</strong></span>
+              <span>Monto: <strong>{{ formatCurrency(form.controls.amount.value || 0) }}</strong></span>
+              <span>Saldo nuevo: <strong>{{ formatCurrency(previewNewBalance()) }}</strong></span>
+            </div>
+
+            @if (movementError()) {
+              <p class="modal__error">{{ movementError() }}</p>
+            }
+
+            <div class="movement-form__actions">
+              <app-button variant="ghost" type="button" [disabled]="isSubmittingMovement()" (click)="cancelMovementForm()">Cancelar</app-button>
+              <app-button variant="primary" type="submit" [disabled]="isSubmittingMovement()">
+                {{ isSubmittingMovement() ? 'Guardando…' : 'Guardar' }}
+              </app-button>
+            </div>
+          </form>
+        }
+
+        <div class="filters-row">
+          <div class="field">
+            <label for="statement-date-from">Desde</label>
+            <input id="statement-date-from" type="date" [value]="dateFrom()" (change)="onDateFromChange($any($event.target).value)" />
+          </div>
+          <div class="field">
+            <label for="statement-date-to">Hasta</label>
+            <input id="statement-date-to" type="date" [value]="dateTo()" (change)="onDateToChange($any($event.target).value)" />
+          </div>
+          @if (dateFrom() || dateTo()) {
+            <app-button variant="ghost" type="button" (click)="clearDateFilters()">Limpiar</app-button>
+          }
+        </div>
+
+        <div class="modal__table-wrapper">
+          <table class="modal__table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Concepto</th>
+                <th class="align-right">Cargo</th>
+                <th class="align-right">Abono</th>
+                <th class="align-right">Saldo</th>
+                <th>Usuario</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="modal__table-opening">
+                <td colspan="4">Saldo inicial del periodo</td>
+                <td class="align-right">{{ formatCurrency(statement()!.openingBalance) }}</td>
+                <td></td>
+              </tr>
+              @for (movement of statement()!.movements; track movement.id) {
+                <tr>
+                  <td>{{ movement.date | date: 'dd/MM/yyyy' }}</td>
+                  <td>{{ movement.description || '—' }}</td>
+                  <td class="align-right">{{ movement.movementType === 'CARGO' ? formatCurrency(movement.amount) : '—' }}</td>
+                  <td class="align-right">{{ movement.movementType === 'ABONO' ? formatCurrency(movement.amount) : '—' }}</td>
+                  <td class="align-right">{{ formatCurrency(movement.balanceAfter) }}</td>
+                  <td>{{ movement.createdByUsername }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="6" class="modal__table-empty">No hay movimientos registrados en el periodo seleccionado.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="totals-row">
+          <div>
+            <span>Total cargos</span>
+            <strong>{{ formatCurrency(statement()!.totalCargos) }}</strong>
+          </div>
+          <div>
+            <span>Total abonos</span>
+            <strong>{{ formatCurrency(statement()!.totalAbonos) }}</strong>
+          </div>
+          <div>
+            <span>Saldo actual</span>
+            <strong>{{ formatCurrency(statement()!.closingBalance) }}</strong>
+          </div>
+        </div>
+      }
+
+      <div class="modal__actions">
+        <app-button variant="ghost" (click)="close()">Cerrar</app-button>
+      </div>
+    </div>
+  </div>
+}

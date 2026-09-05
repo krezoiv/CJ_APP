@@ -1,0 +1,246 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">{{ isEditMode ? 'Editar producto' : 'Agregar producto' }}</h2>
+        <button type="button" class="modal__close" (click)="close()" aria-label="Cerrar">
+          <app-icon name="close" [size]="18" />
+        </button>
+      </div>
+
+      <form class="modal__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="field">
+          <label for="product-name">Nombre del producto</label>
+          <input id="product-name" type="text" formControlName="name" placeholder="Ej. Coca Cola 2L" />
+          @if (form.controls.name.invalid && form.controls.name.touched) {
+            <span class="field__error">Ingresa un nombre de al menos 2 caracteres.</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="product-sku">SKU / Código de barras (opcional)</label>
+          <input id="product-sku" type="text" formControlName="sku" placeholder="Ej. 7501234567890" />
+          @if (form.controls.sku.invalid && form.controls.sku.touched) {
+            <span class="field__error">Solo letras, números y guiones, máximo 64 caracteres.</span>
+          }
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="product-category">Categoría</label>
+            <select id="product-category" formControlName="categoryId">
+              <option value="" disabled>Selecciona una categoría</option>
+              @for (category of categories; track category.id) {
+                <option [value]="category.id">{{ category.name }}</option>
+              }
+            </select>
+            @if (form.controls.categoryId.invalid && form.controls.categoryId.touched) {
+              <span class="field__error">La categoría es obligatoria.</span>
+            }
+          </div>
+
+          <div class="field">
+            <label for="product-business">Negocio</label>
+            <select id="product-business" formControlName="businessId">
+              <option value="" disabled>Selecciona un negocio</option>
+              @for (business of businesses; track business.id) {
+                <option [value]="business.id">{{ business.name }}</option>
+              }
+            </select>
+            @if (form.controls.businessId.invalid && form.controls.businessId.touched) {
+              <span class="field__error">El negocio es obligatorio.</span>
+            }
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="product-unit-of-measure">Unidad de medida</label>
+          <select id="product-unit-of-measure" formControlName="unitOfMeasureId">
+            <option value="" disabled>Selecciona una unidad de medida</option>
+            @for (unit of unitsOfMeasure; track unit.id) {
+              <option [value]="unit.id">{{ unit.name }} ({{ unit.abbreviation }})</option>
+            }
+          </select>
+          @if (form.controls.unitOfMeasureId.invalid && form.controls.unitOfMeasureId.touched) {
+            <span class="field__error">La unidad de medida es obligatoria.</span>
+          }
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="product-cost-price">Precio de costo</label>
+            <input
+              id="product-cost-price"
+              type="text"
+              inputmode="decimal"
+              appDecimalInput
+              formControlName="costPrice"
+              placeholder="0.00"
+            />
+            @if (form.controls.costPrice.invalid && form.controls.costPrice.touched) {
+              <span class="field__error">Ingresa un valor mayor a 0.</span>
+            }
+          </div>
+
+          <div class="field">
+            <label for="product-public-price">Precio público</label>
+            <input
+              id="product-public-price"
+              type="text"
+              inputmode="decimal"
+              appDecimalInput
+              formControlName="publicPrice"
+              placeholder="0.00"
+            />
+            @if (form.controls.publicPrice.invalid && form.controls.publicPrice.touched) {
+              <span class="field__error">Ingresa un valor mayor a 0.</span>
+            }
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="product-wholesale-price">Precio por mayor</label>
+            <input
+              id="product-wholesale-price"
+              type="text"
+              inputmode="decimal"
+              appDecimalInput
+              formControlName="wholesalePrice"
+              placeholder="0.00"
+            />
+            @if (form.controls.wholesalePrice.invalid && form.controls.wholesalePrice.touched) {
+              <span class="field__error">Ingresa un valor mayor a 0.</span>
+            }
+          </div>
+
+          @if (!isEditMode) {
+            <div class="field">
+              <label for="product-stock">Stock inicial</label>
+              <input
+                id="product-stock"
+                type="text"
+                inputmode="numeric"
+                [appDecimalInput]="0"
+                formControlName="stock"
+                placeholder="0"
+              />
+              <span class="field__hint">Se registrará como saldo inicial en Bodega.</span>
+              @if (form.controls.stock.invalid && form.controls.stock.touched) {
+                <span class="field__error">Ingresa una cantidad válida (0 o más).</span>
+              }
+            </div>
+          }
+        </div>
+
+        @if (isEditMode) {
+          <p class="field__hint">
+            El stock ya no se edita aquí — usa Compras, Ventas o Traslados para modificarlo.
+          </p>
+        }
+
+        <div class="presentation-section">
+          <div class="presentation-section__header">
+            <span class="presentation-section__title">Presentaciones adicionales (opcional)</span>
+            <button type="button" class="link-btn" (click)="addPresentationRow()">
+              <app-icon name="plus" [size]="14" />
+              Agregar otra unidad de medida
+            </button>
+          </div>
+
+          <p class="field__hint">Ej. "Caja" con factor 12, o "Paquete" con factor 6 — además de la Unidad base.</p>
+
+          @if (isEditMode && existingPresentationNames().length > 0) {
+            <p class="field__hint">Este producto ya tiene: {{ existingPresentationNames().join(', ') }}.</p>
+          }
+
+          <div formArrayName="presentations">
+            @for (row of presentationRows.controls; track row; let i = $index) {
+              <div class="presentation-row" [formGroupName]="i">
+                <div class="field-row">
+                  <div class="field">
+                    <label [for]="'presentation-type-' + i">Tipo de presentación</label>
+                    <select [id]="'presentation-type-' + i" formControlName="presentationTypeId">
+                      <option value="" disabled>Selecciona una presentación…</option>
+                      @for (type of presentationTypeOptions(); track type.id) {
+                        <option [value]="type.id">{{ type.name }}</option>
+                      }
+                    </select>
+                    @if (row.controls.presentationTypeId.invalid && row.controls.presentationTypeId.touched) {
+                      <span class="field__error">Selecciona un tipo de presentación.</span>
+                    }
+                  </div>
+
+                  <div class="field">
+                    <label [for]="'presentation-factor-' + i">Factor (unidades base)</label>
+                    <input
+                      [id]="'presentation-factor-' + i"
+                      type="text"
+                      inputmode="numeric"
+                      [appDecimalInput]="0"
+                      formControlName="conversionFactor"
+                      placeholder="Ej. 12"
+                    />
+                    @if (row.controls.conversionFactor.invalid && row.controls.conversionFactor.touched) {
+                      <span class="field__error">Ingresa un factor mayor a 0.</span>
+                    }
+                  </div>
+                </div>
+
+                <div class="field-row">
+                  <div class="field">
+                    <label [for]="'presentation-cost-' + i">Precio de costo</label>
+                    <input
+                      [id]="'presentation-cost-' + i"
+                      type="text"
+                      inputmode="decimal"
+                      appDecimalInput
+                      formControlName="costPrice"
+                      placeholder="0.00"
+                    />
+                  </div>
+
+                  <div class="field">
+                    <label [for]="'presentation-public-' + i">Precio público</label>
+                    <input
+                      [id]="'presentation-public-' + i"
+                      type="text"
+                      inputmode="decimal"
+                      appDecimalInput
+                      formControlName="publicPrice"
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  class="presentation-row__remove"
+                  (click)="removePresentationRow(i)"
+                  [attr.aria-label]="'Quitar presentación ' + (i + 1)"
+                >
+                  <app-icon name="trash-2" [size]="14" />
+                  Quitar esta presentación
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (errorMessage()) {
+          <p class="modal__error">{{ errorMessage() }}</p>
+        }
+
+        <div class="modal__actions">
+          <app-button variant="ghost-danger" type="button" [disabled]="isSubmitting()" (click)="close()">
+            <app-icon name="close" [size]="16" />
+            Cancelar
+          </app-button>
+          <app-button variant="primary" type="submit" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Guardando…' : isEditMode ? 'Guardar cambios' : 'Agregar producto' }}
+          </app-button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

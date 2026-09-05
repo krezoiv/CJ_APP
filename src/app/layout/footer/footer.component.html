@@ -1,0 +1,53 @@
+<footer class="footer">
+  <app-container wide>
+    <div class="footer__top">
+      <div class="footer__brand">
+        <div class="footer__brand-row">
+          <img class="footer__logo" src="assets/images/logo.png" alt="{{ site.name }}" width="48" height="48" />
+          <span class="footer__brand-name">{{ site.name }}</span>
+        </div>
+        <p class="footer__tagline">{{ site.tagline }}</p>
+        <div class="footer__socials">
+          @for (social of socialLinks; track social.id) {
+            <a class="footer__social" [href]="social.href" [attr.aria-label]="social.label" target="_blank" rel="noopener noreferrer">
+              <app-icon [name]="social.icon" [size]="18" />
+            </a>
+          }
+        </div>
+      </div>
+
+      <div class="footer__col">
+        <h3 class="footer__heading">Navegación</h3>
+        <ul class="footer__list">
+          @for (link of navLinks; track link.label) {
+            <li><a [routerLink]="link.path" [fragment]="link.fragment">{{ link.label }}</a></li>
+          }
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h3 class="footer__heading">Contacto</h3>
+        <ul class="footer__list">
+          @for (channel of channels; track channel.id) {
+            <li>
+              <a [href]="channel.href">
+                <app-icon [name]="channel.icon" [size]="16" />
+                {{ channel.value }}
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h3 class="footer__heading">Horario</h3>
+        <p class="footer__text">{{ site.schedule }}</p>
+        <p class="footer__text">{{ site.address }}</p>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <p>© {{ year }} {{ site.name }}. Todos los derechos reservados.</p>
+    </div>
+  </app-container>
+</footer>

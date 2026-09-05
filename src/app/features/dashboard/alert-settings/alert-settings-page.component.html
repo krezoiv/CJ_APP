@@ -1,0 +1,67 @@
+<div class="alert-settings">
+  <header class="alert-settings__header">
+    <h1 class="alert-settings__title">Configuración de Alertas</h1>
+    <p class="alert-settings__subtitle">
+      Ajusta los umbrales que activan las alertas del sistema. El stock mínimo por producto se
+      configura en el detalle de cada producto, en Inventario.
+    </p>
+  </header>
+
+  @if (loading()) {
+    <p class="loading-note">
+      <app-icon name="clock" [size]="16" />
+      Cargando configuración…
+    </p>
+  } @else {
+    <div class="alert-settings__grid">
+      <app-card>
+        <h2 class="section-title">Compras a crédito</h2>
+        <p class="section-hint">
+          Días de anticipación antes de la fecha de pago en los que debe empezar a mostrarse la
+          alerta de "pago próximo a vencer".
+        </p>
+        <div class="field-row">
+          <label for="alert-days">Días de anticipación</label>
+          <input
+            id="alert-days"
+            type="number"
+            min="0"
+            step="1"
+            [value]="alertDaysDraft()"
+            (input)="onAlertDaysInput($any($event.target).value)"
+          />
+          <app-button [disabled]="!canSaveAlertDays() || isSavingAlertDays()" (click)="saveAlertDays()">
+            {{ isSavingAlertDays() ? 'Guardando...' : 'Guardar' }}
+          </app-button>
+        </div>
+      </app-card>
+
+      <app-card>
+        <h2 class="section-title">Saldo mínimo de recargas</h2>
+        <p class="section-hint">
+          Umbral independiente por operador — Q0 significa que ese operador no genera alertas de
+          saldo bajo.
+        </p>
+        @for (type of rechargeTypes(); track type.id) {
+          <div class="field-row">
+            <label [attr.for]="'min-balance-' + type.id">{{ type.name }}</label>
+            <input
+              [id]="'min-balance-' + type.id"
+              type="number"
+              min="0"
+              step="0.01"
+              [value]="minBalanceDraft()[type.id]"
+              (input)="onMinBalanceInput(type.id, $any($event.target).value)"
+            />
+            <app-button
+              [disabled]="!canSaveMinBalance(type.id) || savingTypeId() === type.id"
+              (click)="saveMinBalance(type.id)"
+            >
+              {{ savingTypeId() === type.id ? 'Guardando...' : 'Guardar' }}
+            </app-button>
+          </div>
+        }
+      </app-card>
+    </div>
+  }
+</div>

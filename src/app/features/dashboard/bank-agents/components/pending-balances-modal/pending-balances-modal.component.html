@@ -1,0 +1,35 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__icon">
+        <app-icon name="alert-triangle" [size]="24" />
+      </div>
+
+      <h2 class="modal__title">Saldos Bancarios Pendientes</h2>
+      <p class="modal__description">
+        Antes de realizar el cuadre de agentes debe registrar y guardar los saldos bancarios correspondientes a
+        esta fecha.
+      </p>
+
+      <p class="modal__date">Fecha del cuadre: <strong>{{ date }}</strong></p>
+
+      @if (missingBanks.length > 0) {
+        <div class="modal__missing">
+          <p class="modal__missing-title">Bancos pendientes de registrar:</p>
+          <ul>
+            @for (bank of missingBanks; track bank.id) {
+              <li>{{ bank.name }}</li>
+            }
+          </ul>
+        </div>
+      }
+
+      <div class="modal__actions">
+        <app-button variant="ghost" (click)="dismissed.emit()">Permanecer aquí</app-button>
+        <app-button variant="primary" routerLink="/dashboard/agentes-bancarios-bancos" (click)="dismissed.emit()">
+          Ir a registrar saldos
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,36 @@
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-4);
+  min-height: 24rem;
+  padding: var(--space-8);
+  background: var(--color-surface-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-xl);
+}
+
+.placeholder__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--radius-full);
+  background: var(--gradient-brand-soft);
+  color: var(--color-primary-600);
+  margin-bottom: var(--space-2);
+}
+
+.placeholder__title {
+  font-size: var(--fs-xl);
+  color: var(--color-text-on-light);
+}
+
+.placeholder__description {
+  font-size: var(--fs-md);
+  color: var(--color-text-on-light-muted);
+  max-width: 32rem;
+}

@@ -1,0 +1,134 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <header class="modal__header">
+        <h2 class="modal__title">Detalle de la transacción</h2>
+        <button type="button" class="modal__close" (click)="onClose()" aria-label="Cerrar">
+          <app-icon name="close" [size]="18" />
+        </button>
+      </header>
+
+      <div class="modal__body">
+        @if (loading()) {
+          <p class="loading-note">
+            <app-icon name="clock" [size]="16" />
+            Cargando detalle…
+          </p>
+        }
+        @if (!loading() && operation(); as op) {
+          @if (op.isVoided) {
+            <div class="void-banner">
+              <app-icon name="x-circle" [size]="16" />
+              <div>
+                <strong>Anulada</strong> el {{ op.voidedAt | date: 'dd/MM/yyyy HH:mm' }} por
+                {{ op.voidedByUsername }}.
+                <p class="void-banner__reason">"{{ op.voidReason }}"</p>
+              </div>
+            </div>
+          }
+
+          <section class="detail-section">
+            <h3 class="detail-section__title">
+              <app-icon name="file-check" [size]="16" />
+              Información General
+            </h3>
+            <dl class="info-grid">
+              <div class="info-grid__item">
+                <dt>Fecha y hora</dt>
+                <dd>{{ op.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+              </div>
+              <div class="info-grid__item">
+                <dt>Banco Agente</dt>
+                <dd>{{ op.transactionBankName }}</dd>
+              </div>
+              <div class="info-grid__item">
+                <dt>Tipo de Transacción</dt>
+                <dd>{{ op.transactionTypeName }}</dd>
+              </div>
+              <div class="info-grid__item">
+                <dt>Cliente</dt>
+                <dd>{{ op.clientName ?? '—' }}</dd>
+              </div>
+              <div class="info-grid__item">
+                <dt>Usuario</dt>
+                <dd>{{ op.username }}</dd>
+              </div>
+              <div class="info-grid__item">
+                <dt>Monto Total</dt>
+                <dd class="info-grid__amount">{{ formatCurrency(op.totalAmount) }}</dd>
+              </div>
+            </dl>
+          </section>
+
+          <section class="detail-section">
+            <h3 class="detail-section__title">
+              <app-icon name="wallet" [size]="16" />
+              Desglose de Efectivo
+            </h3>
+            <div class="table-wrapper">
+              <table class="detail-table">
+                <thead>
+                  <tr>
+                    <th>Denominación</th>
+                    <th class="align-right">Cantidad</th>
+                    <th class="align-right">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (detail of op.cashDetails; track detail.id) {
+                    <tr>
+                      <td>Q{{ detail.denomination }}</td>
+                      <td class="align-right">{{ detail.quantity }}</td>
+                      <td class="align-right">{{ formatCurrency(detail.subtotal) }}</td>
+                    </tr>
+                  }
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="2">Total Efectivo</td>
+                    <td class="align-right">{{ formatCurrency(op.totalCash) }}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </section>
+
+          <section class="detail-section">
+            <h3 class="detail-section__title">
+              <app-icon name="arrow-left-right" [size]="16" />
+              Distribución de Transacciones
+            </h3>
+            <div class="table-wrapper">
+              <table class="detail-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th class="align-right">Monto</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (transaction of op.transactions; track transaction.id) {
+                    <tr>
+                      <td>Transacción {{ transaction.sequence }}</td>
+                      <td class="align-right">{{ formatCurrency(transaction.amount) }}</td>
+                    </tr>
+                  }
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td>Total Transacciones</td>
+                    <td class="align-right">{{ formatCurrency(op.totalDistributed) }}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </section>
+        }
+      </div>
+
+      <div class="modal__footer">
+        <app-button variant="ghost" (click)="onClose()">Cerrar</app-button>
+      </div>
+    </div>
+  </div>
+}

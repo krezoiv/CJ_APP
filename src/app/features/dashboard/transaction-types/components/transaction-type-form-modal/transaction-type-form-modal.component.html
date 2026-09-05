@@ -1,0 +1,45 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">{{ isEditMode ? 'Editar tipo de transacción' : 'Agregar tipo de transacción' }}</h2>
+        <button type="button" class="modal__close" (click)="close()" aria-label="Cerrar">
+          <app-icon name="close" [size]="18" />
+        </button>
+      </div>
+
+      <form class="modal__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="field">
+          <label for="transaction-type-name">Nombre</label>
+          <input id="transaction-type-name" type="text" formControlName="name" placeholder="Ej. Depósito" />
+          @if (form.controls.name.invalid && form.controls.name.touched) {
+            <span class="field__error">Ingresa un nombre de al menos 2 caracteres.</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="transaction-type-icon">Icono</label>
+          <div class="icon-picker">
+            <app-icon [name]="form.controls.icon.value" [size]="20" />
+            <select id="transaction-type-icon" formControlName="icon">
+              @for (icon of icons; track icon) {
+                <option [value]="icon">{{ icon }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        @if (errorMessage()) {
+          <p class="modal__error">{{ errorMessage() }}</p>
+        }
+
+        <div class="modal__actions">
+          <app-button variant="ghost" type="button" [disabled]="isSubmitting()" (click)="close()">Cancelar</app-button>
+          <app-button variant="primary" type="submit" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Guardando…' : isEditMode ? 'Guardar cambios' : 'Agregar tipo de transacción' }}
+          </app-button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

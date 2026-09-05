@@ -1,0 +1,24 @@
+<app-section sectionId="servicios" tone="light" spacing="lg">
+  <app-section-heading
+    eyebrow="Nuestros servicios"
+    title="Un solo lugar para resolver el día a día de tu negocio y tu familia"
+    subtitle="Desde los útiles del colegio hasta tus operaciones bancarias, sin perder tiempo yendo de un lado a otro."
+  />
+
+  <div class="services__grid">
+    @for (service of services$ | async; track service.id; let i = $index) {
+      <app-card [revealDelay]="i * 60" appRevealOnScroll [padding]="'lg'">
+        <div class="service-card">
+          @if (service.tag) {
+            <app-badge class="service-card__tag" tone="gold">{{ service.tag }}</app-badge>
+          }
+          <div class="service-card__icon">
+            <app-icon [name]="service.icon" [size]="26" />
+          </div>
+          <h3 class="service-card__title">{{ service.title }}</h3>
+          <p class="service-card__description">{{ service.description }}</p>
+        </div>
+      </app-card>
+    }
+  </div>
+</app-section>

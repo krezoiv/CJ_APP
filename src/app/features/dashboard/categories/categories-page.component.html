@@ -1,0 +1,45 @@
+<div class="categories">
+  <header class="categories__header">
+    <div>
+      <h1 class="categories__title">Categorías</h1>
+      <p class="categories__subtitle">Organiza las categorías disponibles para clasificar tus productos.</p>
+    </div>
+  </header>
+
+  <app-category-summary [data]="categories()" />
+
+  <app-category-toolbar
+    [searchTerm]="searchTerm()"
+    [statusFilter]="statusFilter()"
+    [canManage]="isAdmin()"
+    (searchTermChange)="searchTerm.set($event)"
+    (statusFilterChange)="statusFilter.set($event)"
+    (addCategory)="openCreateForm()"
+  />
+
+  <app-category-table
+    [categories]="filteredCategories()"
+    [loading]="loading()"
+    [hasActiveFilters]="hasActiveFilters()"
+    [canManage]="isAdmin()"
+    (edit)="openEditForm($event)"
+    (delete)="requestDelete($event)"
+    (clearFilters)="clearFilters()"
+    (addCategory)="openCreateForm()"
+  />
+</div>
+
+<app-category-form-modal
+  [open]="isFormOpen()"
+  [category]="editingCategory()"
+  (closed)="closeForm()"
+  (saved)="onCategorySaved($event)"
+/>
+
+<app-category-delete-confirm-modal
+  [open]="isDeleteOpen()"
+  [category]="deletingCategory()"
+  [isDeleting]="isDeleting()"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>

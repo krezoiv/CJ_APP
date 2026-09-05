@@ -1,0 +1,48 @@
+<div class="users">
+  <header class="users__header">
+    <div>
+      <h1 class="users__title">Usuarios</h1>
+      <p class="users__subtitle">Gestiona los usuarios y sus permisos dentro del sistema.</p>
+    </div>
+  </header>
+
+  <app-user-summary [data]="users()" />
+
+  <app-user-toolbar
+    [searchTerm]="searchTerm()"
+    [statusFilter]="statusFilter()"
+    [roleFilter]="roleFilter()"
+    [roles]="roles()"
+    (searchTermChange)="searchTerm.set($event)"
+    (statusFilterChange)="statusFilter.set($event)"
+    (roleFilterChange)="roleFilter.set($event)"
+    (addUser)="openCreateForm()"
+  />
+
+  <app-user-table
+    [users]="filteredUsers()"
+    [loading]="loading()"
+    [hasActiveFilters]="hasActiveFilters()"
+    [currentUserId]="currentUserId()"
+    (edit)="openEditForm($event)"
+    (delete)="requestDelete($event)"
+    (clearFilters)="clearFilters()"
+    (addUser)="openCreateForm()"
+  />
+</div>
+
+<app-user-form-modal
+  [open]="isFormOpen()"
+  [user]="editingUser()"
+  [roles]="roles()"
+  (closed)="closeForm()"
+  (saved)="onUserSaved($event)"
+/>
+
+<app-user-delete-confirm-modal
+  [open]="isDeleteOpen()"
+  [user]="deletingUser()"
+  [isDeleting]="isDeleting()"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>

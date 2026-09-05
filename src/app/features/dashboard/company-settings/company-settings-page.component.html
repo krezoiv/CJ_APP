@@ -1,0 +1,86 @@
+<div class="company-settings">
+  <header class="company-settings__header">
+    <h1 class="company-settings__title">Configuración de Empresa</h1>
+    <p class="company-settings__subtitle">
+      Estos datos (logo, nombre, dirección, teléfono, correo, NIT y redes sociales) aparecen en el
+      encabezado de todos los documentos PDF: Ventas, Compras, Tickets y Cotizaciones.
+    </p>
+  </header>
+
+  @if (loading()) {
+    <p class="loading-note">
+      <app-icon name="clock" [size]="16" />
+      Cargando configuración…
+    </p>
+  } @else {
+    <app-card>
+      <form [formGroup]="form" (ngSubmit)="save()" class="company-settings__form">
+        <div class="logo-field">
+          <span class="field-label">Logo</span>
+          <div class="logo-field__row">
+            @if (logoBase64()) {
+              <img class="logo-field__preview" [src]="'data:image/png;base64,' + logoBase64()" alt="Logo actual" />
+            } @else {
+              <div class="logo-field__placeholder">
+                <app-icon name="briefcase" [size]="24" />
+              </div>
+            }
+            <div class="logo-field__actions">
+              <label class="logo-field__upload-btn">
+                Seleccionar imagen
+                <input type="file" accept="image/*" (change)="onLogoFileSelected($event)" hidden />
+              </label>
+              @if (logoBase64()) {
+                <app-button variant="ghost" type="button" (click)="removeLogo()">Quitar logo</app-button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="businessName">Nombre del negocio *</label>
+            <input id="businessName" type="text" formControlName="businessName" maxlength="150" />
+          </div>
+
+          <div class="form-field">
+            <label for="taxId">NIT</label>
+            <input id="taxId" type="text" formControlName="taxId" maxlength="50" />
+          </div>
+
+          <div class="form-field">
+            <label for="address">Dirección</label>
+            <input id="address" type="text" formControlName="address" maxlength="255" />
+          </div>
+
+          <div class="form-field">
+            <label for="phone">Teléfono</label>
+            <input id="phone" type="text" formControlName="phone" maxlength="20" />
+          </div>
+
+          <div class="form-field">
+            <label for="email">Correo</label>
+            <input id="email" type="email" formControlName="email" maxlength="150" />
+          </div>
+
+          <div class="form-field">
+            <label for="socialMedia">Redes sociales</label>
+            <input id="socialMedia" type="text" formControlName="socialMedia" maxlength="255" />
+          </div>
+        </div>
+
+        @if (updatedByUsername()) {
+          <p class="last-updated">
+            Última actualización por {{ updatedByUsername() }} el {{ updatedAt() | date: 'dd/MM/yyyy HH:mm' }}
+          </p>
+        }
+
+        <div class="form-actions">
+          <app-button type="submit" [disabled]="isSaving()">
+            {{ isSaving() ? 'Guardando...' : 'Guardar cambios' }}
+          </app-button>
+        </div>
+      </form>
+    </app-card>
+  }
+</div>

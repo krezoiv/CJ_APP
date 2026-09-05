@@ -1,0 +1,272 @@
+<div class="cuadre-agentes">
+  <header class="cuadre-agentes__header">
+    <h1 class="cuadre-agentes__title">Cuadre Agentes</h1>
+    <p class="cuadre-agentes__subtitle">
+      Resumen financiero y conteo de efectivo — fecha de operación: {{ draft.operationDate() | date: 'dd/MM/yyyy' }}
+    </p>
+  </header>
+
+  @if (!isTodayOperationDate()) {
+    <p class="info-banner info-banner--warning">
+      <app-icon name="alert-triangle" [size]="16" />
+      Cuadre Agentes trabaja sobre la fecha seleccionada actualmente en Bancos ({{
+        draft.operationDate() | date: 'dd/MM/yyyy'
+      }}), no necesariamente hoy.
+      <button type="button" class="info-banner__link" (click)="resetToToday()">Volver a hoy</button>
+    </p>
+  }
+
+  @if (isCheckingAccess()) {
+    <app-card [hoverable]="false" class="cuadre-agentes__access-card">
+      <p class="loading-note">
+        <app-icon name="clock" [size]="16" />
+        Verificando estado del día…
+      </p>
+    </app-card>
+  } @else if (dayClosed()) {
+    <app-card [hoverable]="false" class="cuadre-agentes__access-card">
+      <div class="access-blocked">
+        <div class="access-blocked__icon">
+          <app-icon name="lock" [size]="28" />
+        </div>
+        <h2 class="access-blocked__title">Día Cerrado</h2>
+        <p class="access-blocked__description">
+          El cuadre de hoy ya fue guardado y el día quedó cerrado. No se pueden realizar nuevos registros
+          para esta fecha. El sistema iniciará un nuevo ciclo automáticamente al cambiar la fecha.
+        </p>
+      </div>
+    </app-card>
+  } @else if (!dayOpened()) {
+    <app-card [hoverable]="false" class="cuadre-agentes__access-card">
+      <div class="access-blocked">
+        <div class="access-blocked__icon">
+          <app-icon name="lock" [size]="28" />
+        </div>
+        <h2 class="access-blocked__title">Día no aperturado</h2>
+        <p class="access-blocked__description">
+          El día actual no ha sido aperturado. Primero debe ingresar al módulo Bancos y aperturar el día para
+          registrar los saldos bancarios.
+        </p>
+        <app-button variant="primary" routerLink="/dashboard/agentes-bancarios-bancos">Ir a Bancos</app-button>
+      </div>
+    </app-card>
+  } @else if (!bankBalancesValidation()?.canReconcile) {
+    <app-card [hoverable]="false" class="cuadre-agentes__access-card">
+      <div class="access-blocked">
+        <div class="access-blocked__icon">
+          <app-icon name="alert-triangle" [size]="28" />
+        </div>
+        <h2 class="access-blocked__title">Saldos pendientes</h2>
+        <p class="access-blocked__description">
+          El día ha sido aperturado, pero aún debe registrar y guardar los saldos bancarios antes de realizar el
+          cuadre.
+        </p>
+        @if (bankBalancesValidation()!.missingBanks.length > 0) {
+          <div class="access-blocked__missing">
+            <p class="access-blocked__missing-title">Bancos pendientes de registrar:</p>
+            <ul>
+              @for (bank of bankBalancesValidation()!.missingBanks; track bank.id) {
+                <li>{{ bank.name }}</li>
+              }
+            </ul>
+          </div>
+        }
+        <app-button variant="primary" routerLink="/dashboard/agentes-bancarios-bancos">
+          Ir a registrar saldos
+        </app-button>
+      </div>
+    </app-card>
+  } @else {
+    <app-card [hoverable]="false" class="cuadre-agentes__banks-card">
+      <div class="banks-card__header">
+        <h2 class="section-title">
+          <app-icon name="bank" [size]="18" />
+          Resumen de Bancos
+        </h2>
+
+        <app-button
+          variant="ghost"
+          size="sm"
+          [disabled]="loading() || isRefreshingBanks() || isSaving()"
+          (click)="refreshBankSummary()"
+        >
+          <app-icon [name]="isRefreshingBanks() ? 'clock' : 'refresh-cw'" [size]="14" />
+          {{ isRefreshingBanks() ? 'Actualizando…' : 'Actualizar Saldos' }}
+        </app-button>
+      </div>
+
+      @if (loading()) {
+        <p class="loading-note">
+          <app-icon name="clock" [size]="16" />
+          Cargando bancos…
+        </p>
+      } @else if (!summary() || summary()!.banks.length === 0) {
+        <p class="empty-note">No hay bancos activos registrados.</p>
+      } @else {
+        <div class="banks-table-wrapper">
+          <table class="banks-table">
+            <thead>
+              <tr>
+                <th>Banco</th>
+                <th>Tipo de Cuenta</th>
+                <th class="align-right">Saldo Final</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (bank of summary()!.banks; track bank.id) {
+                <tr>
+                  <td class="banks-table__name">{{ bank.name }}</td>
+                  <td>
+                    <span
+                      class="account-type-badge"
+                      [class.account-type-badge--credit]="bank.calculationType === 'subtract'"
+                    >
+                      {{ bank.accountTypeName }}
+                    </span>
+                  </td>
+                  <td class="align-right banks-table__value">
+                    {{ bank.calculationType === 'subtract' ? '−' : '+' }} {{ formatCurrency(bank.finalBalance) }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr class="banks-table__subtotal-row">
+                <td colspan="2">Cuentas Positivas (Ahorro + Monetaria)</td>
+                <td class="align-right">{{ formatCurrency(summary()!.totalPositiveAccounts) }}</td>
+              </tr>
+              <tr class="banks-table__subtotal-row">
+                <td colspan="2">Líneas de Crédito</td>
+                <td class="align-right">− {{ formatCurrency(summary()!.totalCreditLines) }}</td>
+              </tr>
+              <tr class="banks-table__total-row">
+                <td colspan="2">Total Bancos</td>
+                <td class="align-right">{{ formatCurrency(summary()!.totalBanks) }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      }
+    </app-card>
+
+    <div class="cuadre-agentes__totals-row">
+      <app-card padding="lg">
+        <div class="summary-tile">
+          <div class="summary-tile__icon">
+            <app-icon name="package" [size]="22" />
+          </div>
+          <span class="summary-tile__title">Total de Activos</span>
+          <span class="summary-tile__value">{{ loading() ? '—' : formatCurrency(summary()?.totalAssets ?? 0) }}</span>
+        </div>
+      </app-card>
+
+      <app-card padding="lg">
+        <div class="summary-tile">
+          <div class="summary-tile__icon">
+            <app-icon name="receipt" [size]="22" />
+          </div>
+          <span class="summary-tile__title">Total de Cuentas por Cobrar</span>
+          <span class="summary-tile__value">{{
+            loading() ? '—' : formatCurrency(summary()?.totalAccountsReceivable ?? 0)
+          }}</span>
+        </div>
+      </app-card>
+    </div>
+
+    <app-card [hoverable]="false" class="cuadre-agentes__cash-card">
+      <h2 class="section-title">
+        <app-icon name="briefcase" [size]="18" />
+        Conteo de Efectivo
+      </h2>
+
+      <div class="cash-table-wrapper">
+        <table class="cash-table">
+          <thead>
+            <tr>
+              <th>Denominación</th>
+              <th class="align-right">Cantidad</th>
+              <th class="align-right">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (denomination of denominations; track denomination) {
+              <tr>
+                <td class="cash-table__denomination">{{ formatCurrency(denomination) }}</td>
+                <td class="align-right">
+                  <input
+                    type="text"
+                    [attr.inputmode]="decimalPlacesFor(denomination) > 0 ? 'decimal' : 'numeric'"
+                    [appDecimalInput]="decimalPlacesFor(denomination)"
+                    [value]="cashCounts()[denomination]"
+                    (input)="onQuantityInput(denomination, $any($event.target).value)"
+                    [attr.aria-label]="'Cantidad de billetes o monedas de ' + formatCurrency(denomination)"
+                  />
+                </td>
+                <td class="align-right cash-table__row-total">{{ formatCurrency(rowTotal(denomination)) }}</td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr class="cash-table__total-row">
+              <td colspan="2">Total Efectivo</td>
+              <td class="align-right">{{ formatCurrency(totalCash()) }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </app-card>
+
+    <app-card [hoverable]="false" class="cuadre-agentes__result-card">
+      <h2 class="section-title">
+        <app-icon name="file-check" [size]="18" />
+        Resumen del Cuadre
+      </h2>
+
+      <dl class="result-summary">
+        <div class="result-summary__row">
+          <dt>Total Efectivo</dt>
+          <dd>{{ formatCurrency(totalCash()) }}</dd>
+        </div>
+        <div class="result-summary__row">
+          <dt>Total Bancos</dt>
+          <dd>{{ loading() ? '—' : formatCurrency(summary()?.totalBanks ?? 0) }}</dd>
+        </div>
+        <div class="result-summary__row">
+          <dt>Total Cuentas por Cobrar</dt>
+          <dd>{{ loading() ? '—' : formatCurrency(summary()?.totalAccountsReceivable ?? 0) }}</dd>
+        </div>
+        <div class="result-summary__row">
+          <dt>Total Activos</dt>
+          <dd>{{ loading() ? '—' : formatCurrency(summary()?.totalAssets ?? 0) }}</dd>
+        </div>
+      </dl>
+
+      <div class="result-block" [class]="'result-block--' + resultStatus()">
+        <span class="result-block__label">Resultado del Cuadre</span>
+        <span class="result-block__value">{{ formatCurrency(resultCuadre()) }}</span>
+        <span class="result-block__badge">
+          <app-icon [name]="resultIcon()" [size]="16" />
+          {{ resultText() }}
+        </span>
+      </div>
+
+      <div class="cuadre-agentes__save-action">
+        <app-button variant="primary" [disabled]="!canSaveCuadre()" (click)="openConfirmModal()">
+          Guardar Cuadre
+        </app-button>
+      </div>
+    </app-card>
+  }
+</div>
+
+<app-agent-reconciliation-confirm-modal
+  [open]="isConfirmModalOpen()"
+  [totalCash]="totalCash()"
+  [totalBanks]="summary()?.totalBanks ?? 0"
+  [totalAssets]="summary()?.totalAssets ?? 0"
+  [totalAccountsReceivable]="summary()?.totalAccountsReceivable ?? 0"
+  [result]="resultCuadre()"
+  [isSaving]="isSaving()"
+  (confirmed)="confirmSaveCuadre()"
+  (cancelled)="cancelConfirm()"
+/>

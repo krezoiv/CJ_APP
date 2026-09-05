@@ -1,0 +1,26 @@
+<div class="dashboard">
+  <app-dashboard-sidebar
+    [open]="isSidebarOpen()"
+    [collapsed]="isSidebarCollapsed()"
+    (closeRequested)="closeSidebar()"
+    (logoutRequested)="logout()"
+    (collapseToggled)="toggleSidebarCollapse()"
+  />
+
+  @if (isSidebarOpen()) {
+    <button type="button" class="dashboard__backdrop" (click)="closeSidebar()" aria-hidden="true" tabindex="-1"></button>
+  }
+
+  <div class="dashboard__main">
+    <app-dashboard-topbar
+      (menuToggled)="toggleSidebar()"
+      (changePasswordRequested)="openChangePassword()"
+      (logoutRequested)="logout()"
+    />
+    <div class="dashboard__content">
+      <router-outlet />
+    </div>
+  </div>
+</div>
+
+<app-change-password-modal [open]="isChangePasswordOpen()" (closed)="closeChangePassword()" />

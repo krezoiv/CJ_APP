@@ -1,0 +1,37 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__icon">
+        <app-icon name="file-check" [size]="24" />
+      </div>
+
+      <h2 class="modal__title">¿Deseas confirmar y guardar esta compra?</h2>
+
+      <dl class="modal__summary">
+        <div class="modal__summary-row">
+          <dt>Proveedor</dt>
+          <dd>{{ supplierName }}</dd>
+        </div>
+        <div class="modal__summary-row">
+          <dt>Fecha</dt>
+          <dd>{{ purchaseDate | date: 'dd/MM/yyyy' }}</dd>
+        </div>
+        <div class="modal__summary-row">
+          <dt>Helados</dt>
+          <dd>{{ itemCount }}</dd>
+        </div>
+        <div class="modal__summary-row modal__summary-row--total">
+          <dt>Total</dt>
+          <dd>{{ formatCurrency(total) }}</dd>
+        </div>
+      </dl>
+
+      <div class="modal__actions">
+        <app-button variant="ghost" [disabled]="isSaving" (click)="cancelled.emit()">Volver</app-button>
+        <app-button variant="primary" [disabled]="isSaving" (click)="confirmed.emit()">
+          {{ isSaving ? 'Guardando…' : 'Confirmar compra' }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

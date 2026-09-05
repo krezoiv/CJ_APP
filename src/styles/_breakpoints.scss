@@ -1,0 +1,40 @@
+// ---------------------------------------------------------------------------
+// Breakpoints (SCSS variables, used only by the mixin below).
+// Media queries can't read CSS custom properties, so this is the one place
+// screen sizes are hard-coded. Change here to retune the whole app.
+// ---------------------------------------------------------------------------
+$bp-sm: 480px; // large phones
+$bp-md: 768px; // tablets (portrait)
+$bp-lg: 1024px; // tablets (landscape) / small laptops
+$bp-xl: 1280px; // desktop
+$bp-xxl: 1536px; // large desktop
+
+$breakpoints: (
+  sm: $bp-sm,
+  md: $bp-md,
+  lg: $bp-lg,
+  xl: $bp-xl,
+  xxl: $bp-xxl,
+);
+
+/// Mobile-first responsive mixin.
+/// Usage: @include respond(md) { ... }
+@mixin respond($name) {
+  @if not map-has-key($breakpoints, $name) {
+    @error "Unknown breakpoint `#{$name}`. Available: #{map-keys($breakpoints)}";
+  }
+  @media (min-width: map-get($breakpoints, $name)) {
+    @content;
+  }
+}
+
+/// Desktop-first helper for the rare "hide on mobile only" case.
+/// Usage: @include respond-down(md) { ... }
+@mixin respond-down($name) {
+  @if not map-has-key($breakpoints, $name) {
+    @error "Unknown breakpoint `#{$name}`. Available: #{map-keys($breakpoints)}";
+  }
+  @media (max-width: (map-get($breakpoints, $name) - 1px)) {
+    @content;
+  }
+}

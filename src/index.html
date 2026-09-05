@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Comercial Jhoel — Librería, Útiles Escolares y Agente Bancario</title>
+  <meta name="description" content="Comercial Jhoel: librería, útiles escolares, fotocopias, agente bancario y servicios administrativos. Un solo lugar de confianza para tu negocio y tu familia.">
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#05070c">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Override opcional de la URL del backend en tiempo de ejecución (sin rebuild) — ver src/main.ts y src/assets/runtime-config.js. -->
+  <script src="assets/runtime-config.js"></script>
+  <script>
+    // Aplica el tema cacheado ANTES de que Angular/el CSS de la app siquiera
+    // carguen — evita el parpadeo claro→oscuro en la primera pintura que
+    // ThemeService (construido más tarde, dentro de Angular) ya no podría
+    // prevenir por sí solo. `ThemeService` sigue siendo la única fuente que
+    // ESCRIBE esta clave; este script solo la lee, nunca la modifica.
+    // Exige también una sesión guardada (`cj_auth_token`) — el tema es una
+    // preferencia del panel autenticado, nunca debe filtrarse al sitio
+    // público (landing, login) para un visitante sin sesión.
+    (function () {
+      try {
+        if (localStorage.getItem('cj_theme') === 'DARK' && localStorage.getItem('cj_auth_token')) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <app-root></app-root>
+</body>
+</html>

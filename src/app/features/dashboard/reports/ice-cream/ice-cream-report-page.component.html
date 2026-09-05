@@ -1,0 +1,136 @@
+<div class="reports-page">
+  <header class="reports-page__header">
+    <div>
+      <h1 class="reports-page__title">Reportería de Heladería</h1>
+      <p class="reports-page__subtitle">Consulte y exporte las ventas y compras del negocio de heladería.</p>
+    </div>
+    <app-button variant="primary" [disabled]="state.exporting()" (click)="exportPdf()">
+      <app-icon name="download" [size]="16" />
+      {{ state.exporting() ? 'Generando…' : 'Exportar PDF' }}
+    </app-button>
+  </header>
+
+  <div class="reports-page__filters">
+    <div class="reports-page__filters-title">
+      <app-icon name="filter" [size]="16" />
+      Filtros
+    </div>
+
+    <div class="type-checkboxes" role="group" aria-label="Tipo de movimiento">
+      <label class="checkbox">
+        <input
+          type="checkbox"
+          [ngModel]="state.draftIncludeSales()"
+          (ngModelChange)="state.draftIncludeSales.set($event)"
+        />
+        Ventas
+      </label>
+      <label class="checkbox">
+        <input
+          type="checkbox"
+          [ngModel]="state.draftIncludePurchases()"
+          (ngModelChange)="state.draftIncludePurchases.set($event)"
+        />
+        Compras
+      </label>
+    </div>
+
+    <div class="filters-grid">
+      <div class="field">
+        <label>Producto</label>
+        <app-report-ice-cream-filter
+          [selectedIceCream]="state.draftIceCream()"
+          (selectionChange)="onDraftIceCreamChange($event)"
+        />
+      </div>
+
+      <div class="field">
+        <label for="icreport-user">Usuario</label>
+        <select
+          id="icreport-user"
+          [ngModel]="state.draftUser()?.id ?? ''"
+          (ngModelChange)="onDraftUserChange($event)"
+        >
+          <option value="">Todos los usuarios</option>
+          @for (u of users(); track u.id) {
+            <option [value]="u.id">{{ u.username }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="icreport-start-date">Fecha Desde</label>
+        <input
+          id="icreport-start-date"
+          type="date"
+          [ngModel]="state.draftStartDate()"
+          (ngModelChange)="state.draftStartDate.set($event)"
+        />
+      </div>
+
+      <div class="field">
+        <label for="icreport-end-date">Fecha Hasta</label>
+        <input
+          id="icreport-end-date"
+          type="date"
+          [ngModel]="state.draftEndDate()"
+          (ngModelChange)="state.draftEndDate.set($event)"
+        />
+      </div>
+    </div>
+
+    <div class="filters-actions">
+      <app-button variant="ghost" [disabled]="!hasActiveFilters()" (click)="clearFilters()">Limpiar filtros</app-button>
+      <app-button variant="primary" (click)="applyFilters()">Consultar</app-button>
+    </div>
+  </div>
+
+  <app-report-summary [tiles]="summaryTiles()" [loading]="state.loadingSummary()" />
+
+  <div class="table-wrapper">
+    <table class="report-table">
+      <thead>
+        <tr>
+          @if (showTypeColumn()) {
+            <th>Tipo</th>
+          }
+          <th>Fecha</th>
+          <th>Producto</th>
+          <th>SKU</th>
+          <th class="align-right">Cantidad</th>
+          <th class="align-right">Precio Unitario</th>
+          <th class="align-right">Total</th>
+          <th>Usuario</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (!state.loadingTable()) {
+          @for (row of state.rows(); track row.id) {
+            <tr>
+              @if (showTypeColumn()) {
+                <td>{{ typeLabel(row.type) }}</td>
+              }
+              <td>{{ row.date | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ row.product }}</td>
+              <td>{{ row.sku }}</td>
+              <td class="align-right">{{ formatQuantity(row.quantity) }}</td>
+              <td class="align-right">{{ formatCurrency(row.unitPrice) }}</td>
+              <td class="align-right report-table__total">{{ formatCurrency(row.total) }}</td>
+              <td>{{ row.username }}</td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+    @if (!state.loadingTable() && state.rows().length === 0) {
+      <p class="table-wrapper__empty">No se encontraron registros con los filtros seleccionados.</p>
+    }
+  </div>
+
+  <app-report-pagination
+    [total]="state.total()"
+    [page]="state.page()"
+    [limit]="20"
+    (pageChange)="onPageChange($event)"
+  />
+</div>

@@ -1,0 +1,29 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="void-reason-title" (click)="$event.stopPropagation()">
+      <div class="modal__icon">
+        <app-icon name="alert-triangle" [size]="24" />
+      </div>
+
+      <h2 class="modal__title" id="void-reason-title">Anular ticket {{ ticketNumber }}</h2>
+      <p class="modal__description">
+        Esta acción no se puede deshacer. El ticket permanecerá en el historial marcado como anulado — indique el motivo.
+      </p>
+
+      <label class="modal__field">
+        Motivo
+        <textarea
+          rows="3"
+          [ngModel]="reason()"
+          (ngModelChange)="reason.set($event)"
+          placeholder="Ej. Error al capturar la cantidad, cliente se retractó…"
+        ></textarea>
+      </label>
+
+      <div class="modal__actions">
+        <app-button variant="ghost" (click)="cancel()">Cancelar</app-button>
+        <app-button variant="danger" [disabled]="!isValid" (click)="confirm()">Anular ticket</app-button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,65 @@
+<div class="inventory">
+  <header class="inventory__header">
+    <div>
+      <h1 class="inventory__title">Inventario</h1>
+      <p class="inventory__subtitle">Gestiona y controla los productos disponibles en tu negocio.</p>
+    </div>
+  </header>
+
+  <app-inventory-summary [data]="products()" />
+
+  <app-inventory-toolbar
+    [categories]="categories()"
+    [businesses]="businesses()"
+    [searchTerm]="searchTerm()"
+    [selectedCategory]="selectedCategory()"
+    [selectedBusiness]="selectedBusiness()"
+    [stockFilter]="stockFilter()"
+    [canManage]="isAdmin()"
+    (searchTermChange)="searchTerm.set($event)"
+    (selectedCategoryChange)="selectedCategory.set($event)"
+    (selectedBusinessChange)="selectedBusiness.set($event)"
+    (stockFilterChange)="stockFilter.set($event)"
+    (addProduct)="openCreateForm()"
+    (transferInventory)="openTransferModal()"
+    (exportPdf)="onExportPdf()"
+    (exportExcel)="onExportExcel()"
+  />
+
+  <app-product-table
+    [products]="filteredProducts()"
+    [loading]="loading()"
+    [hasActiveFilters]="hasActiveFilters()"
+    [canManage]="isAdmin()"
+    (edit)="openEditForm($event)"
+    (delete)="requestDelete($event)"
+    (clearFilters)="clearFilters()"
+    (addProduct)="openCreateForm()"
+    (viewDetail)="viewDetail($event)"
+  />
+</div>
+
+<app-transfer-inventory-modal
+  [open]="isTransferOpen()"
+  [products]="products()"
+  (closed)="closeTransferModal()"
+  (completed)="onTransferCompleted()"
+/>
+
+<app-product-form-modal
+  [open]="isFormOpen()"
+  [product]="editingProduct()"
+  [categories]="categoryOptions()"
+  [businesses]="businessOptions()"
+  [unitsOfMeasure]="unitOfMeasureOptions()"
+  (closed)="closeForm()"
+  (saved)="onProductSaved($event)"
+/>
+
+<app-delete-confirm-modal
+  [open]="isDeleteOpen()"
+  [product]="deletingProduct()"
+  [isDeleting]="isDeleting()"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>

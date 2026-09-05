@@ -1,0 +1,160 @@
+@if (loading) {
+  <div class="table-wrapper table-wrapper--desktop" aria-hidden="true">
+    <table class="asset-table">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Fecha</th>
+          <th>Monto</th>
+          <th>Descripción</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of skeletonRows; track $index) {
+          <tr class="skeleton-row">
+            <td><span class="skeleton skeleton--lg"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--lg"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="loading-note">
+    <app-icon name="clock" [size]="16" />
+    Cargando activos…
+  </p>
+} @else if (records.length === 0) {
+  <app-empty-state
+    icon="package"
+    [title]="hasActiveFilters ? 'No se encontraron registros' : 'Aún no tienes activos registrados'"
+    [description]="
+      hasActiveFilters
+        ? 'Intenta con otro término de búsqueda o ajusta los filtros aplicados.'
+        : 'Registra tu primer activo para comenzar a llevar el control.'
+    "
+  >
+    @if (hasActiveFilters) {
+      <app-button variant="ghost" (click)="clearFilters.emit()">Limpiar filtros</app-button>
+    } @else if (canManage) {
+      <app-button variant="primary" (click)="addRecord.emit()">
+        <app-icon name="plus" [size]="16" />
+        Nuevo Activo
+      </app-button>
+    }
+  </app-empty-state>
+} @else {
+  <div class="table-wrapper table-wrapper--desktop">
+    <table class="asset-table">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Fecha</th>
+          <th class="align-right">Monto</th>
+          <th>Descripción</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (record of records; track record.id) {
+          <tr>
+            <td class="asset-table__client">{{ record.clientName }}</td>
+            <td>{{ record.date | date: 'dd/MM/yyyy' }}</td>
+            <td class="align-right">{{ formatCurrency(record.amount) }}</td>
+            <td class="asset-table__description">{{ record.description || '—' }}</td>
+            <td>
+              <app-badge [tone]="record.isActive ? 'success' : 'danger'">
+                {{ record.isActive ? 'Activo' : 'Inactivo' }}
+              </app-badge>
+            </td>
+            <td>
+              <div class="actions">
+                <button
+                  type="button"
+                  class="action-btn"
+                  (click)="viewStatement.emit(record)"
+                  [attr.aria-label]="'Ver estado de cuenta de ' + record.clientName"
+                >
+                  <app-icon name="eye" [size]="16" />
+                </button>
+                @if (canManage) {
+                  <button
+                    type="button"
+                    class="action-btn"
+                    (click)="edit.emit(record)"
+                    [attr.aria-label]="'Editar activo de ' + record.clientName"
+                  >
+                    <app-icon name="edit-2" [size]="16" />
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn action-btn--danger"
+                    [disabled]="!record.isActive"
+                    (click)="delete.emit(record)"
+                    [attr.aria-label]="'Eliminar activo de ' + record.clientName"
+                  >
+                    <app-icon name="trash-2" [size]="16" />
+                  </button>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-list">
+    @for (record of records; track record.id) {
+      <div class="asset-card">
+        <div class="asset-card__header">
+          <p class="asset-card__client">{{ record.clientName }}</p>
+          <app-badge [tone]="record.isActive ? 'success' : 'danger'">
+            {{ record.isActive ? 'Activo' : 'Inactivo' }}
+          </app-badge>
+        </div>
+        <p class="asset-card__row"><span>Fecha</span>{{ record.date | date: 'dd/MM/yyyy' }}</p>
+        <p class="asset-card__row"><span>Monto</span>{{ formatCurrency(record.amount) }}</p>
+        @if (record.description) {
+          <p class="asset-card__description">{{ record.description }}</p>
+        }
+
+        <div class="actions">
+          <button
+            type="button"
+            class="action-btn"
+            (click)="viewStatement.emit(record)"
+            [attr.aria-label]="'Ver estado de cuenta de ' + record.clientName"
+          >
+            <app-icon name="eye" [size]="16" />
+          </button>
+          @if (canManage) {
+            <button
+              type="button"
+              class="action-btn"
+              (click)="edit.emit(record)"
+              [attr.aria-label]="'Editar activo de ' + record.clientName"
+            >
+              <app-icon name="edit-2" [size]="16" />
+            </button>
+            <button
+              type="button"
+              class="action-btn action-btn--danger"
+              [disabled]="!record.isActive"
+              (click)="delete.emit(record)"
+              [attr.aria-label]="'Eliminar activo de ' + record.clientName"
+            >
+              <app-icon name="trash-2" [size]="16" />
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}

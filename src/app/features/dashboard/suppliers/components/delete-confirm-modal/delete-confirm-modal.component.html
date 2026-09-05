@@ -1,0 +1,22 @@
+@if (open && supplier) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__icon">
+        <app-icon name="alert-triangle" [size]="24" />
+      </div>
+
+      <h2 class="modal__title">¿Estás seguro de eliminar este proveedor?</h2>
+      <p class="modal__description">
+        <strong>{{ supplier.name }}</strong> se desactivará y dejará de estar disponible para nuevas compras. No se
+        elimina permanentemente ni afecta a las compras que ya lo usan.
+      </p>
+
+      <div class="modal__actions">
+        <app-button variant="ghost" [disabled]="isDeleting" (click)="cancelled.emit()">Cancelar</app-button>
+        <app-button variant="danger" [disabled]="isDeleting" (click)="confirmed.emit()">
+          {{ isDeleting ? 'Desactivando…' : 'Sí, desactivar' }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

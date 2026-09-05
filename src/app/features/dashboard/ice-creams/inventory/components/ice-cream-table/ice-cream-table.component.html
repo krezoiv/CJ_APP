@@ -1,0 +1,181 @@
+@if (loading) {
+  <div class="table-wrapper table-wrapper--desktop" aria-hidden="true">
+    <table class="ice-cream-table">
+      <thead>
+        <tr>
+          <th>SKU</th>
+          <th>Producto</th>
+          <th class="align-right">Precio costo</th>
+          <th class="align-right">Precio público</th>
+          <th class="align-right">Stock</th>
+          <th>Estado</th>
+          <th class="align-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of skeletonRows; track $index) {
+          <tr class="skeleton-row">
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--lg"></span></td>
+            <td class="align-right"><span class="skeleton skeleton--sm"></span></td>
+            <td class="align-right"><span class="skeleton skeleton--sm"></span></td>
+            <td class="align-right"><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td class="align-right"><span class="skeleton skeleton--sm"></span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="loading-note">
+    <app-icon name="clock" [size]="16" />
+    Cargando helados…
+  </p>
+} @else if (sortedIceCreams().length === 0) {
+  <app-empty-state
+    icon="gift"
+    [title]="hasActiveFilters ? 'No se encontraron helados' : 'Aún no tienes helados registrados'"
+    [description]="
+      hasActiveFilters
+        ? 'Intenta con otro término de búsqueda o ajusta los filtros aplicados.'
+        : 'Agrega tu primer helado para comenzar a gestionar el inventario de Heladería.'
+    "
+  >
+    @if (hasActiveFilters) {
+      <app-button variant="ghost" (click)="clearFilters.emit()">Limpiar filtros</app-button>
+    } @else if (canManage) {
+      <app-button variant="primary" (click)="addIceCream.emit()">
+        <app-icon name="plus" [size]="16" />
+        Agregar helado
+      </app-button>
+    }
+  </app-empty-state>
+} @else {
+  <div class="table-wrapper table-wrapper--desktop">
+    <table class="ice-cream-table">
+      <thead>
+        <tr>
+          <th>
+            <button type="button" class="sort-btn" (click)="toggleSort('sku')">
+              SKU
+              <app-icon [name]="sortIcon('sku')" [size]="14" />
+            </button>
+          </th>
+          <th>
+            <button type="button" class="sort-btn" (click)="toggleSort('product')">
+              Producto
+              <app-icon [name]="sortIcon('product')" [size]="14" />
+            </button>
+          </th>
+          <th class="align-right">
+            <button type="button" class="sort-btn sort-btn--right" (click)="toggleSort('costPrice')">
+              Precio costo
+              <app-icon [name]="sortIcon('costPrice')" [size]="14" />
+            </button>
+          </th>
+          <th class="align-right">
+            <button type="button" class="sort-btn sort-btn--right" (click)="toggleSort('publicPrice')">
+              Precio público
+              <app-icon [name]="sortIcon('publicPrice')" [size]="14" />
+            </button>
+          </th>
+          <th class="align-right">
+            <button type="button" class="sort-btn sort-btn--right" (click)="toggleSort('stock')">
+              Stock
+              <app-icon [name]="sortIcon('stock')" [size]="14" />
+            </button>
+          </th>
+          <th>Estado</th>
+          @if (canManage) {
+            <th class="align-right">Acciones</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (iceCream of sortedIceCreams(); track iceCream.id) {
+          <tr>
+            <td class="ice-cream-table__sku">{{ iceCream.sku }}</td>
+            <td class="ice-cream-table__name">{{ iceCream.product }}</td>
+            <td class="align-right">{{ formatCurrency(iceCream.costPrice) }}</td>
+            <td class="align-right">{{ formatCurrency(iceCream.publicPrice) }}</td>
+            <td class="align-right">{{ formatQuantity(iceCream.stock) }}</td>
+            <td>
+              <app-badge [tone]="statusTone(iceCream)">{{ statusLabel(iceCream) }}</app-badge>
+            </td>
+            @if (canManage) {
+              <td class="align-right">
+                <div class="actions">
+                  <button
+                    type="button"
+                    class="action-btn"
+                    (click)="edit.emit(iceCream)"
+                    [attr.aria-label]="'Editar ' + iceCream.product"
+                  >
+                    <app-icon name="edit-2" [size]="16" />
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn action-btn--danger"
+                    (click)="delete.emit(iceCream)"
+                    [attr.aria-label]="'Desactivar ' + iceCream.product"
+                  >
+                    <app-icon name="trash-2" [size]="16" />
+                  </button>
+                </div>
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-list">
+    @for (iceCream of sortedIceCreams(); track iceCream.id) {
+      <div class="ice-cream-card">
+        <div class="ice-cream-card__header">
+          <div>
+            <p class="ice-cream-card__name">{{ iceCream.product }}</p>
+            <p class="ice-cream-card__sku">SKU: {{ iceCream.sku }}</p>
+          </div>
+          <app-badge [tone]="statusTone(iceCream)">{{ statusLabel(iceCream) }}</app-badge>
+        </div>
+
+        <div class="ice-cream-card__prices">
+          <div>
+            <span class="ice-cream-card__price-label">Costo</span>
+            <span class="ice-cream-card__price-value">{{ formatCurrency(iceCream.costPrice) }}</span>
+          </div>
+          <div>
+            <span class="ice-cream-card__price-label">Público</span>
+            <span class="ice-cream-card__price-value">{{ formatCurrency(iceCream.publicPrice) }}</span>
+          </div>
+        </div>
+
+        <div class="ice-cream-card__footer">
+          <span class="ice-cream-card__stock">Stock: <strong>{{ formatQuantity(iceCream.stock) }}</strong></span>
+          @if (canManage) {
+            <div class="actions">
+              <button
+                type="button"
+                class="action-btn"
+                (click)="edit.emit(iceCream)"
+                [attr.aria-label]="'Editar ' + iceCream.product"
+              >
+                <app-icon name="edit-2" [size]="16" />
+              </button>
+              <button
+                type="button"
+                class="action-btn action-btn--danger"
+                (click)="delete.emit(iceCream)"
+                [attr.aria-label]="'Desactivar ' + iceCream.product"
+              >
+                <app-icon name="trash-2" [size]="16" />
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}

@@ -1,0 +1,117 @@
+@use 'mixins' as *;
+@use 'breakpoints' as bp;
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: rgba(5, 7, 12, 0.6);
+  backdrop-filter: blur(4px);
+  overflow-y: auto;
+}
+
+.modal {
+  width: 100%;
+  max-width: 32rem;
+  background: var(--color-surface-light);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-lg);
+  margin-block: auto;
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+}
+
+.modal__title {
+  font-size: var(--fs-lg);
+  color: var(--color-text-on-light);
+}
+
+.modal__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-on-light-subtle);
+
+  &:hover {
+    color: var(--color-text-on-light);
+  }
+}
+
+.modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+
+  @include bp.respond(sm) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  label {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--color-text-on-light-muted);
+  }
+
+  input,
+  select {
+    background: var(--color-bg-light-muted);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    color: var(--color-text-on-light);
+    font-size: var(--fs-sm);
+    @include focus-ring;
+
+    &:focus {
+      border-color: var(--color-primary-500);
+    }
+  }
+}
+
+.field-hint {
+  font-size: var(--fs-xs);
+  color: var(--color-text-on-light-subtle);
+  margin-top: calc(var(--space-5) * -1);
+}
+
+.field__error {
+  font-size: var(--fs-xs);
+  color: #dc4444;
+}
+
+.modal__error {
+  font-size: var(--fs-sm);
+  color: #dc4444;
+  background: rgba(220, 68, 68, 0.08);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}

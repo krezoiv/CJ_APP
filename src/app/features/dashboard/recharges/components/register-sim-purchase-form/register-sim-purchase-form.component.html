@@ -1,0 +1,60 @@
+<form class="purchase-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <h2 class="purchase-form__title">
+    <app-icon name="plus" [size]="18" />
+    Comprar SIM
+  </h2>
+  <p class="purchase-form__subtitle">Registra la entrada de inventario físico de SIM — no afecta el saldo electrónico.</p>
+
+  <div class="field">
+    <label for="sim-purchase-type">Producto</label>
+    <select
+      id="sim-purchase-type"
+      formControlName="simTypeId"
+      (change)="onTypeChange($any($event.target).value)"
+    >
+      @for (type of types; track type.id) {
+        <option [value]="type.id">{{ type.name }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="field">
+    <label for="sim-purchase-quantity">Cantidad</label>
+    <input
+      id="sim-purchase-quantity"
+      type="number"
+      min="1"
+      step="1"
+      formControlName="quantity"
+    />
+    @if (form.controls.quantity.invalid && form.controls.quantity.touched) {
+      <span class="field__error">Ingresa una cantidad entera mayor que cero.</span>
+    }
+  </div>
+
+  <div class="sim-preview">
+    <div class="sim-preview__row">
+      <span>Precio de compra</span>
+      <strong>{{ formatCurrency(previewUnitCost) }}</strong>
+    </div>
+    <div class="sim-preview__row">
+      <span>Total</span>
+      <strong>{{ formatCurrency(previewTotal) }}</strong>
+    </div>
+  </div>
+
+  <app-button variant="primary" type="submit" fullWidth [disabled]="isSubmitting() || lockReason !== null">
+    {{ isSubmitting() ? 'Registrando…' : 'Registrar compra' }}
+  </app-button>
+  @if (lockReason === 'closed') {
+    <p class="purchase-form__lock-hint">
+      <app-icon name="lock" [size]="12" />
+      Día de recargas cerrado.
+    </p>
+  } @else if (lockReason === 'not_opened') {
+    <p class="purchase-form__lock-hint">
+      <app-icon name="lock" [size]="12" />
+      Día de recargas sin aperturar.
+    </p>
+  }
+</form>

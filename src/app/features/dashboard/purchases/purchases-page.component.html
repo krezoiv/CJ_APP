@@ -1,0 +1,123 @@
+<div class="purchases">
+  <header class="purchases__header">
+    <div>
+      <h1 class="purchases__title">Compras</h1>
+      <p class="purchases__subtitle">Registra las facturas de compra a tus proveedores.</p>
+    </div>
+  </header>
+
+  <div class="purchases__tabs" role="tablist" aria-label="Compras abiertas">
+    @for (draftItem of draft.drafts(); track draftItem.id) {
+      <div
+        class="purchases__tab"
+        role="tab"
+        [class.purchases__tab--active]="draftItem.id === draft.activeDraftId()"
+        [attr.aria-selected]="draftItem.id === draft.activeDraftId()"
+        (click)="switchDraft(draftItem.id)"
+      >
+        @if (draftHasItems(draftItem)) {
+          <span class="purchases__tab-dot" aria-hidden="true"></span>
+        }
+        <span class="purchases__tab-label">{{ draftLabel(draftItem) }}</span>
+        <button
+          type="button"
+          class="purchases__tab-close"
+          [attr.aria-label]="'Cerrar ' + draftLabel(draftItem)"
+          (click)="requestCloseTab(draftItem.id); $event.stopPropagation()"
+        >
+          ×
+        </button>
+      </div>
+    }
+    <button type="button" class="purchases__tab-add" (click)="openNewDraft()" aria-label="Nueva compra">
+      + Nueva compra
+    </button>
+  </div>
+
+  <div class="purchases__form-row">
+    <div class="field">
+      <label for="purchase-supplier">Proveedor</label>
+      <select id="purchase-supplier" [ngModel]="draft.supplierId()" (ngModelChange)="onSupplierChange($event)">
+        <option value="" disabled>Seleccionar proveedor</option>
+        @for (supplier of suppliers(); track supplier.id) {
+          <option [value]="supplier.id">{{ supplier.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="purchase-date">Fecha de compra</label>
+      <input
+        id="purchase-date"
+        type="date"
+        [ngModel]="draft.purchaseDate()"
+        (ngModelChange)="onDateChange($event)"
+        [max]="draft.purchaseDate()"
+      />
+    </div>
+
+    <div class="field">
+      <label for="purchase-payment-type">Tipo de compra</label>
+      <select
+        id="purchase-payment-type"
+        [ngModel]="draft.paymentType()"
+        (ngModelChange)="onPaymentTypeChange($event)"
+      >
+        <option value="CONTADO">Contado</option>
+        <option value="CREDITO">Crédito</option>
+      </select>
+    </div>
+
+    @if (draft.paymentType() === 'CREDITO') {
+      <div class="field">
+        <label for="purchase-payment-due-date">Fecha de pago</label>
+        <input
+          id="purchase-payment-due-date"
+          type="date"
+          [ngModel]="draft.paymentDueDate()"
+          (ngModelChange)="onPaymentDueDateChange($event)"
+          [min]="draft.purchaseDate()"
+        />
+      </div>
+    }
+  </div>
+
+  <app-purchase-product-search (productSelected)="onProductSelected($event)" />
+
+  <div class="purchases__receipt">
+    <app-purchase-items-table
+      [items]="draft.items()"
+      (quantityChange)="onQuantityChange($event)"
+      (costPriceChange)="onCostPriceChange($event)"
+      (publicPriceChange)="onPublicPriceChange($event)"
+      (presentationChange)="onPresentationChange($event)"
+      (removeItem)="onRemoveItem($event)"
+    />
+
+    <app-purchase-summary
+      [itemCount]="draft.items().length"
+      [total]="draft.total()"
+      [isSaving]="isSaving()"
+      [supplierSelected]="!!draft.supplierId()"
+      (cancel)="requestCancel()"
+      (save)="requestSave()"
+    />
+  </div>
+</div>
+
+<app-purchase-cancel-confirm-modal
+  [open]="closeConfirmDraftId() !== null"
+  (confirmed)="confirmCloseTab()"
+  (cancelled)="dismissCancel()"
+/>
+
+<app-purchase-save-confirm-modal
+  [open]="isSaveConfirmOpen()"
+  [supplierName]="selectedSupplierName()"
+  [purchaseDate]="purchaseDateAsDate()"
+  [itemCount]="draft.items().length"
+  [total]="draft.total()"
+  [isSaving]="isSaving()"
+  (confirmed)="confirmSave()"
+  (cancelled)="dismissSaveConfirm()"
+/>

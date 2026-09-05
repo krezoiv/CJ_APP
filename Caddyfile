@@ -1,0 +1,13 @@
+:{$PORT:80}
+
+root * /usr/share/caddy
+encode gzip
+
+# SPA fallback: Angular usa PathLocationStrategy (rutas reales, no /#/...),
+# así que cualquier ruta no reconocida como archivo estático (/dashboard,
+# /ventas, etc.) debe servir index.html y dejar que Angular Router la
+# resuelva del lado del cliente — sin esto, recargar una ruta interna
+# devolvería 404.
+try_files {path} /index.html
+
+file_server

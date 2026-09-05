@@ -1,0 +1,14 @@
+<div class="summary-grid" [class.summary-grid--loading]="loading">
+  @for (tile of tiles; track tile.title) {
+    <app-card padding="lg">
+      <div class="summary-tile">
+        <div class="summary-tile__icon">
+          <app-icon [name]="tile.icon" [size]="22" />
+        </div>
+        <span class="summary-tile__title">{{ tile.title }}</span>
+        <span class="summary-tile__value">{{ loading ? '—' : tile.value }}</span>
+        <span class="summary-tile__description">{{ tile.description }}</span>
+      </div>
+    </app-card>
+  }
+</div>

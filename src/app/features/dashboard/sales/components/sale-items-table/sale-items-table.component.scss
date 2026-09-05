@@ -1,0 +1,221 @@
+@use 'mixins' as *;
+@use 'breakpoints' as bp;
+
+:host {
+  display: block;
+}
+
+// ---- Desktop table ---------------------------------------------------------
+
+.table-wrapper--desktop {
+  display: none;
+
+  @include bp.respond(md) {
+    display: block;
+    overflow-x: auto;
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+  }
+}
+
+.sale-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 44rem;
+
+  th,
+  td {
+    padding: var(--space-4) var(--space-5);
+    text-align: center;
+    font-size: var(--fs-sm);
+  }
+
+  thead {
+    background: var(--color-table-header-bg);
+  }
+
+  thead th {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-table-header-text);
+    border-bottom: 1px solid var(--color-border-light);
+    padding-block: var(--space-3);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--color-border-light);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: var(--color-surface-light-hover);
+    }
+  }
+
+  td {
+    color: var(--color-text-on-light-muted);
+  }
+}
+
+.sale-table__row--pending {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.align-center {
+  text-align: center;
+}
+
+.align-right {
+  text-align: center;
+}
+
+.sale-table__sku {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-on-light-subtle);
+}
+
+.sale-table__name {
+  color: var(--color-text-on-light);
+  font-weight: var(--fw-medium);
+}
+
+.sale-table__total {
+  color: var(--color-text-on-light);
+  font-weight: var(--fw-semibold);
+}
+
+// ---- Quantity stepper --------------------------------------------------------
+
+.qty-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.qty-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-md);
+  background: rgba(47, 131, 224, 0.1);
+  color: var(--color-primary-600);
+  flex-shrink: 0;
+  @include focus-ring;
+
+  &:hover:not(:disabled) {
+    background: rgba(47, 131, 224, 0.18);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.qty-input {
+  width: 3rem;
+  text-align: center;
+  background: var(--color-bg-light-muted);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--fs-sm);
+  color: var(--color-text-on-light);
+  @include focus-ring;
+
+  &:focus {
+    border-color: var(--color-primary-500);
+  }
+
+  // Hide native spinner — the +/- buttons already cover it.
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  -moz-appearance: textfield;
+}
+
+// ---- Remove action --------------------------------------------------------
+
+.remove-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: rgba(220, 68, 68, 0.1);
+  color: #dc4444;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  @include focus-ring;
+
+  &:hover {
+    background: rgba(220, 68, 68, 0.18);
+  }
+}
+
+// ---- Mobile card list -------------------------------------------------------
+
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  @include bp.respond(md) {
+    display: none;
+  }
+}
+
+.sale-card--pending {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.sale-card {
+  background: var(--color-surface-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+}
+
+.sale-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.sale-card__name {
+  color: var(--color-text-on-light);
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-sm);
+}
+
+.sale-card__sku {
+  font-size: var(--fs-xs);
+  color: var(--color-text-on-light-subtle);
+}
+
+.sale-card__total {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-on-light);
+  flex-shrink: 0;
+}
+
+.sale-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}

@@ -1,0 +1,231 @@
+<div class="detail">
+  <header class="detail__header">
+    <button type="button" class="back-btn" (click)="goBack()">
+      <app-icon name="arrow-right" [size]="16" class="back-btn__icon" />
+      Volver a Inventario
+    </button>
+  </header>
+
+  @if (loading()) {
+    <p class="loading-note">
+      <app-icon name="clock" [size]="16" />
+      Cargando detalle del producto…
+    </p>
+  } @else if (!detail()) {
+    <app-empty-state icon="package" title="Producto no encontrado" description="No se pudo cargar la información de este producto." />
+  } @else {
+    @let d = detail()!;
+
+    <div class="detail__title-row">
+      <h1 class="detail__title">{{ d.productName }}</h1>
+      <span class="detail__subtitle">{{ d.categoryName }} @if (d.sku) { · SKU: {{ d.sku }} }</span>
+    </div>
+
+    <div class="detail__grid">
+      <app-card>
+        <h2 class="section-title">General</h2>
+        <dl class="info-list">
+          <div>
+            <dt>Nombre</dt>
+            <dd>{{ d.productName }}</dd>
+          </div>
+          <div>
+            <dt>SKU</dt>
+            <dd>{{ d.sku || '—' }}</dd>
+          </div>
+          <div>
+            <dt>Categoría</dt>
+            <dd>{{ d.categoryName }}</dd>
+          </div>
+          <div>
+            <dt>Unidad base</dt>
+            <dd>Unidad</dd>
+          </div>
+          <div>
+            <dt>Stock total</dt>
+            <dd><strong>{{ formatQuantity(d.totalStock) }}</strong></dd>
+          </div>
+        </dl>
+      </app-card>
+
+      <app-card>
+        <h2 class="section-title">Inventario por ubicación</h2>
+        @if (d.stockByLocation.length === 0) {
+          <p class="empty-note">Sin registros de stock.</p>
+        } @else {
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Ubicación</th>
+                <th class="align-right">Cantidad (unidades base)</th>
+                @if (isAdmin()) {
+                  <th class="align-right">Stock mínimo</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of d.stockByLocation; track row.locationId) {
+                <tr>
+                  <td>{{ row.locationName }}</td>
+                  <td class="align-right">{{ formatQuantity(row.quantity) }}</td>
+                  @if (isAdmin()) {
+                    <td class="align-right">
+                      <div class="min-stock-editor">
+                        <input
+                          type="number"
+                          min="0"
+                          step="1"
+                          class="min-stock-input"
+                          [attr.aria-label]="'Stock mínimo en ' + row.locationName"
+                          [value]="draftMinStock()[row.locationId]"
+                          (input)="onMinStockInput(row.locationId, $any($event.target).value)"
+                        />
+                        <button
+                          type="button"
+                          class="action-btn"
+                          [disabled]="!canSaveMinStock(row.locationId) || savingMinStockLocationId() === row.locationId"
+                          (click)="saveMinStock(row.locationId)"
+                          aria-label="Guardar stock mínimo"
+                        >
+                          <app-icon name="check" [size]="16" />
+                        </button>
+                      </div>
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr>
+                <td>Total</td>
+                <td class="align-right"><strong>{{ formatQuantity(d.totalStock) }}</strong></td>
+                @if (isAdmin()) {
+                  <td></td>
+                }
+              </tr>
+            </tfoot>
+          </table>
+        }
+      </app-card>
+
+      <app-card class="detail__grid-full">
+        <div class="section-header">
+          <h2 class="section-title">Presentaciones</h2>
+          @if (isAdmin()) {
+            <app-button variant="ghost" (click)="openCreatePresentation()">
+              <app-icon name="plus" [size]="16" />
+              Nueva presentación
+            </app-button>
+          }
+        </div>
+
+        @if (d.presentations.length === 0) {
+          <p class="empty-note">Este producto no tiene presentaciones registradas.</p>
+        } @else {
+          <div class="table-wrapper">
+            <table class="mini-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th class="align-right">Factor (unidades base)</th>
+                  <th class="align-right">Precio costo</th>
+                  <th class="align-right">Precio público</th>
+                  <th>Estado</th>
+                  @if (isAdmin()) {
+                    <th class="align-right">Acciones</th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (presentation of d.presentations; track presentation.id) {
+                  <tr>
+                    <td>{{ presentation.name }}</td>
+                    <td class="align-right">{{ presentation.conversionFactor }}</td>
+                    <td class="align-right">{{ formatCurrency(presentation.costPrice) }}</td>
+                    <td class="align-right">{{ formatCurrency(presentation.publicPrice) }}</td>
+                    <td>
+                      <app-badge [tone]="presentation.isActive ? 'success' : 'neutral-dark'">
+                        {{ presentation.isActive ? 'Activa' : 'Inactiva' }}
+                      </app-badge>
+                    </td>
+                    @if (isAdmin()) {
+                      <td class="align-right">
+                        <div class="actions">
+                          <button
+                            type="button"
+                            class="action-btn"
+                            (click)="openEditPresentation(presentation)"
+                            [attr.aria-label]="'Editar ' + presentation.name"
+                          >
+                            <app-icon name="edit-2" [size]="16" />
+                          </button>
+                          @if (presentation.name !== 'Unidad') {
+                            <button
+                              type="button"
+                              class="action-btn"
+                              [class.action-btn--danger]="presentation.isActive"
+                              (click)="toggleActive(presentation)"
+                              [attr.aria-label]="(presentation.isActive ? 'Desactivar ' : 'Reactivar ') + presentation.name"
+                            >
+                              <app-icon [name]="presentation.isActive ? 'trash-2' : 'arrow-up-circle'" [size]="16" />
+                            </button>
+                          }
+                        </div>
+                      </td>
+                    }
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </app-card>
+
+      <app-card class="detail__grid-full">
+        <h2 class="section-title">Movimientos recientes</h2>
+        @if (d.recentMovements.length === 0) {
+          <p class="empty-note">Sin movimientos registrados todavía.</p>
+        } @else {
+          <div class="table-wrapper">
+            <table class="mini-table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Tipo</th>
+                  <th>Presentación</th>
+                  <th>Origen</th>
+                  <th>Destino</th>
+                  <th class="align-right">Cantidad</th>
+                  <th class="align-right">Unidades base</th>
+                  <th>Usuario</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (movement of d.recentMovements; track movement.id) {
+                  <tr>
+                    <td>{{ movement.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+                    <td>{{ movementTypeLabel[movement.movementType] }}</td>
+                    <td>{{ movement.presentationName }}</td>
+                    <td>{{ movement.locationFromName || '—' }}</td>
+                    <td>{{ movement.locationToName || '—' }}</td>
+                    <td class="align-right">{{ formatQuantity(movement.quantityPresentation) }}</td>
+                    <td class="align-right">{{ formatQuantity(movement.quantityBaseUnits) }}</td>
+                    <td>{{ movement.username }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </app-card>
+    </div>
+  }
+</div>
+
+<app-presentation-form-modal
+  [open]="isPresentationFormOpen()"
+  [productId]="productId"
+  [presentation]="editingPresentation()"
+  (closed)="closePresentationForm()"
+  (saved)="onPresentationSaved()"
+/>

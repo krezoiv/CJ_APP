@@ -1,0 +1,77 @@
+<div class="history">
+  @if (isEmpty()) {
+    <app-empty-state icon="tag" title="Sin tickets registrados" description="Los tickets que registres aparecerán aquí." />
+  } @else {
+    <div class="table-wrapper">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Número</th>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th class="align-right">Total</th>
+            <th>Usuario</th>
+            <th>Estado</th>
+            <th class="align-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ticket of tickets(); track ticket.id) {
+            <tr [class.history-table__row--voided]="ticket.isVoided">
+              <td class="history-table__number">{{ ticket.ticketNumber }}</td>
+              <td>{{ ticket.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ ticket.clientName || '—' }}</td>
+              <td class="align-right">{{ formatCurrency(ticket.total) }}</td>
+              <td>{{ ticket.username }}</td>
+              <td>
+                @if (ticket.isVoided) {
+                  <app-badge tone="danger">Anulado</app-badge>
+                } @else {
+                  <app-badge tone="success">Vigente</app-badge>
+                }
+              </td>
+              <td class="align-right">
+                <div class="actions">
+                  <button type="button" class="action-btn" (click)="viewDetail(ticket)" title="Ver detalle">
+                    <app-icon name="eye" [size]="16" />
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn"
+                    [disabled]="generatingPdfId() === ticket.id"
+                    (click)="regeneratePdf(ticket)"
+                    title="Generar PDF de nuevo"
+                  >
+                    <app-icon name="file-check" [size]="16" />
+                  </button>
+                  @if (isAdmin()) {
+                    <button
+                      type="button"
+                      class="action-btn action-btn--danger"
+                      [disabled]="ticket.isVoided"
+                      (click)="requestVoid(ticket)"
+                      title="Anular"
+                    >
+                      <app-icon name="x-circle" [size]="16" />
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-report-pagination [total]="total()" [page]="page()" [limit]="limit" (pageChange)="onPageChange($event)" />
+  }
+</div>
+
+<app-ticket-detail-modal [ticketId]="detailTicketId()" (closed)="closeDetail()" />
+
+<app-void-reason-modal
+  [open]="voidTarget() !== null"
+  [ticketNumber]="voidTarget()?.ticketNumber || ''"
+  (confirmed)="confirmVoid($event)"
+  (cancelled)="cancelVoid()"
+/>

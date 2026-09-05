@@ -1,0 +1,164 @@
+@use 'mixins' as *;
+@use 'breakpoints' as bp;
+
+.reports-page__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+
+  @include bp.respond(sm) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.reports-page__title {
+  font-size: var(--fs-2xl);
+  color: var(--color-text-on-light);
+  margin-bottom: var(--space-2);
+}
+
+.reports-page__subtitle {
+  font-size: var(--fs-md);
+  color: var(--color-text-on-light-muted);
+}
+
+.reports-page__filters {
+  background: var(--color-surface-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  margin-bottom: var(--space-6);
+}
+
+.reports-page__filters-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-on-light);
+  margin-bottom: var(--space-4);
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+
+  @include bp.respond(sm) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  label {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--color-text-on-light-muted);
+  }
+
+  input,
+  select {
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    color: var(--color-text-on-light);
+    font-size: var(--fs-sm);
+    font-family: var(--font-body);
+    box-shadow: var(--shadow-sm);
+    @include focus-ring;
+
+    &:focus {
+      border-color: var(--color-primary-500);
+    }
+  }
+}
+
+.filters-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+app-report-summary {
+  display: block;
+  margin-bottom: var(--space-6);
+}
+
+// ---- Table (mirrors the Purchases report's own "por producto" inline table styles) ----
+
+.table-wrapper {
+  overflow-x: auto;
+  background: var(--color-surface-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+}
+
+.table-wrapper__empty {
+  padding: var(--space-8);
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--color-text-on-light-subtle);
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 52rem;
+
+  th,
+  td {
+    padding: var(--space-4) var(--space-5);
+    text-align: left;
+    font-size: var(--fs-sm);
+    white-space: nowrap;
+  }
+
+  thead {
+    background: var(--color-table-header-bg);
+  }
+
+  thead th {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-table-header-text);
+    border-bottom: 1px solid var(--color-border-light);
+    padding-block: var(--space-3);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--color-border-light);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: var(--color-surface-light-hover);
+    }
+  }
+
+  td {
+    color: var(--color-text-on-light-muted);
+  }
+}
+
+.align-right {
+  text-align: right;
+}
+
+.report-table__total {
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-on-light);
+}

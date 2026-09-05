@@ -1,0 +1,58 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">{{ isEditMode ? 'Editar rol' : 'Agregar rol' }}</h2>
+        <button type="button" class="modal__close" (click)="close()" aria-label="Cerrar">
+          <app-icon name="close" [size]="18" />
+        </button>
+      </div>
+
+      <form class="modal__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="field">
+          <label for="role-name">Nombre del rol</label>
+          <input id="role-name" type="text" formControlName="name" placeholder="Ej. SUPERVISOR" />
+          @if (isSystemRole) {
+            <span class="field__hint">Los roles del sistema no pueden renombrarse.</span>
+          } @else if (form.controls.name.invalid && form.controls.name.touched) {
+            <span class="field__error">Ingresa un nombre de al menos 2 caracteres.</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="role-description">Descripción (opcional)</label>
+          <textarea
+            id="role-description"
+            formControlName="description"
+            rows="3"
+            placeholder="Ej. Supervisión de ventas e inventario"
+          ></textarea>
+          @if (form.controls.description.invalid && form.controls.description.touched) {
+            <span class="field__error">La descripción es demasiado larga.</span>
+          }
+        </div>
+
+        @if (isEditMode) {
+          <label class="checkbox-field">
+            <input type="checkbox" formControlName="isActive" />
+            Rol activo (disponible para asignar)
+          </label>
+          @if (!canDeactivate) {
+            <span class="field__hint">No se puede desactivar: este rol tiene usuarios asignados.</span>
+          }
+        }
+
+        @if (errorMessage()) {
+          <p class="modal__error">{{ errorMessage() }}</p>
+        }
+
+        <div class="modal__actions">
+          <app-button variant="ghost" type="button" [disabled]="isSubmitting()" (click)="close()">Cancelar</app-button>
+          <app-button variant="primary" type="submit" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Guardando…' : isEditMode ? 'Guardar cambios' : 'Agregar rol' }}
+          </app-button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

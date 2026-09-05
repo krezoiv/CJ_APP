@@ -1,0 +1,139 @@
+@if (loading) {
+  <div class="table-wrapper table-wrapper--desktop" aria-hidden="true">
+    <table class="client-table">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of skeletonRows; track $index) {
+          <tr class="skeleton-row">
+            <td><span class="skeleton skeleton--lg"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="loading-note">
+    <app-icon name="clock" [size]="16" />
+    Cargando clientes…
+  </p>
+} @else if (sortedClients().length === 0) {
+  <app-empty-state
+    icon="users"
+    [title]="hasActiveFilters ? 'No se encontraron clientes' : 'Aún no tienes clientes'"
+    [description]="
+      hasActiveFilters
+        ? 'Intenta con otro término de búsqueda o ajusta los filtros aplicados.'
+        : 'Agrega tu primer cliente para comenzar a registrarlos en el sistema.'
+    "
+  >
+    @if (hasActiveFilters) {
+      <app-button variant="ghost" (click)="clearFilters.emit()">Limpiar filtros</app-button>
+    } @else if (canManage) {
+      <app-button variant="primary" (click)="addClient.emit()">
+        <app-icon name="plus" [size]="16" />
+        Nuevo Cliente
+      </app-button>
+    }
+  </app-empty-state>
+} @else {
+  <div class="table-wrapper table-wrapper--desktop">
+    <table class="client-table">
+      <thead>
+        <tr>
+          <th>
+            <button type="button" class="sort-btn" (click)="toggleSort('name')">
+              Cliente
+              <app-icon [name]="sortIcon('name')" [size]="14" />
+            </button>
+          </th>
+          <th>
+            <button type="button" class="sort-btn" (click)="toggleSort('isActive')">
+              Estado
+              <app-icon [name]="sortIcon('isActive')" [size]="14" />
+            </button>
+          </th>
+          @if (canManage) {
+            <th>Acciones</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (client of sortedClients(); track client.id) {
+          <tr>
+            <td class="client-table__name">{{ client.name }}</td>
+            <td>
+              <app-badge [tone]="client.isActive ? 'success' : 'danger'">
+                {{ client.isActive ? 'Activo' : 'Inactivo' }}
+              </app-badge>
+            </td>
+            @if (canManage) {
+              <td>
+                <div class="actions">
+                  <button
+                    type="button"
+                    class="action-btn"
+                    (click)="edit.emit(client)"
+                    [attr.aria-label]="'Editar ' + client.name"
+                  >
+                    <app-icon name="edit-2" [size]="16" />
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn action-btn--danger"
+                    [disabled]="!client.isActive"
+                    (click)="delete.emit(client)"
+                    [attr.aria-label]="'Eliminar ' + client.name"
+                  >
+                    <app-icon name="trash-2" [size]="16" />
+                  </button>
+                </div>
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-list">
+    @for (client of sortedClients(); track client.id) {
+      <div class="client-card">
+        <div class="client-card__header">
+          <p class="client-card__name">{{ client.name }}</p>
+          <app-badge [tone]="client.isActive ? 'success' : 'danger'">
+            {{ client.isActive ? 'Activo' : 'Inactivo' }}
+          </app-badge>
+        </div>
+
+        @if (canManage) {
+          <div class="actions">
+            <button
+              type="button"
+              class="action-btn"
+              (click)="edit.emit(client)"
+              [attr.aria-label]="'Editar ' + client.name"
+            >
+              <app-icon name="edit-2" [size]="16" />
+            </button>
+            <button
+              type="button"
+              class="action-btn action-btn--danger"
+              [disabled]="!client.isActive"
+              (click)="delete.emit(client)"
+              [attr.aria-label]="'Eliminar ' + client.name"
+            >
+              <app-icon name="trash-2" [size]="16" />
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}

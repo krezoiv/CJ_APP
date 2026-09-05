@@ -1,0 +1,77 @@
+<div class="toolbar">
+  <div class="toolbar__row">
+    <label class="search" for="inventory-search">
+      <app-icon name="search" [size]="18" />
+      <input
+        id="inventory-search"
+        type="text"
+        placeholder="Buscar por nombre, SKU, categoría o negocio…"
+        [ngModel]="searchTerm"
+        (ngModelChange)="searchTermChange.emit($event)"
+      />
+    </label>
+
+    <label class="category-select" for="inventory-category">
+      <span class="visually-hidden">Filtrar por categoría</span>
+      <select
+        id="inventory-category"
+        [ngModel]="selectedCategory"
+        (ngModelChange)="selectedCategoryChange.emit($event)"
+      >
+        <option value="">Todas las categorías</option>
+        @for (category of categories; track category) {
+          <option [value]="category">{{ category }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="category-select" for="inventory-business">
+      <span class="visually-hidden">Filtrar por negocio</span>
+      <select
+        id="inventory-business"
+        [ngModel]="selectedBusiness"
+        (ngModelChange)="selectedBusinessChange.emit($event)"
+      >
+        <option value="">Todos los negocios</option>
+        @for (business of businesses; track business) {
+          <option [value]="business">{{ business }}</option>
+        }
+      </select>
+    </label>
+
+    <app-button variant="ghost" (click)="transferInventory.emit()">
+      <app-icon name="arrow-right" [size]="16" />
+      Trasladar inventario
+    </app-button>
+
+    <app-button variant="ghost" (click)="exportPdf.emit()">
+      <app-icon name="download" [size]="16" />
+      Exportar PDF
+    </app-button>
+
+    <app-button variant="ghost" (click)="exportExcel.emit()">
+      <app-icon name="download" [size]="16" />
+      Exportar Excel
+    </app-button>
+
+    @if (canManage) {
+      <app-button variant="primary" (click)="addProduct.emit()">
+        <app-icon name="plus" [size]="16" />
+        Agregar producto
+      </app-button>
+    }
+  </div>
+
+  <div class="toolbar__filters" role="group" aria-label="Filtrar por estado de stock">
+    @for (option of stockFilterOptions; track option.value) {
+      <button
+        type="button"
+        class="filter-chip"
+        [class.filter-chip--active]="stockFilter === option.value"
+        (click)="stockFilterChange.emit(option.value)"
+      >
+        {{ option.label }}
+      </button>
+    }
+  </div>
+</div>

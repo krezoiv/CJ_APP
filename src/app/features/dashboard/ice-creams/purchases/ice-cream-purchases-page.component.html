@@ -1,0 +1,72 @@
+<div class="purchases">
+  <header class="purchases__header">
+    <div>
+      <h1 class="purchases__title">Heladería · Compras</h1>
+      <p class="purchases__subtitle">Registra las facturas de compra de helados a tus proveedores.</p>
+    </div>
+  </header>
+
+  <div class="purchases__form-row">
+    <div class="field">
+      <label for="ice-cream-purchase-supplier">Proveedor</label>
+      <select
+        id="ice-cream-purchase-supplier"
+        [ngModel]="draft.supplierId()"
+        (ngModelChange)="onSupplierChange($event)"
+      >
+        <option value="" disabled>Seleccionar proveedor</option>
+        @for (supplier of suppliers(); track supplier.id) {
+          <option [value]="supplier.id">{{ supplier.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="ice-cream-purchase-date">Fecha de compra</label>
+      <input
+        id="ice-cream-purchase-date"
+        type="date"
+        [ngModel]="draft.purchaseDate()"
+        (ngModelChange)="onDateChange($event)"
+        [max]="draft.purchaseDate()"
+      />
+    </div>
+  </div>
+
+  <app-ice-cream-purchase-product-search (iceCreamSelected)="onIceCreamSelected($event)" />
+
+  <div class="purchases__receipt">
+    <app-ice-cream-purchase-items-table
+      [items]="draft.items()"
+      (quantityChange)="onQuantityChange($event)"
+      (costPriceChange)="onCostPriceChange($event)"
+      (removeItem)="onRemoveItem($event)"
+    />
+
+    <app-ice-cream-purchase-summary
+      [itemCount]="draft.items().length"
+      [total]="draft.total()"
+      [isSaving]="isSaving()"
+      [supplierSelected]="!!draft.supplierId()"
+      (cancel)="requestCancel()"
+      (save)="requestSave()"
+    />
+  </div>
+</div>
+
+<app-ice-cream-purchase-cancel-confirm-modal
+  [open]="isCancelConfirmOpen()"
+  (confirmed)="confirmCancel()"
+  (cancelled)="dismissCancel()"
+/>
+
+<app-ice-cream-purchase-save-confirm-modal
+  [open]="isSaveConfirmOpen()"
+  [supplierName]="selectedSupplierName()"
+  [purchaseDate]="purchaseDateAsDate()"
+  [itemCount]="draft.items().length"
+  [total]="draft.total()"
+  [isSaving]="isSaving()"
+  (confirmed)="confirmSave()"
+  (cancelled)="dismissSaveConfirm()"
+/>

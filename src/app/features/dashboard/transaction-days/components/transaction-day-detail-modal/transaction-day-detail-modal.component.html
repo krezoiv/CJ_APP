@@ -1,0 +1,185 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <header class="modal__header">
+        <h2 class="modal__title">Detalle del día {{ date }}</h2>
+        <button type="button" class="modal__close" (click)="onClose()" aria-label="Cerrar">
+          <app-icon name="close" [size]="18" />
+        </button>
+      </header>
+
+      <div class="modal__body">
+        @if (loading()) {
+          <p class="loading-note">
+            <app-icon name="clock" [size]="16" />
+            Cargando detalle…
+          </p>
+        }
+        @if (!loading() && detail(); as d) {
+          <section class="detail-section">
+            <h3 class="detail-section__title">
+              <app-icon name="file-check" [size]="16" />
+              Información General
+            </h3>
+            <dl class="info-grid">
+              <div class="info-grid__item">
+                <dt>Estado</dt>
+                <dd>
+                  <span class="status-badge" [class]="'status-badge--' + d.status">
+                    <app-icon [name]="statusIcon[d.status]" [size]="13" />
+                    {{ statusLabel[d.status] }}
+                  </span>
+                </dd>
+              </div>
+              <div class="info-grid__item">
+                <dt>Apertura</dt>
+                <dd>{{ d.openedAt | date: 'dd/MM/yyyy HH:mm' }} · {{ d.openedByUsername }}</dd>
+              </div>
+              <div class="info-grid__item">
+                <dt>Cierre</dt>
+                <dd>{{ d.closedAt ? (d.closedAt | date: 'dd/MM/yyyy HH:mm') + ' · ' + d.closedByUsername : '—' }}</dd>
+              </div>
+              @if (d.reopenedAt) {
+                <div class="info-grid__item">
+                  <dt>Reapertura</dt>
+                  <dd>{{ d.reopenedAt | date: 'dd/MM/yyyy HH:mm' }} · {{ d.reopenedByUsername }}</dd>
+                </div>
+                <div class="info-grid__item info-grid__item--wide">
+                  <dt>Motivo de reapertura</dt>
+                  <dd>{{ d.reopenReason }}</dd>
+                </div>
+              }
+              @if (d.isCancelled) {
+                <div class="info-grid__item">
+                  <dt>Anulación</dt>
+                  <dd>{{ d.cancelledAt | date: 'dd/MM/yyyy HH:mm' }} · {{ d.cancelledByUsername }}</dd>
+                </div>
+                <div class="info-grid__item info-grid__item--wide">
+                  <dt>Motivo de anulación</dt>
+                  <dd>{{ d.cancelReason }}</dd>
+                </div>
+              }
+            </dl>
+          </section>
+
+          <section class="detail-section">
+            <h3 class="detail-section__title">
+              <app-icon name="arrow-left-right" [size]="16" />
+              Operaciones de Transaccionar
+            </h3>
+            @if (operations().length === 0) {
+              <p class="empty-note">No se registraron operaciones de Transaccionar en esta fecha.</p>
+            } @else {
+              <div class="table-wrapper">
+                <table class="detail-table">
+                  <thead>
+                    <tr>
+                      <th>Hora</th>
+                      <th>Banco Agente</th>
+                      <th>Tipo</th>
+                      <th>Cliente</th>
+                      <th class="align-right">Monto</th>
+                      <th class="align-right">Transacciones</th>
+                      <th>Usuario</th>
+                      <th>Estado</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (operation of operations(); track operation.id) {
+                      <tr [class.detail-table__row--voided]="operation.isVoided">
+                        <td>{{ operation.createdAt | date: 'HH:mm' }}</td>
+                        <td>{{ operation.transactionBankName }}</td>
+                        <td>{{ operation.transactionTypeName }}</td>
+                        <td>{{ operation.clientName ?? '—' }}</td>
+                        <td class="align-right">{{ formatCurrency(operation.totalAmount) }}</td>
+                        <td class="align-right">{{ operation.transactionCount }}</td>
+                        <td>{{ operation.username }}</td>
+                        <td>
+                          @if (operation.isVoided) {
+                            <span class="status-badge status-badge--CANCELLED">
+                              <app-icon name="x-circle" [size]="12" />
+                              Anulada
+                            </span>
+                          } @else {
+                            <span class="status-badge status-badge--CLOSED">Vigente</span>
+                          }
+                        </td>
+                        <td>
+                          <button
+                            type="button"
+                            class="action-btn"
+                            title="Ver detalle"
+                            (click)="openOperationDetail(operation.id)"
+                          >
+                            <app-icon name="eye" [size]="15" />
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <dl class="summary-grid">
+                <div class="summary-grid__item">
+                  <dt>Operaciones vigentes</dt>
+                  <dd>{{ activeOperations().length }}</dd>
+                </div>
+                <div class="summary-grid__item">
+                  <dt>Transacciones</dt>
+                  <dd>{{ transactionsTotal() }}</dd>
+                </div>
+                <div class="summary-grid__item">
+                  <dt>Monto Total</dt>
+                  <dd>{{ formatCurrency(operationsTotal()) }}</dd>
+                </div>
+              </dl>
+            }
+          </section>
+
+          <section class="detail-section">
+            <h3 class="detail-section__title">
+              <app-icon name="clock" [size]="16" />
+              Historial de Cambios
+            </h3>
+            @if (d.auditLog.length === 0) {
+              <p class="empty-note">
+                No hay eventos de auditoría registrados para este día (probablemente su ciclo comenzó antes de
+                implementarse este módulo).
+              </p>
+            } @else {
+              <ul class="timeline">
+                @for (entry of d.auditLog; track entry.id) {
+                  <li class="timeline__item">
+                    <span class="timeline__dot" [class]="'timeline__dot--' + entry.action"></span>
+                    <div class="timeline__content">
+                      <div class="timeline__row">
+                        <strong>{{ auditActionLabel[entry.action] }}</strong>
+                        <span class="timeline__date">{{ entry.performedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+                      </div>
+                      <p class="timeline__meta">Por {{ entry.performedByUsername }}</p>
+                      @if (entry.reason) {
+                        <p class="timeline__reason">"{{ entry.reason }}"</p>
+                      }
+                    </div>
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+        }
+      </div>
+
+      <div class="modal__footer">
+        <app-button variant="ghost" (click)="onClose()">Cerrar</app-button>
+      </div>
+    </div>
+  </div>
+}
+
+<app-bank-deposit-detail-modal
+  [open]="isOperationDetailOpen()"
+  [operationId]="selectedOperationId()"
+  (closed)="closeOperationDetail()"
+/>

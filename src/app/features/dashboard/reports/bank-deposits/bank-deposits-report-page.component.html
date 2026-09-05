@@ -1,0 +1,191 @@
+<div class="reports-page">
+  <header class="reports-page__header">
+    <div>
+      <h1 class="reports-page__title">Reporte de Transacciones</h1>
+      <p class="reports-page__subtitle">Consulta, filtra y exporta el historial de depósitos registrados en Transaccionar.</p>
+    </div>
+    <app-button variant="primary" [disabled]="exporting()" (click)="exportPdf()">
+      <app-icon name="download" [size]="16" />
+      {{ exporting() ? 'Generando…' : 'Exportar PDF' }}
+    </app-button>
+  </header>
+
+  <div class="reports-page__filters">
+    <div class="reports-page__filters-title">
+      <app-icon name="filter" [size]="16" />
+      Filtros
+    </div>
+
+    <div class="filters-grid">
+      <div class="field">
+        <label for="bdreport-start-date">Desde</label>
+        <input
+          id="bdreport-start-date"
+          type="date"
+          [ngModel]="draftStartDate()"
+          (ngModelChange)="draftStartDate.set($event)"
+        />
+      </div>
+
+      <div class="field">
+        <label for="bdreport-end-date">Hasta</label>
+        <input
+          id="bdreport-end-date"
+          type="date"
+          [ngModel]="draftEndDate()"
+          (ngModelChange)="draftEndDate.set($event)"
+          [max]="draftEndDate()"
+        />
+      </div>
+
+      <div class="field">
+        <label for="bdreport-bank">Banco Agente</label>
+        <select
+          id="bdreport-bank"
+          [ngModel]="draftTransactionBankId()"
+          (ngModelChange)="draftTransactionBankId.set($event)"
+        >
+          <option value="">Todos los bancos</option>
+          @for (bank of transactionBanks(); track bank.id) {
+            <option [value]="bank.id">{{ bank.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="bdreport-type">Tipo de Transacción</label>
+        <select
+          id="bdreport-type"
+          [ngModel]="draftTransactionTypeId()"
+          (ngModelChange)="draftTransactionTypeId.set($event)"
+        >
+          <option value="">Todos los tipos</option>
+          @for (type of transactionTypes(); track type.id) {
+            <option [value]="type.id">{{ type.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="bdreport-user">Usuario</label>
+        <select id="bdreport-user" [ngModel]="draftUserId()" (ngModelChange)="draftUserId.set($event)">
+          <option value="">Todos los usuarios</option>
+          @for (user of users(); track user.id) {
+            <option [value]="user.id">{{ user.username }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="filters-actions">
+      <app-button variant="ghost" [disabled]="!hasActiveFilters()" (click)="clearFilters()">Limpiar filtros</app-button>
+      <app-button variant="primary" (click)="applyFilters()">Aplicar filtros</app-button>
+    </div>
+  </div>
+
+  <app-report-summary [tiles]="summaryTiles()" [loading]="loadingSummary()" />
+
+  <div class="table-wrapper">
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>Fecha y Hora</th>
+          <th>Banco Agente</th>
+          <th>Tipo</th>
+          <th>Cliente</th>
+          <th class="align-right">Monto Total</th>
+          <th class="align-right">Transacciones</th>
+          <th>Usuario</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (!loadingTable()) {
+          @for (row of rows(); track row.id) {
+            <tr [class.report-table__row--voided]="row.isVoided">
+              <td>{{ row.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ row.transactionBankName }}</td>
+              <td>{{ row.transactionTypeName }}</td>
+              <td>{{ row.clientName || '—' }}</td>
+              <td class="align-right report-table__total">{{ formatCurrency(row.totalAmount) }}</td>
+              <td class="align-right">{{ formatQuantity(row.transactionCount) }}</td>
+              <td>{{ row.username }}</td>
+              <td>
+                @if (row.isVoided) {
+                  <span class="status-badge status-badge--voided" [title]="row.voidReason ?? ''">
+                    <app-icon name="x-circle" [size]="13" />
+                    Anulada
+                  </span>
+                } @else {
+                  <span class="status-badge status-badge--active">
+                    <app-icon name="check-circle" [size]="13" />
+                    Vigente
+                  </span>
+                }
+              </td>
+              <td class="report-table__actions">
+                <button type="button" class="action-btn" title="Ver detalle" (click)="openDetail(row.id)">
+                  <app-icon name="eye" [size]="16" />
+                </button>
+                <button
+                  type="button"
+                  class="action-btn action-btn--danger"
+                  title="Anular transacción"
+                  [disabled]="row.isVoided"
+                  (click)="openVoidModal(row.id)"
+                >
+                  <app-icon name="x-circle" [size]="16" />
+                </button>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+    @if (!loadingTable() && rows().length === 0) {
+      <p class="table-wrapper__empty">No se encontraron registros con los filtros seleccionados.</p>
+    }
+  </div>
+
+  <app-report-pagination [total]="total()" [page]="page()" [limit]="20" (pageChange)="onPageChange($event)" />
+
+  @if (summary() && summary()!.byBank.length > 0) {
+    <div class="by-bank">
+      <h2 class="by-bank__title">Por banco agente</h2>
+      <div class="table-wrapper">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Banco Agente</th>
+              <th class="align-right">Operaciones</th>
+              <th class="align-right">Monto Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of summary()!.byBank; track row.transactionBankId) {
+              <tr>
+                <td>{{ row.transactionBankName }}</td>
+                <td class="align-right">{{ formatQuantity(row.operationCount) }}</td>
+                <td class="align-right report-table__total">{{ formatCurrency(row.totalAmount) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>
+
+<app-bank-deposit-detail-modal
+  [open]="isDetailOpen()"
+  [operationId]="selectedOperationId()"
+  (closed)="closeDetail()"
+/>
+
+<app-void-confirm-modal
+  [open]="isVoidModalOpen()"
+  [isSaving]="isSavingVoid()"
+  (confirmed)="confirmVoid($event)"
+  (cancelled)="cancelVoidModal()"
+/>

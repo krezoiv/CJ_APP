@@ -1,0 +1,34 @@
+<div class="toolbar">
+  <div class="toolbar__row">
+    <label class="search" for="ice-cream-search">
+      <app-icon name="search" [size]="18" />
+      <input
+        id="ice-cream-search"
+        type="text"
+        placeholder="Buscar por SKU o nombre del helado…"
+        [ngModel]="searchTerm"
+        (ngModelChange)="searchTermChange.emit($event)"
+      />
+    </label>
+
+    @if (canManage) {
+      <app-button variant="primary" (click)="addIceCream.emit()">
+        <app-icon name="plus" [size]="16" />
+        Agregar helado
+      </app-button>
+    }
+  </div>
+
+  <div class="toolbar__filters" role="group" aria-label="Filtrar por estado de stock">
+    @for (option of stockFilterOptions; track option.value) {
+      <button
+        type="button"
+        class="filter-chip"
+        [class.filter-chip--active]="stockFilter === option.value"
+        (click)="stockFilterChange.emit(option.value)"
+      >
+        {{ option.label }}
+      </button>
+    }
+  </div>
+</div>

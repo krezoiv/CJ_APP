@@ -1,0 +1,45 @@
+<div class="account-types">
+  <header class="account-types__header">
+    <div>
+      <h1 class="account-types__title">Tipos de Cuenta</h1>
+      <p class="account-types__subtitle">Administra los tipos de cuenta disponibles para registrar bancos (Monetaria, Ahorro, Corriente…).</p>
+    </div>
+  </header>
+
+  <app-account-type-summary [data]="accountTypes()" />
+
+  <app-account-type-toolbar
+    [searchTerm]="searchTerm()"
+    [statusFilter]="statusFilter()"
+    [canManage]="isAdmin()"
+    (searchTermChange)="searchTerm.set($event)"
+    (statusFilterChange)="statusFilter.set($event)"
+    (addAccountType)="openCreateForm()"
+  />
+
+  <app-account-type-table
+    [accountTypes]="filteredAccountTypes()"
+    [loading]="loading()"
+    [hasActiveFilters]="hasActiveFilters()"
+    [canManage]="isAdmin()"
+    (edit)="openEditForm($event)"
+    (delete)="requestDelete($event)"
+    (clearFilters)="clearFilters()"
+    (addAccountType)="openCreateForm()"
+  />
+</div>
+
+<app-account-type-form-modal
+  [open]="isFormOpen()"
+  [accountType]="editingAccountType()"
+  (closed)="closeForm()"
+  (saved)="onAccountTypeSaved($event)"
+/>
+
+<app-account-type-delete-confirm-modal
+  [open]="isDeleteOpen()"
+  [accountType]="deletingAccountType()"
+  [isDeleting]="isDeleting()"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>

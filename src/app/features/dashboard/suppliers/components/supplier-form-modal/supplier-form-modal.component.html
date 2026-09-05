@@ -1,0 +1,72 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">{{ isEditMode ? 'Editar proveedor' : 'Agregar proveedor' }}</h2>
+        <button type="button" class="modal__close" (click)="close()" aria-label="Cerrar">
+          <app-icon name="close" [size]="18" />
+        </button>
+      </div>
+
+      <form class="modal__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="field">
+          <label for="supplier-name">Nombre del proveedor</label>
+          <input id="supplier-name" type="text" formControlName="name" placeholder="Ej. Distribuidora Central" />
+          @if (form.controls.name.invalid && form.controls.name.touched) {
+            <span class="field__error">Ingresa un nombre de al menos 2 caracteres.</span>
+          }
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="supplier-phone">Teléfono (opcional)</label>
+            <input id="supplier-phone" type="text" formControlName="phone" placeholder="Ej. 22334455" />
+            @if (form.controls.phone.invalid && form.controls.phone.touched) {
+              <span class="field__error">Ingresa un teléfono válido.</span>
+            }
+          </div>
+
+          <div class="field">
+            <label for="supplier-tax-id">NIT (opcional)</label>
+            <input id="supplier-tax-id" type="text" formControlName="taxId" placeholder="Ej. 123456-7" />
+            @if (form.controls.taxId.invalid && form.controls.taxId.touched) {
+              <span class="field__error">El NIT es demasiado largo.</span>
+            }
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="supplier-email">Email (opcional)</label>
+          <input id="supplier-email" type="email" formControlName="email" placeholder="Ej. ventas@proveedor.com" />
+          @if (form.controls.email.invalid && form.controls.email.touched) {
+            <span class="field__error">Ingresa un correo válido.</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="supplier-address">Dirección (opcional)</label>
+          <textarea
+            id="supplier-address"
+            formControlName="address"
+            rows="2"
+            placeholder="Ej. Zona 1, Ciudad de Guatemala"
+          ></textarea>
+          @if (form.controls.address.invalid && form.controls.address.touched) {
+            <span class="field__error">La dirección es demasiado larga.</span>
+          }
+        </div>
+
+        @if (errorMessage()) {
+          <p class="modal__error">{{ errorMessage() }}</p>
+        }
+
+        <div class="modal__actions">
+          <app-button variant="ghost" type="button" [disabled]="isSubmitting()" (click)="close()">Cancelar</app-button>
+          <app-button variant="primary" type="submit" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Guardando…' : isEditMode ? 'Guardar cambios' : 'Agregar proveedor' }}
+          </app-button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

@@ -1,0 +1,275 @@
+@use 'mixins' as *;
+@use 'breakpoints' as bp;
+
+:host {
+  display: block;
+}
+
+// ---- Desktop table ---------------------------------------------------------
+
+.table-wrapper--desktop {
+  display: none;
+
+  @include bp.respond(md) {
+    display: block;
+    overflow-x: auto;
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+  }
+}
+
+.recharge-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 48rem;
+
+  th,
+  td {
+    padding: var(--space-4) var(--space-5);
+    text-align: left;
+    font-size: var(--fs-sm);
+  }
+
+  thead {
+    background: var(--color-table-header-bg);
+  }
+
+  thead th {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-table-header-text);
+    border-bottom: 1px solid var(--color-border-light);
+    padding-block: var(--space-3);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--color-border-light);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: var(--color-surface-light-hover);
+    }
+  }
+
+  td {
+    color: var(--color-text-on-light-muted);
+  }
+}
+
+.align-right {
+  text-align: right;
+}
+
+.recharge-table__type {
+  color: var(--color-text-on-light);
+  font-weight: var(--fw-medium);
+}
+
+.recharge-table__daily {
+  color: var(--color-text-on-light);
+  font-weight: var(--fw-semibold);
+}
+
+.recharge-table__sale {
+  color: var(--color-primary-600);
+  font-weight: var(--fw-semibold);
+}
+
+// ---- Editable "Saldo final" cell -------------------------------------------
+
+.final-balance-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+.final-balance-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+  font-size: var(--fs-xs);
+  color: var(--color-text-on-light-subtle);
+  justify-content: flex-end;
+}
+
+.final-balance-error {
+  margin-top: var(--space-2);
+  font-size: var(--fs-xs);
+  color: #dc4444;
+  text-align: right;
+}
+
+.price-input {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: var(--color-bg-light-muted);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-1) var(--space-2);
+  color: var(--color-text-on-light-subtle);
+  font-size: var(--fs-xs);
+  @include focus-ring;
+
+  &:focus-within {
+    border-color: var(--color-primary-500);
+  }
+
+  input {
+    width: 5rem;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--color-text-on-light);
+    font-size: var(--fs-sm);
+    text-align: right;
+
+    &:disabled {
+      color: var(--color-text-on-light-subtle);
+      cursor: not-allowed;
+    }
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    -moz-appearance: textfield;
+  }
+}
+
+// ---- Loading skeleton --------------------------------------------------------
+
+.loading-note {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-content: center;
+  padding: var(--space-4);
+  font-size: var(--fs-sm);
+  color: var(--color-text-on-light-subtle);
+
+  @include bp.respond(md) {
+    display: none;
+  }
+}
+
+.skeleton {
+  display: inline-block;
+  height: 0.9rem;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, var(--color-bg-light-muted) 25%, var(--color-border-light) 50%, var(--color-bg-light-muted) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.skeleton--lg {
+  width: 9rem;
+}
+
+.skeleton--sm {
+  width: 3.5rem;
+}
+
+@keyframes skeleton-pulse {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+// ---- Mobile card list -------------------------------------------------------
+
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  @include bp.respond(md) {
+    display: none;
+  }
+}
+
+.recharge-card {
+  background: var(--color-surface-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+}
+
+.recharge-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.recharge-card__type {
+  color: var(--color-text-on-light);
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-md);
+}
+
+.recharge-card__sale {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--color-primary-600);
+}
+
+.recharge-card__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+
+  dt {
+    font-size: var(--fs-xs);
+    color: var(--color-text-on-light-subtle);
+    margin-bottom: var(--space-1);
+  }
+
+  dd {
+    font-size: var(--fs-sm);
+    color: var(--color-text-on-light);
+    font-weight: var(--fw-medium);
+  }
+}
+
+.recharge-card__final-balance {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: var(--fs-xs);
+  color: var(--color-text-on-light-subtle);
+
+  .final-balance-cell {
+    justify-content: space-between;
+  }
+
+  .price-input {
+    flex: 1;
+
+    input {
+      width: 100%;
+    }
+  }
+
+  .final-balance-hint {
+    justify-content: flex-start;
+  }
+
+  .final-balance-error {
+    text-align: left;
+  }
+}

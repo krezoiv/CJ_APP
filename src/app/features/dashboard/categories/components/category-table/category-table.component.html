@@ -1,0 +1,150 @@
+@if (loading) {
+  <div class="table-wrapper table-wrapper--desktop" aria-hidden="true">
+    <table class="category-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of skeletonRows; track $index) {
+          <tr class="skeleton-row">
+            <td><span class="skeleton skeleton--lg"></span></td>
+            <td><span class="skeleton skeleton--lg"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="loading-note">
+    <app-icon name="clock" [size]="16" />
+    Cargando categorías…
+  </p>
+} @else if (sortedCategories().length === 0) {
+  <app-empty-state
+    icon="layers"
+    [title]="hasActiveFilters ? 'No se encontraron categorías' : 'Aún no tienes categorías'"
+    [description]="
+      hasActiveFilters
+        ? 'Intenta con otro término de búsqueda o ajusta los filtros aplicados.'
+        : 'Agrega tu primera categoría para empezar a clasificar tus productos.'
+    "
+  >
+    @if (hasActiveFilters) {
+      <app-button variant="ghost" (click)="clearFilters.emit()">Limpiar filtros</app-button>
+    } @else if (canManage) {
+      <app-button variant="primary" (click)="addCategory.emit()">
+        <app-icon name="plus" [size]="16" />
+        Agregar categoría
+      </app-button>
+    }
+  </app-empty-state>
+} @else {
+  <div class="table-wrapper table-wrapper--desktop">
+    <table class="category-table">
+      <thead>
+        <tr>
+          <th>
+            <button type="button" class="sort-btn" (click)="toggleSort('name')">
+              Nombre
+              <app-icon [name]="sortIcon('name')" [size]="14" />
+            </button>
+          </th>
+          <th>
+            <button type="button" class="sort-btn" (click)="toggleSort('description')">
+              Descripción
+              <app-icon [name]="sortIcon('description')" [size]="14" />
+            </button>
+          </th>
+          <th>
+            <button type="button" class="sort-btn" (click)="toggleSort('isActive')">
+              Estado
+              <app-icon [name]="sortIcon('isActive')" [size]="14" />
+            </button>
+          </th>
+          @if (canManage) {
+            <th>Acciones</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (category of sortedCategories(); track category.id) {
+          <tr>
+            <td class="category-table__name">{{ category.name }}</td>
+            <td class="category-table__description">{{ category.description || '—' }}</td>
+            <td>
+              <app-badge [tone]="category.isActive ? 'success' : 'danger'">
+                {{ category.isActive ? 'Activa' : 'Inactiva' }}
+              </app-badge>
+            </td>
+            @if (canManage) {
+              <td>
+                <div class="actions">
+                  <button
+                    type="button"
+                    class="action-btn"
+                    (click)="edit.emit(category)"
+                    [attr.aria-label]="'Editar ' + category.name"
+                  >
+                    <app-icon name="edit-2" [size]="16" />
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn action-btn--danger"
+                    [disabled]="!category.isActive"
+                    (click)="delete.emit(category)"
+                    [attr.aria-label]="'Eliminar ' + category.name"
+                  >
+                    <app-icon name="trash-2" [size]="16" />
+                  </button>
+                </div>
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-list">
+    @for (category of sortedCategories(); track category.id) {
+      <div class="category-card">
+        <div class="category-card__header">
+          <p class="category-card__name">{{ category.name }}</p>
+          <app-badge [tone]="category.isActive ? 'success' : 'danger'">
+            {{ category.isActive ? 'Activa' : 'Inactiva' }}
+          </app-badge>
+        </div>
+
+        <p class="category-card__description">{{ category.description || 'Sin descripción' }}</p>
+
+        @if (canManage) {
+          <div class="actions">
+            <button
+              type="button"
+              class="action-btn"
+              (click)="edit.emit(category)"
+              [attr.aria-label]="'Editar ' + category.name"
+            >
+              <app-icon name="edit-2" [size]="16" />
+            </button>
+            <button
+              type="button"
+              class="action-btn action-btn--danger"
+              [disabled]="!category.isActive"
+              (click)="delete.emit(category)"
+              [attr.aria-label]="'Eliminar ' + category.name"
+            >
+              <app-icon name="trash-2" [size]="16" />
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}

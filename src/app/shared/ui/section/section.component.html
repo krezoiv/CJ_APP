@@ -1,0 +1,9 @@
+<section
+  [attr.id]="sectionId ?? null"
+  class="section"
+  [class]="'section--' + tone + ' section--spacing-' + spacing"
+>
+  <app-container [wide]="wideContainer">
+    <ng-content></ng-content>
+  </app-container>
+</section>

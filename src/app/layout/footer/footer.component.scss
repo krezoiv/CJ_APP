@@ -1,0 +1,113 @@
+@use 'breakpoints' as bp;
+@use 'mixins' as *;
+
+.footer {
+  background: var(--color-bg-dark);
+  color: var(--color-text-on-dark-muted);
+  padding-block: var(--space-16) var(--space-8);
+  border-top: 1px solid var(--color-border-dark);
+}
+
+.footer__top {
+  display: grid;
+  gap: var(--space-10);
+  padding-bottom: var(--space-12);
+
+  @include bp.respond(md) {
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    gap: var(--space-8);
+  }
+}
+
+.footer__brand-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.footer__logo {
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+
+.footer__brand-name {
+  font-family: var(--font-heading);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-lg);
+  color: var(--color-text-on-dark);
+}
+
+.footer__tagline {
+  max-width: 22rem;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-normal);
+  margin-bottom: var(--space-6);
+}
+
+.footer__socials {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.footer__social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-dark);
+  border: 1px solid var(--color-border-dark);
+  color: var(--color-text-on-dark-muted);
+  transition:
+    color var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out);
+
+  &:hover {
+    color: var(--color-accent-cyan);
+    border-color: var(--color-accent-cyan);
+  }
+}
+
+.footer__heading {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-on-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--space-4);
+}
+
+.footer__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.footer__list a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-sm);
+  transition: color var(--duration-base) var(--ease-out);
+
+  &:hover {
+    color: var(--color-text-on-dark);
+  }
+}
+
+.footer__text {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-normal);
+  margin-bottom: var(--space-2);
+}
+
+.footer__bottom {
+  padding-top: var(--space-8);
+  border-top: 1px solid var(--color-border-dark);
+  font-size: var(--fs-xs);
+  text-align: center;
+}

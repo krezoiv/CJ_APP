@@ -1,0 +1,128 @@
+@use 'mixins' as *;
+@use 'breakpoints' as bp;
+
+:host {
+  display: block;
+}
+
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.toolbar__row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+
+  @include bp.respond(md) {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+  background: var(--color-surface-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-text-on-light-subtle);
+  @include focus-ring;
+
+  &:focus-within {
+    border-color: var(--color-primary-500);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--color-text-on-light);
+    font-size: var(--fs-sm);
+
+    &::placeholder {
+      color: var(--color-text-on-light-subtle);
+    }
+  }
+}
+
+.toolbar__filters-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+
+  @include bp.respond(md) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.filter-field__label {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  color: var(--color-text-on-light-muted);
+}
+
+.date-input {
+  background: var(--color-surface-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-text-on-light);
+  font-size: var(--fs-sm);
+  font-family: var(--font-body);
+  @include focus-ring;
+
+  &:focus {
+    border-color: var(--color-primary-500);
+  }
+}
+
+.toolbar__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.filter-chip {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border-light);
+  background: var(--color-surface-light);
+  color: var(--color-text-on-light-muted);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+  @include focus-ring;
+
+  &:hover {
+    border-color: var(--color-primary-300);
+    color: var(--color-text-on-light);
+  }
+}
+
+.filter-chip--active {
+  background: var(--gradient-brand);
+  border-color: transparent;
+  color: var(--color-white);
+}
+
+.filter-chip--clear {
+  color: var(--color-primary-600);
+  border-style: dashed;
+}

@@ -1,0 +1,12 @@
+@if (showChrome()) {
+  <app-navbar />
+}
+<main>
+  <router-outlet />
+</main>
+@if (showChrome()) {
+  <app-footer />
+}
+<app-toast-container />
+<app-confirm-dialog />
+<app-pdf-prompt-modal />

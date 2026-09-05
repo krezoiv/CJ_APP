@@ -1,0 +1,47 @@
+<div class="businesses">
+  <header class="businesses__header">
+    <div>
+      <h1 class="businesses__title">Negocios</h1>
+      <p class="businesses__subtitle">
+        Gestiona las líneas de negocio (librería, tienda, heladería...) a las que pertenecen tus productos.
+      </p>
+    </div>
+  </header>
+
+  <app-business-summary [data]="businesses()" />
+
+  <app-business-toolbar
+    [searchTerm]="searchTerm()"
+    [statusFilter]="statusFilter()"
+    [canManage]="isAdmin()"
+    (searchTermChange)="searchTerm.set($event)"
+    (statusFilterChange)="statusFilter.set($event)"
+    (addBusiness)="openCreateForm()"
+  />
+
+  <app-business-table
+    [businesses]="filteredBusinesses()"
+    [loading]="loading()"
+    [hasActiveFilters]="hasActiveFilters()"
+    [canManage]="isAdmin()"
+    (edit)="openEditForm($event)"
+    (delete)="requestDelete($event)"
+    (clearFilters)="clearFilters()"
+    (addBusiness)="openCreateForm()"
+  />
+</div>
+
+<app-business-form-modal
+  [open]="isFormOpen()"
+  [business]="editingBusiness()"
+  (closed)="closeForm()"
+  (saved)="onBusinessSaved($event)"
+/>
+
+<app-business-delete-confirm-modal
+  [open]="isDeleteOpen()"
+  [business]="deletingBusiness()"
+  [isDeleting]="isDeleting()"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>

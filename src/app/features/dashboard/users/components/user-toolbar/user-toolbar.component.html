@@ -1,0 +1,44 @@
+<div class="toolbar">
+  <div class="toolbar__row">
+    <label class="search" for="user-search">
+      <app-icon name="search" [size]="18" />
+      <input
+        id="user-search"
+        type="text"
+        placeholder="Buscar por usuario o teléfono…"
+        [ngModel]="searchTerm"
+        (ngModelChange)="searchTermChange.emit($event)"
+      />
+    </label>
+
+    <select
+      class="role-select"
+      aria-label="Filtrar por rol"
+      [ngModel]="roleFilter"
+      (ngModelChange)="roleFilterChange.emit($event)"
+    >
+      <option value="all">Todos los roles</option>
+      @for (role of roles; track role.id) {
+        <option [value]="role.id">{{ role.name }}</option>
+      }
+    </select>
+
+    <app-button variant="primary" (click)="addUser.emit()">
+      <app-icon name="plus" [size]="16" />
+      Agregar usuario
+    </app-button>
+  </div>
+
+  <div class="toolbar__filters" role="group" aria-label="Filtrar por estado">
+    @for (option of statusFilterOptions; track option.value) {
+      <button
+        type="button"
+        class="filter-chip"
+        [class.filter-chip--active]="statusFilter === option.value"
+        (click)="statusFilterChange.emit(option.value)"
+      >
+        {{ option.label }}
+      </button>
+    }
+  </div>
+</div>

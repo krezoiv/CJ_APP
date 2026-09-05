@@ -1,0 +1,42 @@
+@if (selectedIceCream) {
+  <div class="search__selected">
+    <span class="search__selected-name">{{ selectedIceCream.product }}</span>
+    <button type="button" class="search__selected-clear" (click)="clear()" title="Quitar filtro de producto">
+      <app-icon name="close" [size]="14" />
+    </button>
+  </div>
+} @else {
+  <div class="search">
+    <label class="search__box" for="report-ice-cream-filter">
+      <app-icon name="search" [size]="16" />
+      <input
+        id="report-ice-cream-filter"
+        type="text"
+        placeholder="Todos los productos"
+        autocomplete="off"
+        [ngModel]="query()"
+        (ngModelChange)="onInput($event)"
+        (focus)="onFocus()"
+        (blur)="onBlur()"
+      />
+      @if (loading()) {
+        <app-icon name="clock" [size]="14" class="search__spinner" />
+      }
+    </label>
+
+    @if (open() && (results().length > 0 || hasSearched())) {
+      <div class="search__dropdown">
+        @if (results().length === 0) {
+          <p class="search__empty">No se encontraron productos.</p>
+        } @else {
+          @for (iceCream of results(); track iceCream.id) {
+            <button type="button" class="search__result" (click)="select(iceCream)">
+              <span class="search__result-name">{{ iceCream.product }}</span>
+              <span class="search__result-meta">{{ iceCream.sku }}</span>
+            </button>
+          }
+        }
+      </div>
+    }
+  </div>
+}

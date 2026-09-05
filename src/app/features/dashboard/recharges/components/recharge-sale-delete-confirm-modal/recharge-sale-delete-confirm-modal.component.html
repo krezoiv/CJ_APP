@@ -1,0 +1,22 @@
+@if (open && sale) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__icon">
+        <app-icon name="alert-triangle" [size]="24" />
+      </div>
+
+      <h2 class="modal__title">¿Eliminar esta recarga?</h2>
+      <p class="modal__description">
+        La recarga de <strong>{{ formatCurrency(sale.amount) }}</strong> ({{ sale.rechargeTypeName }}) al número
+        <strong>{{ sale.phoneNumber }}</strong> se eliminará permanentemente y ya no se contará en el cuadre del día.
+      </p>
+
+      <div class="modal__actions">
+        <app-button variant="ghost" [disabled]="isDeleting" (click)="cancelled.emit()">Cancelar</app-button>
+        <app-button variant="danger" [disabled]="isDeleting" (click)="confirmed.emit()">
+          {{ isDeleting ? 'Eliminando…' : 'Sí, eliminar' }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

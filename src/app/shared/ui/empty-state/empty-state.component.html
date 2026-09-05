@@ -1,0 +1,10 @@
+<div class="empty-state">
+  <div class="empty-state__icon">
+    <app-icon [name]="icon" [size]="28" />
+  </div>
+  <h3 class="empty-state__title">{{ title }}</h3>
+  @if (description) {
+    <p class="empty-state__description">{{ description }}</p>
+  }
+  <ng-content></ng-content>
+</div>

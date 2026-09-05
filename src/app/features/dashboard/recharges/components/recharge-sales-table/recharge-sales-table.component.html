@@ -1,0 +1,158 @@
+@if (loading) {
+  <div class="table-wrapper table-wrapper--desktop" aria-hidden="true">
+    <table class="sales-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Número de teléfono</th>
+          <th>Operador</th>
+          <th class="align-right">Monto</th>
+          <th>Fecha</th>
+          <th class="align-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of skeletonRows; track row) {
+          <tr class="skeleton-row">
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--lg"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="loading-note">
+    <app-icon name="clock" [size]="16" />
+    Cargando recargas vendidas…
+  </p>
+} @else if (sales.length === 0) {
+  <p class="empty-note">
+    <app-icon name="phone" [size]="16" />
+    Aún no se han registrado recargas vendidas para esta fecha.
+  </p>
+} @else {
+  <div class="table-wrapper table-wrapper--desktop">
+    <table class="sales-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Número de teléfono</th>
+          <th>Operador</th>
+          <th class="align-right">Monto</th>
+          <th>Fecha</th>
+          <th class="align-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (sale of sales; track sale.id; let i = $index) {
+          <tr>
+            <td>{{ i + 1 }}</td>
+            <td class="sales-table__phone">{{ sale.phoneNumber }}</td>
+            <td>{{ sale.rechargeTypeName }}</td>
+            <td class="align-right sales-table__amount">{{ formatCurrency(sale.amount) }}</td>
+            <td>{{ sale.date | date: 'dd/MM/yyyy' }}</td>
+            <td class="align-center">
+              @if (dayLockReason === 'closed') {
+                <span class="locked-hint">
+                  <app-icon name="lock" [size]="14" />
+                  Día cerrado
+                </span>
+              } @else if (dayLockReason === 'not_opened') {
+                <span class="locked-hint">
+                  <app-icon name="lock" [size]="14" />
+                  Sin aperturar
+                </span>
+              } @else if (sale.locked) {
+                <span class="locked-hint">
+                  <app-icon name="lock" [size]="14" />
+                  Cerrada
+                </span>
+              } @else {
+                <div class="actions">
+                  <button
+                    type="button"
+                    class="action-btn"
+                    (click)="editRequested.emit(sale)"
+                    [attr.aria-label]="'Editar recarga de ' + sale.phoneNumber"
+                  >
+                    <app-icon name="edit-2" [size]="16" />
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn action-btn--danger"
+                    (click)="deleteRequested.emit(sale)"
+                    [attr.aria-label]="'Eliminar recarga de ' + sale.phoneNumber"
+                  >
+                    <app-icon name="trash-2" [size]="16" />
+                  </button>
+                </div>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-list">
+    @for (sale of sales; track sale.id; let i = $index) {
+      <div class="sale-card">
+        <div class="sale-card__header">
+          <p class="sale-card__phone">#{{ i + 1 }} — {{ sale.phoneNumber }}</p>
+          <span class="sale-card__amount">{{ formatCurrency(sale.amount) }}</span>
+        </div>
+
+        <dl class="sale-card__grid">
+          <div>
+            <dt>Operador</dt>
+            <dd>{{ sale.rechargeTypeName }}</dd>
+          </div>
+          <div>
+            <dt>Fecha</dt>
+            <dd>{{ sale.date | date: 'dd/MM/yyyy' }}</dd>
+          </div>
+        </dl>
+
+        @if (dayLockReason === 'closed') {
+          <span class="locked-hint">
+            <app-icon name="lock" [size]="14" />
+            Día de recargas cerrado.
+          </span>
+        } @else if (dayLockReason === 'not_opened') {
+          <span class="locked-hint">
+            <app-icon name="lock" [size]="14" />
+            Día de recargas sin aperturar.
+          </span>
+        } @else if (sale.locked) {
+          <span class="locked-hint">
+            <app-icon name="lock" [size]="14" />
+            Cerrada — el cuadre de este operador ya fue guardado.
+          </span>
+        } @else {
+          <div class="actions">
+            <button
+              type="button"
+              class="action-btn"
+              (click)="editRequested.emit(sale)"
+              [attr.aria-label]="'Editar recarga de ' + sale.phoneNumber"
+            >
+              <app-icon name="edit-2" [size]="16" />
+            </button>
+            <button
+              type="button"
+              class="action-btn action-btn--danger"
+              (click)="deleteRequested.emit(sale)"
+              [attr.aria-label]="'Eliminar recarga de ' + sale.phoneNumber"
+            >
+              <app-icon name="trash-2" [size]="16" />
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}

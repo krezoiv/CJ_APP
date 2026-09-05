@@ -1,0 +1,101 @@
+<h2 class="summary__title">
+  <app-icon name="bar-chart" [size]="18" />
+  Resumen de Ventas y Cuadre
+</h2>
+
+@if (loading()) {
+  <p class="loading-note">
+    <app-icon name="clock" [size]="16" />
+    Cargando resumen de ventas…
+  </p>
+}
+@if (!loading() && summary(); as data) {
+  <div class="summary">
+    <div class="summary__row">
+      <span>Total vendido Claro</span>
+      <span class="summary__value">{{ formatCurrency(data.totalClaro) }}</span>
+    </div>
+    <div class="summary__row">
+      <span>Total vendido Tigo</span>
+      <span class="summary__value">{{ formatCurrency(data.totalTigo) }}</span>
+    </div>
+
+    <div class="summary__row summary__row--total">
+      <span>Total ventas</span>
+      <span class="summary__value">{{ formatCurrency(data.totalSales) }}</span>
+    </div>
+
+    @if (data.savedClosure) {
+      <div class="saved-closure">
+        <p class="saved-closure__title">
+          <app-icon name="check-circle" [size]="14" />
+          Cuadre guardado para esta fecha
+        </p>
+        <div class="saved-closure__row">
+          <span>Recaudado</span>
+          <span>{{ formatCurrency(data.totalCollected!) }}</span>
+        </div>
+        <div class="saved-closure__row">
+          <span>Resultado</span>
+          <app-badge [tone]="savedStatusTone()">
+            <app-icon [name]="savedStatusIcon()" [size]="12" />
+            {{ formatCurrency(data.difference!) }} — {{ savedStatusText() }}
+          </app-badge>
+        </div>
+      </div>
+    }
+
+    <label class="field">
+      <span>{{ data.savedClosure ? 'Corregir total recaudado' : 'Total recaudado' }}</span>
+      <div class="price-input">
+        <span>Q</span>
+        <input
+          type="text"
+          inputmode="decimal"
+          appDecimalInput
+          [disabled]="lockReason !== null || (data.savedClosure && !isAdmin())"
+          [value]="totalCollectedDraft() ?? ''"
+          (input)="onTotalCollectedInput($any($event.target).value)"
+          aria-label="Total recaudado"
+        />
+      </div>
+    </label>
+
+    @if (previewResult() !== null) {
+      <div class="result">
+        <span class="result__label">Resultado del cuadre</span>
+        <span class="result__value" [class]="'result__value--' + previewStatus()">
+          {{ formatCurrency(previewResult()!) }}
+        </span>
+
+        @if (previewStatus(); as status) {
+          <app-badge [tone]="statusTone()">
+            <app-icon [name]="statusIcon()" [size]="14" />
+            {{ statusText() }}
+          </app-badge>
+        }
+      </div>
+    }
+
+    @if (lockReason === 'closed') {
+      <p class="locked-hint">
+        <app-icon name="lock" [size]="12" />
+        Día de recargas cerrado — no se puede guardar el cuadre.
+      </p>
+    } @else if (lockReason === 'not_opened') {
+      <p class="locked-hint">
+        <app-icon name="lock" [size]="12" />
+        Día de recargas sin aperturar — no se puede guardar el cuadre.
+      </p>
+    } @else if (data.savedClosure && !isAdmin()) {
+      <p class="locked-hint">
+        <app-icon name="lock" [size]="12" />
+        Cuadre ya guardado para esta fecha — solo un administrador puede corregirlo.
+      </p>
+    }
+
+    <app-button variant="primary" fullWidth [disabled]="!canSave() || isSaving() || lockReason !== null" (click)="save()">
+      {{ isSaving() ? 'Guardando…' : 'Guardar cuadre' }}
+    </app-button>
+  </div>
+}

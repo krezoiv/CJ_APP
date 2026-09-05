@@ -1,0 +1,73 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">{{ isEditMode ? 'Editar helado' : 'Agregar helado' }}</h2>
+        <button type="button" class="modal__close" (click)="close()" aria-label="Cerrar">
+          <app-icon name="close" [size]="18" />
+        </button>
+      </div>
+
+      <form class="modal__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="field">
+          <label for="ice-cream-sku">SKU</label>
+          <input id="ice-cream-sku" type="text" formControlName="sku" placeholder="Ej. HEL-0001" />
+          @if (form.controls.sku.invalid && form.controls.sku.touched) {
+            <span class="field__error">Ingresa un SKU válido (letras, números y guiones).</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="ice-cream-product">Producto</label>
+          <input id="ice-cream-product" type="text" formControlName="product" placeholder="Ej. Helado de Vainilla" />
+          @if (form.controls.product.invalid && form.controls.product.touched) {
+            <span class="field__error">Ingresa un nombre de al menos 2 caracteres.</span>
+          }
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="ice-cream-cost-price">Precio de costo</label>
+            <input
+              id="ice-cream-cost-price"
+              type="text"
+              inputmode="decimal"
+              appDecimalInput
+              formControlName="costPrice"
+              placeholder="0.00"
+            />
+            @if (form.controls.costPrice.invalid && form.controls.costPrice.touched) {
+              <span class="field__error">Ingresa un valor de 0 o más.</span>
+            }
+          </div>
+
+          <div class="field">
+            <label for="ice-cream-public-price">Precio público</label>
+            <input
+              id="ice-cream-public-price"
+              type="text"
+              inputmode="decimal"
+              appDecimalInput
+              formControlName="publicPrice"
+              placeholder="0.00"
+            />
+            @if (form.controls.publicPrice.invalid && form.controls.publicPrice.touched) {
+              <span class="field__error">Ingresa un valor de 0 o más.</span>
+            }
+          </div>
+        </div>
+
+        @if (errorMessage()) {
+          <p class="modal__error">{{ errorMessage() }}</p>
+        }
+
+        <div class="modal__actions">
+          <app-button variant="ghost" type="button" [disabled]="isSubmitting()" (click)="close()">Cancelar</app-button>
+          <app-button variant="primary" type="submit" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Guardando…' : isEditMode ? 'Guardar cambios' : 'Agregar helado' }}
+          </app-button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

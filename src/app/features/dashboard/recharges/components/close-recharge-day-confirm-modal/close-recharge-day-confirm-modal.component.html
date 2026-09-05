@@ -1,0 +1,22 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__icon">
+        <app-icon name="lock" [size]="24" />
+      </div>
+
+      <h2 class="modal__title">¿Cerrar el día de recargas?</h2>
+      <p class="modal__description">
+        Al cerrar el día se bloquearán nuevas compras, ventas y cuadres para esta fecha. Solo un administrador podrá
+        reabrirlo posteriormente, indicando un motivo.
+      </p>
+
+      <div class="modal__actions">
+        <app-button variant="ghost" [disabled]="isClosing" (click)="cancelled.emit()">Cancelar</app-button>
+        <app-button variant="primary" [disabled]="isClosing" (click)="confirmed.emit()">
+          {{ isClosing ? 'Cerrando…' : 'Sí, cerrar día' }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

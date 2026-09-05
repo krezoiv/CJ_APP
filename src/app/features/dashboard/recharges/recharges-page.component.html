@@ -1,0 +1,167 @@
+<div class="recharges">
+  <header class="recharges__header">
+    <div>
+      <h1 class="recharges__title">Recargas Electrónicas</h1>
+      <p class="recharges__subtitle">Controla el saldo diario de cada operadora: compras, saldo del día y cierre.</p>
+    </div>
+
+    <div class="recharges__header-actions">
+      <label class="recharges__date-field">
+        <span>Fecha de operación</span>
+        <input
+          type="date"
+          [value]="operationDate()"
+          [max]="maxSelectableDate"
+          (change)="onDateChange($any($event.target).value)"
+          aria-label="Fecha de operación"
+        />
+      </label>
+
+      @if (!isEditingUnlocked() && isTodayOperationDate()) {
+        <app-button variant="ghost" (click)="reopenEntryModal()">
+          <app-icon name="lock" [size]="16" />
+          Habilitar edición
+        </app-button>
+      }
+
+      @if (activeDayStatus()?.canCloseDay) {
+        <app-button variant="primary" (click)="openCloseDayModal()">
+          <app-icon name="lock" [size]="16" />
+          Cerrar Día
+        </app-button>
+      }
+    </div>
+  </header>
+
+  @if (effectiveDayClosed()) {
+    <p class="info-banner info-banner--locked">
+      <app-icon name="lock" [size]="16" />
+      El día de recargas del {{ operationDate() }} está cerrado. Solo un administrador puede reabrirlo desde
+      "Gestión de Días de Recargas".
+    </p>
+  }
+
+  <section class="recharges__sales-section">
+    <div class="recharges__sales-header">
+      <h2 class="recharges__sales-title">Recargas Vendidas</h2>
+      <app-button variant="primary" [disabled]="!isEditingUnlocked()" (click)="openAddSaleModal()">
+        <app-icon name="plus" [size]="16" />
+        Agregar Recarga
+      </app-button>
+    </div>
+
+    <app-recharge-sales-table
+      [sales]="sales()"
+      [loading]="salesLoading()"
+      [dayLockReason]="dayLockReason()"
+      (editRequested)="openEditSaleModal($event)"
+      (deleteRequested)="requestDeleteSale($event)"
+    />
+  </section>
+
+  <app-recharge-table
+    [balances]="balances()"
+    [loading]="loading()"
+    [isAdmin]="isAdmin()"
+    [dayLockReason]="dayLockReason()"
+    (requestFinalBalance)="onRequestFinalBalance($event)"
+  />
+
+  <div class="recharges__cards-row">
+    <app-card [hoverable]="false" class="recharges__purchase-card">
+      <app-register-purchase-form
+        [types]="types()"
+        [operationDate]="operationDate()"
+        [lockReason]="dayLockReason()"
+        (registered)="onPurchaseRegistered($event)"
+      />
+    </app-card>
+
+    <app-card [hoverable]="false" class="recharges__summary-card">
+      <app-recharge-sales-summary-card
+        [operationDate]="operationDate()"
+        [refreshTrigger]="salesSummaryRefreshTick()"
+        [lockReason]="dayLockReason()"
+        (closureSaved)="onClosureSaved()"
+      />
+    </app-card>
+  </div>
+
+  <!--
+    SIM Claro/SIM Tigo — inventario físico, completamente separado del
+    saldo electrónico de arriba: sección propia, tabla propia, tarjetas
+    propias. Nunca se suma ni se mezcla con las cifras de "Recargas
+    Vendidas"/el cuadre de saldo electrónico.
+  -->
+  <section class="recharges__sim-section">
+    <h2 class="recharges__sim-title">
+      <app-icon name="smartphone" [size]="18" />
+      SIM
+    </h2>
+    <p class="recharges__sim-subtitle">Inventario físico de SIM — independiente del saldo electrónico de Claro y Tigo.</p>
+
+    <app-sim-stock-table [stocks]="simStocks()" [loading]="simLoading()" />
+
+    <div class="recharges__cards-row">
+      <app-card [hoverable]="false" class="recharges__purchase-card">
+        <app-register-sim-purchase-form
+          [types]="simTypes()"
+          [operationDate]="operationDate()"
+          [lockReason]="dayLockReason()"
+          (registered)="onSimPurchaseRegistered($event)"
+        />
+      </app-card>
+
+      <app-card [hoverable]="false" class="recharges__purchase-card">
+        <app-register-sim-sale-form
+          [types]="simTypes()"
+          [stockByTypeId]="simStockByTypeId()"
+          [operationDate]="operationDate()"
+          [lockReason]="dayLockReason()"
+          (registered)="onSimSaleRegistered($event)"
+        />
+      </app-card>
+    </div>
+  </section>
+</div>
+
+<app-recharge-entry-confirm-modal
+  [open]="isEntryConfirmModalOpen()"
+  [isOpening]="isOpeningDay()"
+  (confirmed)="confirmEntryModal()"
+  (cancelled)="cancelEntryModal()"
+/>
+
+<app-close-recharge-day-confirm-modal
+  [open]="isCloseDayConfirmModalOpen()"
+  [isClosing]="isClosingDay()"
+  (confirmed)="confirmCloseDayModal()"
+  (cancelled)="cancelCloseDayModal()"
+/>
+
+<app-final-balance-confirm-modal
+  [open]="isFinalBalanceModalOpen()"
+  [rechargeTypeName]="finalBalanceTarget()?.rechargeTypeName ?? ''"
+  [dailyBalance]="finalBalanceTarget()?.dailyBalance ?? 0"
+  [finalBalance]="finalBalanceDraft()"
+  [isSaving]="isSavingFinalBalance()"
+  (confirmed)="confirmFinalBalance()"
+  (cancelled)="cancelFinalBalance()"
+/>
+
+<app-recharge-sale-form-modal
+  [open]="isSaleModalOpen()"
+  [types]="types()"
+  [operationDate]="operationDate()"
+  [sale]="saleModalTarget()"
+  (saved)="onSaleSaved($event)"
+  (closed)="closeSaleModal()"
+/>
+
+<app-recharge-sale-delete-confirm-modal
+  [open]="isDeleteSaleModalOpen()"
+  [sale]="deleteSaleTarget()"
+  [isDeleting]="isDeletingSale()"
+  (confirmed)="confirmDeleteSale()"
+  (cancelled)="cancelDeleteSale()"
+/>

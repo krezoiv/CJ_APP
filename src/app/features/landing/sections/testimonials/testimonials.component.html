@@ -1,0 +1,22 @@
+<app-section tone="muted" spacing="lg">
+  <app-section-heading eyebrow="Testimonios" title="Lo que dicen quienes ya confían en nosotros" />
+
+  <div class="testimonials__grid">
+    @for (testimonial of testimonials$ | async; track testimonial.id; let i = $index) {
+      <app-card [revealDelay]="i * 70" appRevealOnScroll tone="light">
+        <div class="testimonial">
+          <div class="testimonial__stars">
+            @for (star of stars; track star) {
+              <app-icon name="star" [size]="16" />
+            }
+          </div>
+          <p class="testimonial__quote">“{{ testimonial.quote }}”</p>
+          <div class="testimonial__author">
+            <span class="testimonial__name">{{ testimonial.author }}</span>
+            <span class="testimonial__role">{{ testimonial.role }}</span>
+          </div>
+        </div>
+      </app-card>
+    }
+  </div>
+</app-section>

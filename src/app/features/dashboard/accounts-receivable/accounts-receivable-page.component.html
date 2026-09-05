@@ -1,0 +1,77 @@
+<div class="accounts-receivable">
+  <header class="accounts-receivable__header">
+    <div>
+      <h1 class="accounts-receivable__title">Cuentas por Cobrar</h1>
+      <p class="accounts-receivable__subtitle">Administra los montos pendientes de cobro por cliente.</p>
+    </div>
+  </header>
+
+  @if (activeBalance()) {
+    <app-card padding="lg" class="balance-summary">
+      <div class="balance-summary__tile">
+        <div class="balance-summary__icon">
+          <app-icon name="receipt" [size]="22" />
+        </div>
+        <span class="balance-summary__title">Saldo total (cuentas activas)</span>
+        <span class="balance-summary__value">{{ formatCurrency(activeBalance()!.totalAmount) }}</span>
+        <span class="balance-summary__description">{{ activeBalance()!.recordCount }} registros activos</span>
+      </div>
+    </app-card>
+  }
+
+  <app-account-receivable-toolbar
+    [searchTerm]="searchTerm()"
+    [statusFilter]="statusFilter()"
+    [clientFilter]="clientFilter()"
+    [dateFrom]="dateFrom()"
+    [dateTo]="dateTo()"
+    [hasActiveFilters]="hasActiveFilters()"
+    [canManage]="isAdmin()"
+    (searchTermChange)="onSearchTermChange($event)"
+    (statusFilterChange)="onStatusFilterChange($event)"
+    (clientFilterChange)="onClientFilterChange($event)"
+    (dateFromChange)="onDateFromChange($event)"
+    (dateToChange)="onDateToChange($event)"
+    (clearFilters)="clearFilters()"
+    (addRecord)="openCreateForm()"
+  />
+
+  <app-account-receivable-table
+    [records]="records()"
+    [loading]="loading()"
+    [hasActiveFilters]="hasActiveFilters()"
+    [canManage]="isAdmin()"
+    (edit)="openEditForm($event)"
+    (delete)="requestDelete($event)"
+    (clearFilters)="clearFilters()"
+    (addRecord)="openCreateForm()"
+    (viewStatement)="openStatement($event)"
+  />
+
+  <app-report-pagination [total]="total()" [page]="page()" [limit]="limit" (pageChange)="onPageChange($event)" />
+</div>
+
+<app-account-receivable-form-modal
+  [open]="isFormOpen()"
+  [record]="editingRecord()"
+  (closed)="closeForm()"
+  (saved)="onRecordSaved($event)"
+/>
+
+<app-account-receivable-delete-confirm-modal
+  [open]="isDeleteOpen()"
+  [record]="deletingRecord()"
+  [isDeleting]="isDeleting()"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>
+
+<app-account-statement-modal
+  [open]="isStatementOpen()"
+  [client]="statementClient()"
+  [service]="accountReceivableService"
+  title="Estado de Cuenta — Cuentas por Cobrar"
+  [canManage]="isAdmin()"
+  (closed)="closeStatement()"
+  (changed)="fetchRecords(); fetchActiveBalance()"
+/>

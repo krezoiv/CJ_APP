@@ -1,0 +1,60 @@
+@if (ticketId) {
+  <div class="modal-backdrop" (click)="close()">
+    <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <button type="button" class="modal__close" (click)="close()" aria-label="Cerrar">
+        <app-icon name="x-circle" [size]="20" />
+      </button>
+
+      @if (loading()) {
+        <p class="modal__loading">Cargando…</p>
+      } @else if (ticket()) {
+        @let t = ticket()!;
+        <h2 class="modal__title">Ticket {{ t.ticketNumber }}</h2>
+        <p class="modal__meta">
+          {{ t.createdAt | date: 'dd/MM/yyyy HH:mm' }} · {{ t.username }}
+          @if (t.clientName) {
+            · {{ t.clientName }}
+          }
+        </p>
+
+        @if (t.isVoided) {
+          <div class="modal__void-banner">
+            <app-icon name="alert-triangle" [size]="16" />
+            Anulado — {{ t.voidReason }}
+          </div>
+        }
+
+        <table class="modal__table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th class="align-center">Cant.</th>
+              <th class="align-right">Precio</th>
+              <th class="align-right">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of t.items; track item.id) {
+              <tr>
+                <td>
+                  {{ item.productName }}
+                  @if (item.observation) {
+                    <div class="modal__item-observation">Obs: {{ item.observation }}</div>
+                  }
+                </td>
+                <td class="align-center">{{ item.quantity }}</td>
+                <td class="align-right">{{ formatCurrency(item.unitPrice) }}</td>
+                <td class="align-right">{{ formatCurrency(item.total) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <div class="modal__total">
+          <span>Total</span>
+          <strong>{{ formatCurrency(t.total) }}</strong>
+        </div>
+      }
+    </div>
+  </div>
+}

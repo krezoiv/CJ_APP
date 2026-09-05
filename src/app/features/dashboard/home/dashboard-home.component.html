@@ -1,0 +1,28 @@
+<div class="home">
+  <header class="home__header">
+    <div>
+      <p class="home__eyebrow">{{ today() | date: "EEEE d 'de' MMMM, yyyy" }}</p>
+      <h1 class="home__title">Hola, {{ currentUser()?.username }}</h1>
+      <p class="home__subtitle">Este es el resumen rápido de tu negocio hoy.</p>
+    </div>
+  </header>
+
+  <div class="home__grid">
+    @for (item of summary$ | async; track item.id) {
+      <app-card padding="lg">
+        <a class="summary-card" [routerLink]="['/dashboard', item.path]">
+          <div class="summary-card__icon">
+            <app-icon [name]="item.icon" [size]="24" />
+          </div>
+          <span class="summary-card__title">{{ item.title }}</span>
+          <span class="summary-card__value">{{ item.value }}</span>
+          <span class="summary-card__description">{{ item.description }}</span>
+        </a>
+      </app-card>
+    }
+  </div>
+
+  @if (isAdmin()) {
+    <app-financial-indicators [metrics]="financialMetrics()" [loading]="loadingFinancialMetrics()" />
+  }
+</div>

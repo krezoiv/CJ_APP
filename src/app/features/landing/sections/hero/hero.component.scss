@@ -1,0 +1,120 @@
+@use 'breakpoints' as bp;
+@use 'mixins' as *;
+
+:host {
+  display: block;
+}
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--gradient-dark-fade);
+  color: var(--color-text-on-dark);
+  padding-top: var(--space-16);
+  padding-bottom: var(--space-20);
+
+  @include bp.respond(lg) {
+    padding-top: var(--space-24);
+    padding-bottom: var(--space-32);
+  }
+}
+
+.hero__grid-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%);
+  pointer-events: none;
+}
+
+.hero__glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.hero__glow--primary {
+  width: 32rem;
+  height: 32rem;
+  top: -10rem;
+  right: -8rem;
+  background: radial-gradient(circle, var(--color-primary-600) 0%, transparent 70%);
+}
+
+.hero__glow--gold {
+  width: 24rem;
+  height: 24rem;
+  bottom: -8rem;
+  left: -6rem;
+  background: radial-gradient(circle, var(--color-accent-gold) 0%, transparent 70%);
+  opacity: 0.25;
+}
+
+.hero__layout {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--space-16);
+  align-items: center;
+
+  @include bp.respond(lg) {
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: var(--space-10);
+  }
+}
+
+.hero__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-6);
+}
+
+.hero__title {
+  font-size: var(--fs-3xl);
+  line-height: var(--lh-tight);
+  max-width: 24ch;
+
+  @include bp.respond(md) {
+    font-size: var(--fs-4xl);
+  }
+}
+
+.hero__subtitle {
+  font-size: var(--fs-md);
+  line-height: var(--lh-normal);
+  color: var(--color-text-on-dark-muted);
+  max-width: 40ch;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.hero__trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  padding-top: var(--space-2);
+}
+
+.hero__trust-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-sm);
+  color: var(--color-text-on-dark-subtle);
+}
+
+.hero__visual {
+  padding-top: var(--space-6);
+
+  @include bp.respond(lg) {
+    padding-top: 0;
+  }
+}

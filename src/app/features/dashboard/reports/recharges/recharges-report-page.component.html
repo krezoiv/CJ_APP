@@ -1,0 +1,97 @@
+<div class="reports-page">
+  <header class="reports-page__header">
+    <div>
+      <h1 class="reports-page__title">Reporte de Recargas Electrónicas</h1>
+      <p class="reports-page__subtitle">Consulta, filtra y exporta el historial de saldos de Claro y Tigo.</p>
+    </div>
+    <app-button variant="primary" [disabled]="exporting()" (click)="exportPdf()">
+      <app-icon name="download" [size]="16" />
+      {{ exporting() ? 'Generando…' : 'Exportar PDF' }}
+    </app-button>
+  </header>
+
+  <div class="reports-page__filters">
+    <div class="reports-page__filters-title">
+      <app-icon name="filter" [size]="16" />
+      Filtros
+    </div>
+
+    <div class="filters-grid">
+      <div class="field">
+        <label for="rreport-start-date">Desde</label>
+        <input
+          id="rreport-start-date"
+          type="date"
+          [ngModel]="draftStartDate()"
+          (ngModelChange)="draftStartDate.set($event)"
+        />
+      </div>
+
+      <div class="field">
+        <label for="rreport-end-date">Hasta</label>
+        <input
+          id="rreport-end-date"
+          type="date"
+          [ngModel]="draftEndDate()"
+          (ngModelChange)="draftEndDate.set($event)"
+          [max]="draftEndDate()"
+        />
+      </div>
+
+      <div class="field">
+        <label for="rreport-type">Tipo de recarga</label>
+        <select id="rreport-type" [ngModel]="draftRechargeTypeId()" (ngModelChange)="draftRechargeTypeId.set($event)">
+          <option value="">Todos (Claro y Tigo)</option>
+          @for (type of types(); track type.id) {
+            <option [value]="type.id">{{ type.name }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="filters-actions">
+      <app-button variant="ghost" [disabled]="!hasActiveFilters()" (click)="clearFilters()">Limpiar filtros</app-button>
+      <app-button variant="primary" (click)="applyFilters()">Aplicar filtros</app-button>
+    </div>
+  </div>
+
+  <app-report-summary [tiles]="summaryTiles()" [loading]="loadingSummary()" />
+
+  <div class="table-wrapper">
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Tipo</th>
+          <th class="align-right">Saldo Anterior</th>
+          <th class="align-right">Compra</th>
+          <th class="align-right">Saldo del Día</th>
+          <th class="align-right">Saldo Final</th>
+          <th class="align-right">Venta</th>
+          <th>Usuario</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (!loadingTable()) {
+          @for (row of rows(); track row.id) {
+            <tr>
+              <td>{{ row.date | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ row.rechargeTypeName }}</td>
+              <td class="align-right">{{ formatCurrency(row.previousBalance) }}</td>
+              <td class="align-right">{{ formatCurrency(row.totalPurchases) }}</td>
+              <td class="align-right">{{ formatCurrency(row.dailyBalance) }}</td>
+              <td class="align-right">{{ row.finalBalance !== null ? formatCurrency(row.finalBalance) : '—' }}</td>
+              <td class="align-right report-table__total">{{ row.sale !== null ? formatCurrency(row.sale) : '—' }}</td>
+              <td>{{ row.createdByUsername }}</td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+    @if (!loadingTable() && rows().length === 0) {
+      <p class="table-wrapper__empty">No se encontraron registros con los filtros seleccionados.</p>
+    }
+  </div>
+
+  <app-report-pagination [total]="total()" [page]="page()" [limit]="20" (pageChange)="onPageChange($event)" />
+</div>

@@ -1,0 +1,45 @@
+<div class="transaction-banks">
+  <header class="transaction-banks__header">
+    <div>
+      <h1 class="transaction-banks__title">Banco Agente</h1>
+      <p class="transaction-banks__subtitle">Administra los bancos agente disponibles para registrar transacciones en Transaccionar.</p>
+    </div>
+  </header>
+
+  <app-transaction-bank-summary [data]="transactionBanks()" />
+
+  <app-transaction-bank-toolbar
+    [searchTerm]="searchTerm()"
+    [statusFilter]="statusFilter()"
+    [canManage]="isAdmin()"
+    (searchTermChange)="searchTerm.set($event)"
+    (statusFilterChange)="statusFilter.set($event)"
+    (addTransactionBank)="openCreateForm()"
+  />
+
+  <app-transaction-bank-table
+    [transactionBanks]="filteredTransactionBanks()"
+    [loading]="loading()"
+    [hasActiveFilters]="hasActiveFilters()"
+    [canManage]="isAdmin()"
+    (edit)="openEditForm($event)"
+    (delete)="requestDelete($event)"
+    (clearFilters)="clearFilters()"
+    (addTransactionBank)="openCreateForm()"
+  />
+</div>
+
+<app-transaction-bank-form-modal
+  [open]="isFormOpen()"
+  [transactionBank]="editingTransactionBank()"
+  (closed)="closeForm()"
+  (saved)="onTransactionBankSaved($event)"
+/>
+
+<app-transaction-bank-delete-confirm-modal
+  [open]="isDeleteOpen()"
+  [transactionBank]="deletingTransactionBank()"
+  [isDeleting]="isDeleting()"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>

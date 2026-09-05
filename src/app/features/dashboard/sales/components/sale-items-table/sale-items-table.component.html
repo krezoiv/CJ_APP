@@ -1,0 +1,134 @@
+@if (items.length === 0) {
+  <app-empty-state
+    icon="receipt"
+    title="El recibo está vacío"
+    description="Busca un producto por SKU o nombre para agregarlo al recibo."
+  />
+} @else {
+  <div class="table-wrapper table-wrapper--desktop">
+    <table class="sale-table">
+      <thead>
+        <tr>
+          <th class="align-center">Cantidad</th>
+          <th>SKU</th>
+          <th>Producto</th>
+          <th class="align-right">Precio unitario</th>
+          <th class="align-right">Total</th>
+          <th class="align-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of items; track item.productId) {
+          <tr [class.sale-table__row--pending]="isPending(item)">
+            <td class="align-center">
+              <div class="qty-stepper">
+                <button
+                  type="button"
+                  class="qty-btn"
+                  [disabled]="item.quantity <= 1 || isPending(item)"
+                  (click)="decrement(item)"
+                  aria-label="Disminuir cantidad"
+                >
+                  <app-icon name="minus" [size]="14" />
+                </button>
+                <input
+                  type="text"
+                  inputmode="numeric"
+                  class="qty-input"
+                  [appDecimalInput]="0"
+                  [value]="item.quantity"
+                  [disabled]="isPending(item)"
+                  (change)="onQuantityInput(item, $any($event.target).value)"
+                  [attr.aria-label]="'Cantidad de ' + item.productName"
+                />
+                <button
+                  type="button"
+                  class="qty-btn"
+                  [disabled]="isPending(item)"
+                  (click)="increment(item)"
+                  aria-label="Aumentar cantidad"
+                >
+                  <app-icon name="plus" [size]="14" />
+                </button>
+              </div>
+            </td>
+            <td class="sale-table__sku">{{ item.sku || '—' }}</td>
+            <td class="sale-table__name">{{ item.productName }}</td>
+            <td class="align-right">{{ formatCurrency(item.unitPrice) }}</td>
+            <td class="align-right sale-table__total">{{ formatCurrency(item.total) }}</td>
+            <td class="align-right">
+              <button
+                type="button"
+                class="remove-btn"
+                [disabled]="isPending(item)"
+                (click)="removeItem.emit(item.productId)"
+                [attr.aria-label]="'Quitar ' + item.productName"
+              >
+                <app-icon name="trash-2" [size]="16" />
+                Quitar
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-list">
+    @for (item of items; track item.productId) {
+      <div class="sale-card" [class.sale-card--pending]="isPending(item)">
+        <div class="sale-card__header">
+          <div>
+            <p class="sale-card__name">{{ item.productName }}</p>
+            <p class="sale-card__sku">{{ item.sku || 'Sin SKU' }}</p>
+          </div>
+          <span class="sale-card__total">{{ formatCurrency(item.total) }}</span>
+        </div>
+
+        <div class="sale-card__footer">
+          <div class="qty-stepper">
+            <button
+              type="button"
+              class="qty-btn"
+              [disabled]="item.quantity <= 1 || isPending(item)"
+              (click)="decrement(item)"
+              aria-label="Disminuir cantidad"
+            >
+              <app-icon name="minus" [size]="14" />
+            </button>
+            <input
+              type="text"
+              inputmode="numeric"
+              class="qty-input"
+              [appDecimalInput]="0"
+              [value]="item.quantity"
+              [disabled]="isPending(item)"
+              (change)="onQuantityInput(item, $any($event.target).value)"
+              [attr.aria-label]="'Cantidad de ' + item.productName"
+            />
+            <button
+              type="button"
+              class="qty-btn"
+              [disabled]="isPending(item)"
+              (click)="increment(item)"
+              aria-label="Aumentar cantidad"
+            >
+              <app-icon name="plus" [size]="14" />
+            </button>
+          </div>
+
+          <button
+            type="button"
+            class="remove-btn"
+            [disabled]="isPending(item)"
+            (click)="removeItem.emit(item.productId)"
+            [attr.aria-label]="'Quitar ' + item.productName"
+          >
+            <app-icon name="trash-2" [size]="16" />
+            Quitar
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+}

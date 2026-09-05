@@ -1,0 +1,21 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__icon">
+        <app-icon name="smartphone" [size]="24" />
+      </div>
+
+      <h2 class="modal__title">Apertura del Día</h2>
+      <p class="modal__description">
+        El día de recargas actual aún no ha sido aperturado. ¿Desea aperturar el día para registrar compras y ventas?
+      </p>
+
+      <div class="modal__actions">
+        <app-button variant="ghost" [disabled]="isOpening" (click)="cancelled.emit()">Cancelar</app-button>
+        <app-button variant="primary" [disabled]="isOpening" (click)="confirmed.emit()">
+          {{ isOpening ? 'Aperturando…' : 'Confirmar Apertura' }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

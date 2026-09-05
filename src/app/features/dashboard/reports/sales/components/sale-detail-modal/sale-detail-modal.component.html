@@ -1,0 +1,65 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">Detalle de venta</h2>
+        <button type="button" class="modal__close" (click)="closed.emit()" aria-label="Cerrar">
+          <app-icon name="close" [size]="18" />
+        </button>
+      </div>
+
+      @if (loading) {
+        <p class="modal__loading">Cargando…</p>
+      } @else if (sale) {
+        <dl class="modal__meta">
+          <div>
+            <dt>Número de venta</dt>
+            <dd>{{ sale.saleNumber }}</dd>
+          </div>
+          <div>
+            <dt>Fecha</dt>
+            <dd>{{ sale.saleDate | date: 'dd/MM/yyyy HH:mm' }}</dd>
+          </div>
+          <div>
+            <dt>Usuario</dt>
+            <dd>{{ sale.username }}</dd>
+          </div>
+        </dl>
+
+        <div class="modal__table-wrapper">
+          <table class="modal__table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>SKU</th>
+                <th class="align-right">Cantidad</th>
+                <th class="align-right">Precio unitario</th>
+                <th class="align-right">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of sale.items; track item.productId) {
+                <tr>
+                  <td>{{ item.productName }}</td>
+                  <td>{{ item.sku || '—' }}</td>
+                  <td class="align-right">{{ formatQuantity(item.quantity) }}</td>
+                  <td class="align-right">{{ formatCurrency(item.unitPrice) }}</td>
+                  <td class="align-right">{{ formatCurrency(item.total) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="modal__total">
+          <span>Total general</span>
+          <strong>{{ formatCurrency(sale.total) }}</strong>
+        </div>
+      }
+
+      <div class="modal__actions">
+        <app-button variant="ghost" (click)="closed.emit()">Cerrar</app-button>
+      </div>
+    </div>
+  </div>
+}

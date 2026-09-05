@@ -1,0 +1,22 @@
+@if (open && business) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__icon">
+        <app-icon name="alert-triangle" [size]="24" />
+      </div>
+
+      <h2 class="modal__title">¿Estás seguro de eliminar este negocio?</h2>
+      <p class="modal__description">
+        <strong>{{ business.name }}</strong> se desactivará y dejará de estar disponible para nuevos productos. No
+        se elimina permanentemente ni afecta a los productos que ya lo usan.
+      </p>
+
+      <div class="modal__actions">
+        <app-button variant="ghost" [disabled]="isDeleting" (click)="cancelled.emit()">Cancelar</app-button>
+        <app-button variant="danger" [disabled]="isDeleting" (click)="confirmed.emit()">
+          {{ isDeleting ? 'Desactivando…' : 'Sí, desactivar' }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,20 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__icon">
+        <app-icon name="alert-triangle" [size]="24" />
+      </div>
+
+      <h2 class="modal__title">¿Desea colocar todos los saldos finales en cero?</h2>
+      <p class="modal__description">
+        Esta acción modificará temporalmente los valores en pantalla. Los cambios no se guardarán en la base de
+        datos hasta que presione <strong>Guardar Cambios</strong>.
+      </p>
+
+      <div class="modal__actions">
+        <app-button variant="ghost" (click)="cancelled.emit()">Cancelar</app-button>
+        <app-button variant="danger" (click)="confirmed.emit()">Sí, poner en cero</app-button>
+      </div>
+    </div>
+  </div>
+}

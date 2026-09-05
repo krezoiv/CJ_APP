@@ -1,0 +1,103 @@
+@use 'mixins' as *;
+
+:host {
+  display: block;
+}
+
+.purchase-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.purchase-form__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-md);
+  color: var(--color-text-on-light);
+}
+
+.purchase-form__subtitle {
+  font-size: var(--fs-xs);
+  color: var(--color-text-on-light-subtle);
+  margin-top: calc(var(--space-2) * -1);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  label {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: var(--color-text-on-light-muted);
+  }
+
+  select,
+  input {
+    background: var(--color-bg-light-muted);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    color: var(--color-text-on-light);
+    font-size: var(--fs-sm);
+    font-family: var(--font-body);
+    @include focus-ring;
+
+    &:focus {
+      border-color: var(--color-primary-500);
+    }
+  }
+
+  input[type='number'] {
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    -moz-appearance: textfield;
+  }
+}
+
+.field__error {
+  font-size: var(--fs-xs);
+  color: #dc4444;
+}
+
+.field__hint {
+  font-size: var(--fs-xs);
+  color: var(--color-text-on-light-subtle);
+}
+
+.sim-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background: var(--color-bg-light-muted);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+.sim-preview__row {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-sm);
+  color: var(--color-text-on-light-muted);
+
+  strong {
+    color: var(--color-text-on-light);
+  }
+}
+
+.purchase-form__lock-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  margin-top: calc(var(--space-3) * -1);
+  font-size: var(--fs-xs);
+  color: var(--color-text-on-light-subtle);
+}

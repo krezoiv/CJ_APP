@@ -1,0 +1,87 @@
+<aside class="sidebar" [class.sidebar--open]="open" [class.sidebar--collapsed]="collapsed">
+  <div class="sidebar__brand">
+    <img class="sidebar__logo" src="assets/images/logo.png" alt="{{ site.name }}" width="36" height="36" />
+    <span class="sidebar__brand-name">{{ site.name }}</span>
+    <button
+      type="button"
+      class="sidebar__collapse-toggle"
+      [attr.aria-label]="collapsed ? 'Expandir menú' : 'Contraer menú'"
+      [title]="collapsed ? 'Expandir menú' : 'Contraer menú'"
+      (click)="collapseToggled.emit()"
+    >
+      <app-icon name="chevrons-left" [size]="16" />
+    </button>
+  </div>
+
+  <nav class="sidebar__nav" aria-label="Navegación del panel">
+    @for (item of navItems(); track item.path) {
+      @if (item.children) {
+        <button
+          type="button"
+          class="sidebar__link sidebar__link--group"
+          [class.sidebar__link--expanded]="isExpanded(item.path)"
+          [attr.aria-expanded]="isExpanded(item.path)"
+          [title]="collapsed ? item.label : null"
+          (click)="toggleGroup(item.path)"
+        >
+          <app-icon [name]="item.icon" [size]="20" class="sidebar__icon" />
+          <span class="sidebar__link-label">{{ item.label }}</span>
+          <app-icon name="chevron-down" [size]="16" class="sidebar__chevron" />
+        </button>
+
+        <div class="sidebar__submenu-wrapper" [class.sidebar__submenu-wrapper--expanded]="isExpanded(item.path)">
+          <div class="sidebar__submenu">
+            @for (child of item.children; track child.path; let i = $index) {
+              <a
+                class="sidebar__link sidebar__link--sub"
+                [class.sidebar__link--disabled]="isLinkDisabled(child.path)"
+                [routerLink]="isLinkDisabled(child.path) ? null : ['/dashboard', child.path]"
+                [attr.aria-disabled]="isLinkDisabled(child.path)"
+                [title]="linkTooltipFor(child.path)"
+                [style.transition-delay]="isExpanded(item.path) ? (i * 35) + 'ms' : '0ms'"
+                routerLinkActive="sidebar__link--active"
+                (click)="onLinkClick(child.path)"
+              >
+                @if (isLinkDisabled(child.path)) {
+                  <app-icon name="lock" [size]="18" />
+                } @else {
+                  <app-icon [name]="child.icon" [size]="18" />
+                }
+                {{ child.label }}
+                @if (hasDraftFor(child.path)) {
+                  <span
+                    class="sidebar__draft-dot"
+                    [title]="draftLabelFor(child.path)"
+                    [attr.aria-label]="draftLabelFor(child.path)"
+                  ></span>
+                }
+              </a>
+            }
+          </div>
+        </div>
+      } @else {
+        <a
+          class="sidebar__link"
+          [routerLink]="item.path ? ['/dashboard', item.path] : ['/dashboard']"
+          [routerLinkActiveOptions]="{ exact: true }"
+          routerLinkActive="sidebar__link--active"
+          [title]="collapsed ? item.label : null"
+          (click)="closeRequested.emit()"
+        >
+          <app-icon [name]="item.icon" [size]="20" />
+          <span class="sidebar__link-label">{{ item.label }}</span>
+        </a>
+      }
+    }
+  </nav>
+
+  <button
+    type="button"
+    class="sidebar__logout"
+    [title]="collapsed ? 'Cerrar sesión' : null"
+    (click)="logoutRequested.emit()"
+  >
+    <app-icon name="power" [size]="20" />
+    <span class="sidebar__link-label">Cerrar sesión</span>
+  </button>
+</aside>

@@ -1,0 +1,19 @@
+.transaction-banks__header {
+  margin-bottom: var(--space-6);
+}
+
+.transaction-banks__title {
+  font-size: var(--fs-2xl);
+  color: var(--color-text-on-light);
+  margin-bottom: var(--space-2);
+}
+
+.transaction-banks__subtitle {
+  font-size: var(--fs-md);
+  color: var(--color-text-on-light-muted);
+}
+
+app-transaction-bank-summary {
+  display: block;
+  margin-bottom: var(--space-8);
+}

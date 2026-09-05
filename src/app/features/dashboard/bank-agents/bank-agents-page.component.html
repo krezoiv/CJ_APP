@@ -1,0 +1,154 @@
+<div class="bank-agents">
+  <header class="bank-agents__header">
+    <div>
+      <h1 class="bank-agents__title">Agentes Bancarios</h1>
+      <p class="bank-agents__subtitle">Registra el cuadre diario de saldos de cada banco.</p>
+    </div>
+
+    <div class="bank-agents__header-actions">
+      <label class="bank-agents__date-field">
+        <span>Fecha de operación</span>
+        <input
+          type="date"
+          [ngModel]="draft.operationDate()"
+          (ngModelChange)="onDateChange($event)"
+          [max]="maxSelectableDate"
+          aria-label="Fecha de operación"
+        />
+      </label>
+
+      <app-button
+        variant="ghost"
+        size="sm"
+        [disabled]="loading() || isRefreshingBalances() || isSaving()"
+        (click)="refreshBalances()"
+      >
+        <app-icon [name]="isRefreshingBalances() ? 'clock' : 'refresh-cw'" [size]="14" />
+        {{ isRefreshingBalances() ? 'Actualizando…' : 'Actualizar Saldos' }}
+      </app-button>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="table-wrapper">
+      <table class="bank-agents-table">
+        <thead>
+          <tr>
+            <th>Banco</th>
+            <th>No. Cuenta</th>
+            <th>Tipo</th>
+            <th class="align-right">Saldo Anterior</th>
+            <th class="align-right">Saldo Final</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+    <p class="loading-note">
+      <app-icon name="clock" [size]="16" />
+      Cargando bancos…
+    </p>
+  } @else if (rows().length === 0) {
+    <div class="empty-state">
+      <app-icon name="bank" [size]="28" />
+      <h2>No hay bancos activos</h2>
+      <p>Agrega bancos desde <strong>Sistema → Bancos</strong> para comenzar a registrar el cuadre diario.</p>
+    </div>
+  } @else {
+    @if (effectiveDayClosed()) {
+      <p class="info-banner info-banner--locked">
+        <app-icon name="lock" [size]="16" />
+        Este día ya fue cerrado y no puede ser modificado.
+      </p>
+    } @else if (!isEditingUnlocked()) {
+      <p class="info-banner info-banner--locked">
+        <app-icon name="lock" [size]="16" />
+        Debe aperturar el día antes de registrar los saldos bancarios.
+        <button type="button" class="info-banner__link" (click)="reopenEntryModal()">Aperturar el día</button>
+      </p>
+    } @else if (hasExistingRecordsForDate()) {
+      <p class="info-banner">
+        <app-icon name="alert-circle" [size]="16" />
+        Ya existen saldos registrados para esta fecha. Puede modificar los registros existentes.
+      </p>
+    } @else {
+      <p class="info-banner">
+        <app-icon name="alert-circle" [size]="16" />
+        No existen registros para esta fecha. Puede ingresar nuevos saldos.
+      </p>
+    }
+
+    <div class="table-wrapper">
+      <table class="bank-agents-table">
+        <thead>
+          <tr>
+            <th>Banco</th>
+            <th>No. Cuenta</th>
+            <th>Tipo</th>
+            <th class="align-right">Saldo Anterior</th>
+            <th class="align-right">Saldo Final</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows(); track row.bankId) {
+            <tr>
+              <td class="bank-agents-table__name">{{ row.bankName }}</td>
+              <td class="bank-agents-table__account-number">{{ row.accountNumber }}</td>
+              <td>{{ row.accountTypeName }}</td>
+              <td class="align-right">{{ formatCurrency(row.previousBalance) }}</td>
+              <td class="align-right">
+                <div class="final-balance-input">
+                  <span>Q</span>
+                  <input
+                    type="text"
+                    inputmode="decimal"
+                    appDecimalInput
+                    [value]="displayFinalBalance(row)"
+                    (change)="onFinalBalanceInput(row.bankId, $any($event.target).value)"
+                    [attr.aria-label]="'Saldo final de ' + row.bankName"
+                    [disabled]="!isEditingUnlocked()"
+                    placeholder="0.00"
+                  />
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="bank-agents__actions">
+      <app-button
+        variant="ghost"
+        size="lg"
+        [disabled]="isSaving() || !isEditingUnlocked()"
+        (click)="openZeroConfirmModal()"
+      >
+        Poner Saldos en Cero
+      </app-button>
+      <app-button variant="primary" size="lg" [disabled]="!canSave" (click)="openSaveConfirmModal()">
+        Guardar Cambios
+      </app-button>
+    </div>
+  }
+</div>
+
+<app-entry-confirm-modal
+  [open]="isEntryConfirmModalOpen()"
+  [isOpening]="isOpeningDay()"
+  (confirmed)="confirmEntryModal()"
+  (cancelled)="cancelEntryModal()"
+/>
+
+<app-save-balances-confirm-modal
+  [open]="isSaveConfirmModalOpen()"
+  [date]="draft.operationDate()"
+  [isSaving]="isSaving()"
+  (confirmed)="confirmSaveChanges()"
+  (cancelled)="cancelSaveConfirm()"
+/>
+
+<app-zero-balances-confirm-modal
+  [open]="isZeroConfirmModalOpen()"
+  (confirmed)="confirmZeroBalances()"
+  (cancelled)="cancelZeroConfirm()"
+/>

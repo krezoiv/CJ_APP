@@ -1,0 +1,37 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__icon">
+        <app-icon name="rotate-ccw" [size]="24" />
+      </div>
+
+      <h2 class="modal__title">Reabrir Día</h2>
+
+      <p class="modal__description">
+        Está a punto de reabrir el día correspondiente a:
+        <strong>{{ date }}</strong>.
+        Este es el mismo ciclo que usa Agentes Bancarios (Cuadre de Agentes) — reabrirlo aquí también lo
+        reabre allá, y permitirá registrar nuevas operaciones en Transaccionar para esta fecha.
+        El historial anterior será conservado.
+        ¿Desea continuar?
+      </p>
+
+      <label class="modal__field">
+        <span>Motivo de reapertura <em>(obligatorio)</em></span>
+        <textarea
+          rows="3"
+          placeholder="Ej: Falta registrar un depósito de Transaccionar de esa fecha."
+          [ngModel]="reason()"
+          (ngModelChange)="reason.set($event)"
+        ></textarea>
+      </label>
+
+      <div class="modal__actions">
+        <app-button variant="ghost" [disabled]="isSaving" (click)="onCancel()">Cancelar</app-button>
+        <app-button variant="primary" [disabled]="!canConfirm || isSaving" (click)="onConfirm()">
+          {{ isSaving ? 'Reabriendo…' : 'Confirmar Reapertura' }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

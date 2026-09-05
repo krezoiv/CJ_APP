@@ -1,0 +1,48 @@
+<div class="search">
+  <label class="search__box" for="sale-product-search">
+    <app-icon name="search" [size]="18" />
+    <input
+      id="sale-product-search"
+      type="text"
+      placeholder="Buscar producto por SKU o nombre…"
+      autocomplete="off"
+      [ngModel]="query()"
+      (ngModelChange)="onInput($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      (keydown.enter)="onEnter()"
+    />
+    @if (loading()) {
+      <app-icon name="clock" [size]="16" class="search__spinner" />
+    }
+  </label>
+
+  @if (open() && (results().length > 0 || hasSearched())) {
+    <div class="search__dropdown">
+      @if (results().length === 0) {
+        <p class="search__empty">No se encontraron productos activos.</p>
+      } @else {
+        @for (product of results(); track product.id) {
+          <button
+            type="button"
+            class="search__result"
+            [class.search__result--disabled]="product.stock <= 0"
+            [disabled]="product.stock <= 0"
+            (click)="select(product)"
+          >
+            <div class="search__result-info">
+              <span class="search__result-name">{{ product.name }}</span>
+              <span class="search__result-meta">{{ product.sku || 'Sin SKU' }} · {{ product.category }}</span>
+            </div>
+            <div class="search__result-stats">
+              <span class="search__result-price">{{ formatCurrency(priceFor(product)) }}</span>
+              <span class="search__result-stock" [class.search__result-stock--out]="product.stock <= 0">
+                {{ product.stock <= 0 ? 'Sin stock' : product.stock + ' disp.' }}
+              </span>
+            </div>
+          </button>
+        }
+      }
+    </div>
+  }
+</div>

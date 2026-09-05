@@ -1,0 +1,68 @@
+<form class="purchase-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <h2 class="purchase-form__title">
+    <app-icon name="plus" [size]="18" />
+    Registrar compra
+  </h2>
+  <p class="purchase-form__subtitle">Suma saldo comprado al total del día — puedes registrar varias compras.</p>
+
+  <div class="field">
+    <label for="recharge-purchase-type">Tipo de recarga</label>
+    <select id="recharge-purchase-type" formControlName="rechargeTypeId">
+      @for (type of types; track type.id) {
+        <option [value]="type.id">{{ type.name }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="field">
+    <label for="recharge-purchase-amount">Monto de Compra</label>
+    <div class="price-input">
+      <span>Q</span>
+      <input
+        id="recharge-purchase-amount"
+        type="text"
+        inputmode="decimal"
+        appDecimalInput
+        formControlName="purchaseAmount"
+        placeholder="0.00"
+      />
+    </div>
+    @if (form.controls.purchaseAmount.invalid && form.controls.purchaseAmount.touched) {
+      <span class="field__error">Ingresa un monto mayor que cero.</span>
+    }
+  </div>
+
+  <div class="field">
+    <label for="recharge-credited-amount">Monto Acreditado</label>
+    <div class="price-input">
+      <span>Q</span>
+      <input
+        id="recharge-credited-amount"
+        type="text"
+        inputmode="decimal"
+        appDecimalInput
+        formControlName="creditedAmount"
+        placeholder="0.00"
+      />
+    </div>
+    @if (form.controls.creditedAmount.invalid && form.controls.creditedAmount.touched) {
+      <span class="field__error">Ingresa un monto mayor que cero.</span>
+    }
+    <span class="field__hint">Este es el valor que afecta el saldo del día.</span>
+  </div>
+
+  <app-button variant="primary" type="submit" fullWidth [disabled]="isSubmitting() || lockReason !== null">
+    {{ isSubmitting() ? 'Registrando…' : 'Registrar compra' }}
+  </app-button>
+  @if (lockReason === 'closed') {
+    <p class="purchase-form__lock-hint">
+      <app-icon name="lock" [size]="12" />
+      Día de recargas cerrado.
+    </p>
+  } @else if (lockReason === 'not_opened') {
+    <p class="purchase-form__lock-hint">
+      <app-icon name="lock" [size]="12" />
+      Día de recargas sin aperturar.
+    </p>
+  }
+</form>

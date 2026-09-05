@@ -1,0 +1,40 @@
+<div class="presentation-units">
+  <header class="presentation-units__header">
+    <div>
+      <h1 class="presentation-units__title">Presentaciones y Medidas</h1>
+      <p class="presentation-units__subtitle">
+        Catálogos centrales para los tipos de presentación y unidades de medida que usan los productos —
+        se seleccionan desde aquí, nunca se escriben libremente en cada producto.
+      </p>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button
+      type="button"
+      role="tab"
+      class="tab"
+      [class.tab--active]="activeTab() === 'presentaciones'"
+      [attr.aria-selected]="activeTab() === 'presentaciones'"
+      (click)="selectTab('presentaciones')"
+    >
+      Tipos de Presentación
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class="tab"
+      [class.tab--active]="activeTab() === 'unidades'"
+      [attr.aria-selected]="activeTab() === 'unidades'"
+      (click)="selectTab('unidades')"
+    >
+      Unidades de Medida
+    </button>
+  </div>
+
+  @if (activeTab() === 'presentaciones') {
+    <app-presentation-types-tab />
+  } @else {
+    <app-units-of-measure-tab />
+  }
+</div>

@@ -1,0 +1,49 @@
+<div class="showcase">
+  <div class="showcase__panel">
+    <div class="showcase__panel-header">
+      <span class="showcase__dot showcase__dot--red"></span>
+      <span class="showcase__dot showcase__dot--gold"></span>
+      <span class="showcase__dot showcase__dot--green"></span>
+      <span class="showcase__panel-title">Flujo de atención · Comercial Jhoel</span>
+    </div>
+
+    <div class="showcase__flow">
+      @for (step of steps; track step.label; let last = $last) {
+        <div class="showcase__step">
+          <div class="showcase__step-icon">
+            <app-icon [name]="step.icon" [size]="20" />
+          </div>
+          <span class="showcase__step-label">{{ step.label }}</span>
+        </div>
+        @if (!last) {
+          <div class="showcase__connector"></div>
+        }
+      }
+    </div>
+
+    <div class="showcase__bars">
+      <div class="showcase__bar" style="--bar-h: 42%"></div>
+      <div class="showcase__bar" style="--bar-h: 68%"></div>
+      <div class="showcase__bar" style="--bar-h: 54%"></div>
+      <div class="showcase__bar" style="--bar-h: 88%"></div>
+      <div class="showcase__bar" style="--bar-h: 63%"></div>
+      <div class="showcase__bar" style="--bar-h: 96%"></div>
+    </div>
+  </div>
+
+  <div class="showcase__chip showcase__chip--top">
+    <app-icon name="bank" [size]="18" />
+    <div>
+      <strong>Agente bancario</strong>
+      <span>Activo ahora</span>
+    </div>
+  </div>
+
+  <div class="showcase__chip showcase__chip--bottom">
+    <app-icon name="trending-up" [size]="18" />
+    <div>
+      <strong>+500</strong>
+      <span>productos en catálogo</span>
+    </div>
+  </div>
+</div>

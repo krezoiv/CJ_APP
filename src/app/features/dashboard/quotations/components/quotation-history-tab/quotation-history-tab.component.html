@@ -1,0 +1,88 @@
+<div class="history">
+  <div class="history__filters">
+    <label class="filter">
+      <span class="filter__label">Estado</span>
+      <select class="filter__select" [ngModel]="statusFilter()" (ngModelChange)="onStatusFilterChange($event)">
+        <option value="ALL">Todas</option>
+        <option value="PENDIENTE">Pendiente</option>
+        <option value="ACEPTADA">Aceptada</option>
+        <option value="VENCIDA">Vencida</option>
+        <option value="ANULADA">Anulada</option>
+      </select>
+    </label>
+  </div>
+
+  @if (isEmpty()) {
+    <app-empty-state icon="tag" title="Sin cotizaciones registradas" description="Las cotizaciones que registres aparecerán aquí." />
+  } @else {
+    <div class="table-wrapper">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Número</th>
+            <th>Cliente</th>
+            <th>Fecha</th>
+            <th>Vencimiento</th>
+            <th class="align-right">Total</th>
+            <th>Usuario</th>
+            <th>Estado</th>
+            <th class="align-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (quotation of quotations(); track quotation.id) {
+            <tr [class.history-table__row--voided]="quotation.status === 'ANULADA'">
+              <td class="history-table__number">{{ quotation.quotationNumber }}</td>
+              <td>{{ quotation.clientName }}</td>
+              <td>{{ quotation.createdAt | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ quotation.expirationDate | date: 'dd/MM/yyyy' }}</td>
+              <td class="align-right">{{ formatCurrency(quotation.total) }}</td>
+              <td>{{ quotation.username }}</td>
+              <td>
+                <app-badge [tone]="statusTone[quotation.status]">{{ statusLabel[quotation.status] }}</app-badge>
+              </td>
+              <td class="align-right">
+                <div class="actions">
+                  <button type="button" class="action-btn" (click)="viewDetail(quotation)" title="Ver detalle">
+                    <app-icon name="eye" [size]="16" />
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn"
+                    [disabled]="generatingPdfId() === quotation.id"
+                    (click)="regeneratePdf(quotation)"
+                    title="Generar PDF de nuevo"
+                  >
+                    <app-icon name="file-check" [size]="16" />
+                  </button>
+                  @if (isAdmin()) {
+                    <button
+                      type="button"
+                      class="action-btn action-btn--danger"
+                      [disabled]="quotation.status === 'ANULADA'"
+                      (click)="requestVoid(quotation)"
+                      title="Anular"
+                    >
+                      <app-icon name="x-circle" [size]="16" />
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-report-pagination [total]="total()" [page]="page()" [limit]="limit" (pageChange)="onPageChange($event)" />
+  }
+</div>
+
+<app-quotation-detail-modal [quotationId]="detailQuotationId()" (closed)="closeDetail()" />
+
+<app-quotation-void-reason-modal
+  [open]="voidTarget() !== null"
+  [quotationNumber]="voidTarget()?.quotationNumber || ''"
+  (confirmed)="confirmVoid($event)"
+  (cancelled)="cancelVoid()"
+/>

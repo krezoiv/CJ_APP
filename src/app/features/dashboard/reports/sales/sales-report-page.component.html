@@ -1,0 +1,149 @@
+<div class="reports-page">
+  <header class="reports-page__header">
+    <div>
+      <h1 class="reports-page__title">Reporte de Ventas</h1>
+      <p class="reports-page__subtitle">Consulta, filtra y exporta las ventas registradas en el sistema.</p>
+    </div>
+    <app-button variant="primary" [disabled]="exporting()" (click)="exportPdf()">
+      <app-icon name="download" [size]="16" />
+      {{ exporting() ? 'Generando…' : 'Exportar PDF' }}
+    </app-button>
+  </header>
+
+  <div class="reports-page__filters">
+    <div class="reports-page__filters-title">
+      <app-icon name="filter" [size]="16" />
+      Filtros
+    </div>
+
+    <div class="filters-grid">
+      <div class="field">
+        <label for="report-start-date">Desde</label>
+        <input
+          id="report-start-date"
+          type="date"
+          [ngModel]="draftStartDate()"
+          (ngModelChange)="draftStartDate.set($event)"
+        />
+      </div>
+
+      <div class="field">
+        <label for="report-end-date">Hasta</label>
+        <input
+          id="report-end-date"
+          type="date"
+          [ngModel]="draftEndDate()"
+          (ngModelChange)="draftEndDate.set($event)"
+          [max]="draftEndDate()"
+        />
+      </div>
+
+      <div class="field">
+        <label for="report-category">Categoría</label>
+        <select id="report-category" [ngModel]="draftCategoryId()" (ngModelChange)="draftCategoryId.set($event)">
+          <option value="">Todas las categorías</option>
+          @for (category of categories(); track category.id) {
+            <option [value]="category.id">{{ category.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="report-business">Negocio</label>
+        <select id="report-business" [ngModel]="draftBusinessId()" (ngModelChange)="draftBusinessId.set($event)">
+          <option value="">Todos los negocios</option>
+          @for (business of businesses(); track business.id) {
+            <option [value]="business.id">{{ business.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="report-user">Usuario</label>
+        <select id="report-user" [ngModel]="draftUserId()" (ngModelChange)="draftUserId.set($event)">
+          <option value="">Todos los usuarios</option>
+          @for (user of users(); track user.id) {
+            <option [value]="user.id">{{ user.username }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field field--wide">
+        <label>Producto</label>
+        <app-report-product-filter
+          [selectedProduct]="draftSelectedProduct()"
+          (selectionChange)="onProductSelectionChange($event)"
+        />
+      </div>
+    </div>
+
+    <div class="filters-actions">
+      <app-button variant="ghost" [disabled]="!hasActiveFilters()" (click)="clearFilters()">Limpiar filtros</app-button>
+      <app-button variant="primary" (click)="applyFilters()">Aplicar filtros</app-button>
+    </div>
+  </div>
+
+  <app-report-summary [tiles]="summaryTiles()" [loading]="loadingSummary()" />
+
+  <div class="reports-page__view-toggle">
+    <button type="button" class="view-toggle__btn" [class.view-toggle__btn--active]="viewMode() === 'detail'" (click)="setViewMode('detail')">
+      Detalle
+    </button>
+    <button
+      type="button"
+      class="view-toggle__btn"
+      [class.view-toggle__btn--active]="viewMode() === 'byProduct'"
+      (click)="setViewMode('byProduct')"
+    >
+      Por producto
+    </button>
+  </div>
+
+  @if (viewMode() === 'detail') {
+    <app-sales-report-table
+      [rows]="rows()"
+      [loading]="loadingTable()"
+      [sortBy]="sortBy()"
+      [sortDirection]="sortDirection()"
+      (sortChange)="onSortChange($event)"
+      (viewDetail)="viewDetail($event)"
+    />
+    <app-report-pagination [total]="total()" [page]="page()" [limit]="20" (pageChange)="onPageChange($event)" />
+  } @else {
+    <div class="table-wrapper">
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>SKU</th>
+            <th class="align-right">Cantidad vendida</th>
+            <th class="align-right">Ingresos</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (!loadingTable()) {
+            @for (row of byProductRows(); track row.productId) {
+              <tr>
+                <td>{{ row.productName }}</td>
+                <td>{{ row.sku || '—' }}</td>
+                <td class="align-right">{{ row.quantitySold }}</td>
+                <td class="align-right report-table__total">{{ formatCurrency(row.totalRevenue) }}</td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+      @if (!loadingTable() && byProductRows().length === 0) {
+        <p class="table-wrapper__empty">No se encontraron productos vendidos con los filtros seleccionados.</p>
+      }
+    </div>
+    <app-report-pagination [total]="byProductTotal()" [page]="page()" [limit]="20" (pageChange)="onPageChange($event)" />
+  }
+</div>
+
+<app-sale-detail-modal
+  [open]="isDetailModalOpen()"
+  [loading]="isDetailLoading()"
+  [sale]="saleDetail()"
+  (closed)="closeDetail()"
+/>

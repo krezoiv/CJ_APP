@@ -1,0 +1,19 @@
+.roles__header {
+  margin-bottom: var(--space-6);
+}
+
+.roles__title {
+  font-size: var(--fs-2xl);
+  color: var(--color-text-on-light);
+  margin-bottom: var(--space-2);
+}
+
+.roles__subtitle {
+  font-size: var(--fs-md);
+  color: var(--color-text-on-light-muted);
+}
+
+app-role-summary {
+  display: block;
+  margin-bottom: var(--space-8);
+}

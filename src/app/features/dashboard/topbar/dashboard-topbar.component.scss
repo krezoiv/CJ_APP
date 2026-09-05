@@ -1,0 +1,390 @@
+@use 'breakpoints' as bp;
+@use 'mixins' as *;
+
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-navbar);
+}
+
+.topbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  height: 4.5rem;
+  padding-inline: var(--space-4);
+  // Vidrio esmerilado semitransparente + blur, en vez del degradado casi
+  // opaco anterior — ahora que `.dashboard` (ver ese archivo) es un tono
+  // más oscuro, esto es lo que hace que la barra se lea como una
+  // superficie propia "flotando" sobre la página, no solo un tono
+  // ligeramente distinto pegado al contenido.
+  background: var(--color-topbar-bg);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border-bottom: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-md);
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+
+  // Franja de acento en degradado de marca sobre el borde superior — mismo
+  // tratamiento que ya usaba esta barra, ligeramente más gruesa para que
+  // siga leyéndose como detalle de marca y no se pierda contra el nuevo
+  // fondo semitransparente.
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-brand);
+  }
+
+  @include bp.respond(lg) {
+    padding-inline: var(--space-8);
+  }
+}
+
+// Al hacer scroll la barra se "asienta": más opaca (ver `--color-topbar-bg
+// -scrolled` en `_tokens.scss`, definida por tema igual que la base) más un
+// filo de acento cian — mismo lenguaje que ya usa el navbar público al
+// hacer scroll, para que ambas barras "respondan" igual.
+.topbar--scrolled {
+  background: var(--color-topbar-bg-scrolled);
+  box-shadow: var(--shadow-md), 0 1px 0 rgba(23, 195, 214, 0.35);
+}
+
+// Nombre del módulo actual, centrado sobre la barra completa — posicionado
+// de forma absoluta (no como un hijo flex más) para que quede centrado
+// respecto al ancho total del topbar sin importar cuántos controles haya
+// a cada lado, y para que nunca empuje ni comprima al resto de elementos.
+.topbar__page-title {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  max-width: 40%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-on-light-muted);
+  pointer-events: none;
+
+  @include bp.respond(md) {
+    display: block;
+  }
+}
+
+.topbar__menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+  color: var(--color-text-on-light);
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+  @include focus-ring;
+
+  &:hover {
+    // Traslúcido (no un color sólido) a propósito — se ve bien tanto
+    // sobre el vidrio claro como sobre el oscuro del topbar, sin
+    // necesitar una variante por tema.
+    background: var(--gradient-brand-soft);
+    color: var(--color-primary-600);
+    transform: scale(1.06);
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
+
+  @include bp.respond(lg) {
+    display: none;
+  }
+}
+
+.topbar__datetime {
+  display: none;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-light);
+  border: 1px solid var(--color-border-light);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--color-text-on-light-muted);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  span::first-letter {
+    text-transform: uppercase;
+  }
+
+  @include bp.respond(md) {
+    display: flex;
+  }
+}
+
+.topbar__datetime-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-full);
+  background: var(--gradient-brand-soft);
+  color: var(--color-primary-600);
+  flex-shrink: 0;
+}
+
+// "Modo Claro / Modo Oscuro" — un toggle deslizante, no dos botones
+// separados, para que el estado activo sea inequívoco de un solo vistazo
+// (posición del thumb) además del ícono que muestra — nunca depende
+// únicamente del color, por accesibilidad. `margin-left: auto` empuja
+// tanto este botón como `.topbar__user` (ver más abajo, ya sin su propio
+// `margin-left: auto`) hacia el borde derecho de la barra.
+.topbar__theme-toggle {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  border-radius: var(--radius-full);
+  @include focus-ring;
+}
+
+.topbar__theme-track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 3.5rem;
+  height: 1.875rem;
+  padding: 0 0.4rem;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-light-muted);
+  border: 1px solid var(--color-border-light);
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out);
+}
+
+.topbar__theme-icon {
+  position: relative;
+  z-index: 1;
+  color: var(--color-text-on-light-subtle);
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+.topbar__theme-icon--sun {
+  opacity: 1;
+}
+
+.topbar__theme-icon--moon {
+  opacity: 0.4;
+}
+
+.topbar__theme-track--dark .topbar__theme-icon--sun {
+  opacity: 0.4;
+}
+
+.topbar__theme-track--dark .topbar__theme-icon--moon {
+  opacity: 1;
+}
+
+.topbar__theme-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-full);
+  background: var(--gradient-brand);
+  color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    background var(--duration-base) var(--ease-out);
+}
+
+.topbar__theme-track--dark .topbar__theme-thumb {
+  transform: translateX(1.625rem);
+  background: linear-gradient(135deg, var(--color-ink-600) 0%, var(--color-ink-500) 100%);
+}
+
+.topbar__user {
+  position: relative;
+}
+
+.topbar__user-trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  padding-right: var(--space-3);
+  border-radius: var(--radius-full);
+  border: 1px solid transparent;
+  background: var(--color-surface-light);
+  box-shadow: var(--shadow-sm);
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+  @include focus-ring;
+
+  app-icon:last-child {
+    color: var(--color-text-on-light-subtle);
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  &:hover {
+    background: var(--gradient-brand-soft);
+    border-color: var(--color-primary-300);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+
+  &[aria-expanded='true'] app-icon:last-child {
+    transform: rotate(180deg);
+  }
+}
+
+.topbar__avatar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-full);
+  background: var(--gradient-brand);
+  color: var(--color-white);
+  // A tight, low-spread tint of the glow token — the full hero glow reads
+  // as a blur blob at this size, this keeps it a subtle "lit" ring instead.
+  box-shadow: 0 2px 10px -2px rgba(47, 131, 224, 0.5);
+  flex-shrink: 0;
+
+  // Punto "sesión activa" — un detalle pequeño y habitual en paneles
+  // profesionales, con un doble borde (blanco + el mismo tono translúcido
+  // del vidrio esmerilado de la barra) para que se despegue tanto del
+  // avatar como del fondo detrás de él.
+  &::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    bottom: -1px;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: var(--radius-full);
+    background: var(--color-accent-green);
+    border: 2px solid var(--color-surface-light);
+  }
+}
+
+.topbar__user-info {
+  display: none;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  line-height: var(--lh-snug);
+
+  strong {
+    font-size: var(--fs-sm);
+    color: var(--color-text-on-light);
+  }
+
+  span {
+    font-size: var(--fs-xs);
+    color: var(--color-text-on-light-subtle);
+  }
+
+  @include bp.respond(sm) {
+    display: flex;
+  }
+}
+
+.topbar__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-modal) - 1);
+  background: transparent;
+  cursor: default;
+}
+
+.topbar__menu {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  z-index: var(--z-modal);
+  min-width: 15rem;
+  padding: var(--space-2);
+  background: var(--color-surface-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  transform-origin: top right;
+  animation: topbar-menu-in var(--duration-fast) var(--ease-out);
+}
+
+@keyframes topbar-menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.topbar__menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--color-text-on-light);
+  text-align: left;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+
+  app-icon {
+    color: var(--color-text-on-light-subtle);
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: var(--color-bg-light-muted);
+    transform: translateX(2px);
+  }
+}
+
+.topbar__menu-item--danger {
+  color: #dc4444;
+
+  app-icon {
+    color: #dc4444;
+  }
+
+  &:hover {
+    background: rgba(220, 68, 68, 0.08);
+  }
+}

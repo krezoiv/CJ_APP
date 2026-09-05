@@ -1,0 +1,66 @@
+@use 'breakpoints' as bp;
+
+.catalog__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+  margin-bottom: var(--space-10);
+
+  @include bp.respond(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include bp.respond(lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.catalog-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.catalog-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  background: var(--gradient-brand-soft);
+  color: var(--color-primary-600);
+}
+
+.catalog-card__body {
+  min-width: 0;
+}
+
+.catalog-card__title {
+  font-size: var(--fs-md);
+  margin-bottom: var(--space-1);
+}
+
+.catalog-card__description {
+  font-size: var(--fs-sm);
+  color: var(--color-text-on-light-muted);
+  line-height: var(--lh-normal);
+}
+
+.catalog-card__count {
+  align-self: flex-start;
+  flex-shrink: 0;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  color: var(--color-primary-600);
+  background: var(--color-primary-100);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.catalog__cta {
+  display: flex;
+  justify-content: center;
+}

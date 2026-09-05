@@ -1,0 +1,45 @@
+<div class="transaction-types">
+  <header class="transaction-types__header">
+    <div>
+      <h1 class="transaction-types__title">Tipo de Transacción</h1>
+      <p class="transaction-types__subtitle">Administra los tipos de transacción disponibles para registrar transacciones en Transaccionar.</p>
+    </div>
+  </header>
+
+  <app-transaction-type-summary [data]="transactionTypes()" />
+
+  <app-transaction-type-toolbar
+    [searchTerm]="searchTerm()"
+    [statusFilter]="statusFilter()"
+    [canManage]="isAdmin()"
+    (searchTermChange)="searchTerm.set($event)"
+    (statusFilterChange)="statusFilter.set($event)"
+    (addTransactionType)="openCreateForm()"
+  />
+
+  <app-transaction-type-table
+    [transactionTypes]="filteredTransactionTypes()"
+    [loading]="loading()"
+    [hasActiveFilters]="hasActiveFilters()"
+    [canManage]="isAdmin()"
+    (edit)="openEditForm($event)"
+    (delete)="requestDelete($event)"
+    (clearFilters)="clearFilters()"
+    (addTransactionType)="openCreateForm()"
+  />
+</div>
+
+<app-transaction-type-form-modal
+  [open]="isFormOpen()"
+  [transactionType]="editingTransactionType()"
+  (closed)="closeForm()"
+  (saved)="onTransactionTypeSaved($event)"
+/>
+
+<app-transaction-type-delete-confirm-modal
+  [open]="isDeleteOpen()"
+  [transactionType]="deletingTransactionType()"
+  [isDeleting]="isDeleting()"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>

@@ -1,0 +1,48 @@
+<div class="search">
+  <label class="search__box" for="ice-cream-sale-search">
+    <app-icon name="search" [size]="18" />
+    <input
+      id="ice-cream-sale-search"
+      type="text"
+      placeholder="Buscar helado por SKU o nombre…"
+      autocomplete="off"
+      [ngModel]="query()"
+      (ngModelChange)="onInput($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      (keydown.enter)="onEnter()"
+    />
+    @if (loading()) {
+      <app-icon name="clock" [size]="16" class="search__spinner" />
+    }
+  </label>
+
+  @if (open() && (results().length > 0 || hasSearched())) {
+    <div class="search__dropdown">
+      @if (results().length === 0) {
+        <p class="search__empty">No se encontraron helados activos.</p>
+      } @else {
+        @for (iceCream of results(); track iceCream.id) {
+          <button
+            type="button"
+            class="search__result"
+            [class.search__result--disabled]="iceCream.stock <= 0"
+            [disabled]="iceCream.stock <= 0"
+            (click)="select(iceCream)"
+          >
+            <div class="search__result-info">
+              <span class="search__result-name">{{ iceCream.product }}</span>
+              <span class="search__result-meta">{{ iceCream.sku }}</span>
+            </div>
+            <div class="search__result-stats">
+              <span class="search__result-price">{{ formatCurrency(iceCream.publicPrice) }}</span>
+              <span class="search__result-stock" [class.search__result-stock--out]="iceCream.stock <= 0">
+                {{ iceCream.stock <= 0 ? 'Sin stock' : iceCream.stock + ' disp.' }}
+              </span>
+            </div>
+          </button>
+        }
+      }
+    </div>
+  }
+</div>

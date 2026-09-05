@@ -1,0 +1,5 @@
+// Global stylesheet entry point.
+// Design tokens live in src/styles/_tokens.scss — that is the file to edit
+// when tuning color, spacing, radius or type across the whole app.
+@use 'styles/tokens';
+@use 'styles/base';

@@ -1,0 +1,230 @@
+// ---------------------------------------------------------------------------
+// DESIGN TOKENS
+// Single source of truth for color, type, spacing, radius and motion.
+// These are plain CSS custom properties on purpose: they can be tweaked live
+// in devtools while iterating on the design, without touching a build step.
+// Brand palette is derived from the Comercial Jhoel logo (deep near-black
+// base, electric blue/cyan as primary, amber as secondary, with the book's
+// magenta/green kept as rare accent colors only).
+// ---------------------------------------------------------------------------
+
+:root {
+  // ---- Brand color ramps --------------------------------------------------
+  --color-primary-900: #0a2b52;
+  --color-primary-700: #124a8a;
+  --color-primary-600: #1a63b8;
+  --color-primary-500: #2f83e0;
+  --color-primary-400: #4fa0f2;
+  --color-primary-300: #82c0f7;
+  --color-primary-100: #dcedfd;
+
+  --color-accent-cyan: #17c3d6;
+  --color-accent-cyan-soft: #7fe6ef;
+  --color-accent-gold: #f5a623;
+  --color-accent-gold-soft: #fbcf7a;
+  --color-accent-magenta: #e0357f;
+  --color-accent-green: #34c77b;
+
+  // ---- Neutral / surface ramps --------------------------------------------
+  --color-ink-950: #05070c;
+  --color-ink-900: #0a0e17;
+  --color-ink-800: #0f1420;
+  --color-ink-700: #161d2d;
+  --color-ink-600: #212a3d;
+  --color-ink-500: #384259;
+  --color-ink-400: #5b6784;
+  --color-ink-300: #8892ab;
+  --color-ink-200: #b9c1d4;
+  --color-ink-100: #dde1ea;
+  --color-ink-50: #f4f6fa;
+  --color-white: #ffffff;
+
+  // ---- Semantic tokens (what components should actually consume) ---------
+  --color-bg-dark: var(--color-ink-950);
+  --color-bg-dark-elevated: var(--color-ink-800);
+  --color-bg-light: var(--color-white);
+  --color-bg-light-muted: var(--color-ink-50);
+
+  --color-surface-dark: var(--color-ink-800);
+  --color-surface-dark-hover: var(--color-ink-700);
+  --color-surface-light: var(--color-white);
+  --color-surface-light-hover: var(--color-ink-50);
+
+  --color-border-dark: rgba(255, 255, 255, 0.08);
+  --color-border-dark-strong: rgba(255, 255, 255, 0.16);
+  --color-border-light: var(--color-ink-100);
+
+  --color-text-on-dark: var(--color-white);
+  --color-text-on-dark-muted: var(--color-ink-200);
+  --color-text-on-dark-subtle: var(--color-ink-400);
+  --color-text-on-light: var(--color-ink-900);
+  --color-text-on-light-muted: var(--color-ink-500);
+  --color-text-on-light-subtle: var(--color-ink-400);
+
+  --color-primary: var(--color-primary-500);
+  --color-primary-strong: var(--color-primary-600);
+  --color-accent: var(--color-accent-cyan);
+  --color-secondary: var(--color-accent-gold);
+
+  --color-focus-ring: var(--color-accent-cyan-soft);
+
+  // Fondo de página del dashboard y "vidrio" del topbar — tokens propios
+  // (no reutilizan `--color-bg-light-muted`/`--color-surface-light`
+  // directamente) porque necesitan valores distintos a esos dos usos ya
+  // establecidos: el fondo de página es un tono más oscuro que
+  // `--color-bg-light-muted` (que sigue siendo el "panel apagado" de
+  // zebra-striping/resúmenes en toda la app), y el topbar necesita
+  // transparencia (rgba) para su efecto de vidrio esmerilado, algo que
+  // ningún token sólido existente puede dar sin `color-mix()`.
+  --color-page-bg: var(--color-ink-100);
+  // Vidrio con un ligero tinte del azul de marca (--color-primary-100) en
+  // vez de blanco puro — misma lógica de identidad que el navbar público
+  // (ver ese componente): ancla el topbar a `--gradient-brand` en vez de
+  // ser un cristal neutro. `-scrolled` es la misma superficie, más sólida,
+  // para el efecto "se asienta" al hacer scroll.
+  --color-topbar-bg: rgba(224, 238, 253, 0.78);
+  --color-topbar-bg-scrolled: rgba(224, 238, 253, 0.94);
+  // Encabezado de tabla — turquesa suave (misma familia que
+  // `--color-accent-cyan`, la firma de marca) en vez del azul pastel
+  // anterior, para darle a las ~40 tablas del panel una identidad propia
+  // y distinguible de los badges/resaltados que sí siguen usando
+  // `--color-primary-100`. Centralizado aquí (no en cada tabla) para que
+  // el modo oscuro pueda darle un tratamiento distinto sin heredarlo.
+  --color-table-header-bg: #190053;
+  // Color del texto del encabezado — separado del fondo a propósito, para
+  // que un cambio de tono del fondo (como el morado oscuro de arriba)
+  // nunca deje el texto con mal contraste otra vez. Antes las 43 tablas
+  // usaban `--color-text-on-light-subtle` (pensado para fondos claros),
+  // que se leía muy pobre sobre un fondo oscuro como este.
+  --color-table-header-text: var(--color-white);
+
+  --gradient-brand: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-accent-cyan) 100%);
+  --gradient-brand-soft: linear-gradient(135deg, rgba(47, 131, 224, 0.16) 0%, rgba(23, 195, 214, 0.12) 100%);
+  --gradient-gold: linear-gradient(135deg, var(--color-accent-gold) 0%, var(--color-accent-gold-soft) 100%);
+  --gradient-dark-fade: linear-gradient(180deg, var(--color-ink-950) 0%, var(--color-ink-900) 100%);
+
+  // ---- Typography ----------------------------------------------------------
+  --font-heading: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+
+  --fs-xs: 0.8125rem; // 13px
+  --fs-sm: 0.9375rem; // 15px
+  --fs-base: 1rem; // 16px
+  --fs-md: 1.125rem; // 18px
+  --fs-lg: 1.375rem; // 22px
+  --fs-xl: 1.75rem; // 28px
+  --fs-2xl: 2.25rem; // 36px
+  --fs-3xl: 2.875rem; // 46px
+  --fs-4xl: 3.5rem; // 56px
+
+  --lh-tight: 1.15;
+  --lh-snug: 1.35;
+  --lh-normal: 1.6;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  // ---- Spacing scale (4px base) --------------------------------------------
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
+
+  // ---- Layout ---------------------------------------------------------------
+  --container-max: 75rem; // 1200px
+  --container-max-wide: 87.5rem; // 1400px
+  --container-pad: var(--space-5);
+  --navbar-height: 4.75rem; // 76px
+
+  // ---- Radius / elevation ----------------------------------------------------
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(5, 7, 12, 0.06), 0 1px 1px rgba(5, 7, 12, 0.04);
+  --shadow-md: 0 8px 24px -8px rgba(10, 14, 23, 0.18), 0 2px 8px rgba(10, 14, 23, 0.08);
+  --shadow-lg: 0 24px 48px -16px rgba(10, 14, 23, 0.28), 0 4px 12px rgba(10, 14, 23, 0.1);
+  --shadow-glow-primary: 0 12px 32px -8px rgba(47, 131, 224, 0.45);
+  --shadow-glow-gold: 0 12px 32px -8px rgba(245, 166, 35, 0.4);
+
+  // ---- Motion -----------------------------------------------------------------
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 450ms;
+
+  // ---- Z-index scale ------------------------------------------------------------
+  --z-navbar: 100;
+  --z-overlay: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+
+  @media (min-width: 768px) {
+    --container-pad: var(--space-8);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// MODO OSCURO — [data-theme="dark"] en <html>, controlado por `ThemeService`.
+//
+// Estrategia deliberada: esta app ya tenía DOS familias de tokens de
+// superficie conviviendo — "-light" (usado por prácticamente todo el
+// contenido: cards, tablas, modales, inputs, el Topbar) y "-dark" (usado
+// únicamente por el Sidebar, que ya es oscuro a propósito en ambos modos,
+// como en la mayoría de paneles admin — Vercel, Linear, Notion). En vez
+// de inventar una tercera paleta, el modo oscuro simplemente REDEFINE los
+// tokens "-light" para que apunten a los mismos valores que ya usan los
+// tokens "-dark" — ningún componente necesita tocarse: cada uno ya
+// consume `var(--color-surface-light)`/`var(--color-text-on-light)`/etc.
+// (confirmado antes de escribir esto: 100+ archivos ya siguen esta
+// convención), así que heredan el modo oscuro automáticamente. El
+// Sidebar, al usar sus propios tokens "-dark" directamente, se mantiene
+// visualmente igual en ambos modos — comportamiento intencional, no un
+// hueco de la implementación.
+// ---------------------------------------------------------------------------
+[data-theme='dark'] {
+  --color-bg-light: var(--color-bg-dark);
+  --color-bg-light-muted: var(--color-bg-dark-elevated);
+
+  --color-surface-light: var(--color-surface-dark);
+  --color-surface-light-hover: var(--color-surface-dark-hover);
+
+  --color-border-light: var(--color-border-dark);
+
+  --color-text-on-light: var(--color-text-on-dark);
+  --color-text-on-light-muted: var(--color-text-on-dark-muted);
+  --color-text-on-light-subtle: var(--color-text-on-dark-subtle);
+
+  --color-page-bg: var(--color-bg-dark);
+  // Mismo tinte de --color-primary-900 que ya ancla el navbar público al
+  // fundirse con el negro base, en vez del gris-azulado neutro anterior.
+  --color-topbar-bg: rgba(11, 32, 58, 0.74);
+  --color-topbar-bg-scrolled: rgba(11, 32, 58, 0.93);
+  // Mismo turquesa de marca, como un tinte translúcido sobre la superficie
+  // oscura en vez de un gris plano — encaja con el mismo lenguaje "vidrio"
+  // que ya usan topbar/navbar en este modo.
+  --color-table-header-bg: rgba(23, 195, 214, 0.16);
+  --color-table-header-text: var(--color-text-on-dark-muted);
+
+  // Sombras algo más marcadas — sobre un fondo oscuro, las sombras suaves
+  // calibradas para blanco (rgba negro muy claro) casi no se notan; estas
+  // mismas variables las consume toda la app (`--shadow-sm/md/lg`), así
+  // que oscurecer/agrandar su alpha aquí basta para que cards/modales/
+  // dropdowns sigan leyéndose "elevados" en modo oscuro.
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35), 0 1px 1px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 8px 24px -8px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 24px 48px -16px rgba(0, 0, 0, 0.65), 0 4px 12px rgba(0, 0, 0, 0.4);
+}

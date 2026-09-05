@@ -1,0 +1,170 @@
+@if (loading) {
+  <p class="loading-note">
+    <app-icon name="clock" [size]="16" />
+    Cargando indicadores…
+  </p>
+} @else if (metrics) {
+  <div class="indicators">
+    <p class="indicators__period">
+      <app-icon name="clock" [size]="14" />
+      Indicadores de <strong>{{ periodDate() | date: 'MMMM yyyy' | titlecase }}</strong>
+      <span class="indicators__period-range">
+        · {{ metrics.period.startDate | date: 'dd/MM' }} – {{ metrics.period.endDate | date: 'dd/MM' }}
+      </span>
+    </p>
+
+    <div class="indicators__grid">
+      <!-- Ventas de Recargas -->
+      <app-card [hoverable]="false" class="metric-card metric-card--cyan">
+        <div class="metric-card__body">
+          <div class="metric-card__header">
+            <span class="metric-card__icon">
+              <app-icon name="smartphone" [size]="18" />
+            </span>
+            <span class="metric-card__title">Ventas de Recargas</span>
+          </div>
+
+          <div class="metric-card__content">
+            <span class="metric-card__hero">{{ formatCurrency(metrics.rechargeSales.total) }}</span>
+            <span class="metric-card__hero-caption">Total del mes</span>
+
+            <div class="metric-card__footer">
+              <div class="metric-card__stat">
+                <span class="metric-card__stat-label">
+                  <app-icon name="arrow-up-circle" [size]="12" />
+                  Mayor
+                </span>
+                @if (metrics.rechargeSales.highestDay; as day) {
+                  <span class="metric-card__stat-value">{{ formatCurrency(day.amount) }}</span>
+                  <span class="metric-card__stat-sub">{{ day.date | date: 'dd/MM/yyyy' }}</span>
+                } @else {
+                  <span class="metric-card__stat-value metric-card__stat-value--empty">N/A</span>
+                }
+              </div>
+              <div class="metric-card__divider"></div>
+              <div class="metric-card__stat">
+                <span class="metric-card__stat-label">
+                  <app-icon name="arrow-down-circle" [size]="12" />
+                  Menor
+                </span>
+                @if (metrics.rechargeSales.lowestDay; as day) {
+                  <span class="metric-card__stat-value">{{ formatCurrency(day.amount) }}</span>
+                  <span class="metric-card__stat-sub">{{ day.date | date: 'dd/MM/yyyy' }}</span>
+                } @else {
+                  <span class="metric-card__stat-value metric-card__stat-value--empty">N/A</span>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </app-card>
+
+      <!-- Ventas -->
+      <app-card [hoverable]="false" class="metric-card metric-card--green">
+        <div class="metric-card__body">
+          <div class="metric-card__header">
+            <span class="metric-card__icon">
+              <app-icon name="receipt" [size]="18" />
+            </span>
+            <span class="metric-card__title">Ventas</span>
+          </div>
+
+          <div class="metric-card__content">
+            <span class="metric-card__hero">{{ formatCurrency(metrics.sales.total) }}</span>
+            <span class="metric-card__hero-caption">Acumuladas del mes</span>
+
+            <div class="metric-card__footer">
+              <div class="metric-card__stat">
+                <span class="metric-card__stat-label">
+                  <app-icon name="arrow-up-circle" [size]="12" />
+                  Mayor
+                </span>
+                @if (metrics.sales.highestDay; as day) {
+                  <span class="metric-card__stat-value">{{ formatCurrency(day.amount) }}</span>
+                  <span class="metric-card__stat-sub">{{ day.date | date: 'dd/MM/yyyy' }}</span>
+                } @else {
+                  <span class="metric-card__stat-value metric-card__stat-value--empty">N/A</span>
+                }
+              </div>
+              <div class="metric-card__divider"></div>
+              <div class="metric-card__stat">
+                <span class="metric-card__stat-label">
+                  <app-icon name="arrow-down-circle" [size]="12" />
+                  Menor
+                </span>
+                @if (metrics.sales.lowestDay; as day) {
+                  <span class="metric-card__stat-value">{{ formatCurrency(day.amount) }}</span>
+                  <span class="metric-card__stat-sub">{{ day.date | date: 'dd/MM/yyyy' }}</span>
+                } @else {
+                  <span class="metric-card__stat-value metric-card__stat-value--empty">N/A</span>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </app-card>
+
+      <!-- Compras -->
+      <app-card [hoverable]="false" class="metric-card metric-card--gold">
+        <div class="metric-card__body">
+          <div class="metric-card__header">
+            <span class="metric-card__icon">
+              <app-icon name="arrow-down-circle" [size]="18" />
+            </span>
+            <span class="metric-card__title">Compras</span>
+          </div>
+
+          <div class="metric-card__content">
+            <span class="metric-card__hero">{{ formatCurrency(metrics.purchases.total) }}</span>
+            <span class="metric-card__hero-caption">Acumuladas del mes</span>
+          </div>
+        </div>
+      </app-card>
+
+      <!-- Transacciones Bancarias -->
+      <app-card [hoverable]="false" class="metric-card metric-card--blue">
+        <div class="metric-card__body">
+          <div class="metric-card__header">
+            <span class="metric-card__icon">
+              <app-icon name="arrow-left-right" [size]="18" />
+            </span>
+            <span class="metric-card__title">Transacciones Bancarias</span>
+          </div>
+
+          <div class="metric-card__content">
+            <span class="metric-card__hero">{{ formatQuantity(metrics.bankTransactions.totalTransactions) }}</span>
+            <span class="metric-card__hero-caption">Transacciones realizadas · Transaccionar</span>
+
+            <div class="metric-card__footer">
+              <div class="metric-card__stat">
+                <span class="metric-card__stat-label">
+                  <app-icon name="arrow-up-circle" [size]="12" />
+                  Más activo
+                </span>
+                @if (metrics.bankTransactions.highestBank; as bank) {
+                  <span class="metric-card__stat-value">{{ bank.bankName }}</span>
+                  <span class="metric-card__stat-sub">{{ formatQuantity(bank.transactions) }} transacciones</span>
+                } @else {
+                  <span class="metric-card__stat-value metric-card__stat-value--empty">N/A</span>
+                }
+              </div>
+              <div class="metric-card__divider"></div>
+              <div class="metric-card__stat">
+                <span class="metric-card__stat-label">
+                  <app-icon name="arrow-down-circle" [size]="12" />
+                  Menos activo
+                </span>
+                @if (metrics.bankTransactions.lowestBank; as bank) {
+                  <span class="metric-card__stat-value">{{ bank.bankName }}</span>
+                  <span class="metric-card__stat-sub">{{ formatQuantity(bank.transactions) }} transacciones</span>
+                } @else {
+                  <span class="metric-card__stat-value metric-card__stat-value--empty">N/A</span>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </app-card>
+    </div>
+  </div>
+}

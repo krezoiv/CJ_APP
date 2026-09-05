@@ -1,0 +1,89 @@
+@use 'mixins' as *;
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: rgba(5, 7, 12, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  width: 100%;
+  max-width: 28rem;
+  background: var(--color-surface-light);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+
+.modal__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-full);
+  background: rgba(220, 68, 68, 0.12);
+  color: #dc4444;
+  margin-inline: auto;
+  margin-bottom: var(--space-5);
+}
+
+.modal__title {
+  font-size: var(--fs-md);
+  color: var(--color-text-on-light);
+  margin-bottom: var(--space-4);
+}
+
+.modal__description {
+  font-size: var(--fs-sm);
+  color: var(--color-text-on-light-muted);
+  margin-bottom: var(--space-5);
+  text-align: left;
+
+  strong {
+    color: var(--color-text-on-light);
+  }
+}
+
+.modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  text-align: left;
+  margin-bottom: var(--space-6);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--color-text-on-light-muted);
+
+  em {
+    font-style: normal;
+    color: #dc4444;
+    font-weight: var(--fw-regular);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 4.5rem;
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-light);
+    background: var(--color-surface-light);
+    color: var(--color-text-on-light);
+    font-size: var(--fs-sm);
+    font-family: var(--font-body);
+    @include focus-ring;
+  }
+}
+
+.modal__actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
+}

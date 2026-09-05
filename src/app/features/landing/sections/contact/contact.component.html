@@ -1,0 +1,76 @@
+<app-section sectionId="contacto" tone="dark" spacing="lg">
+  <div class="contact__layout">
+    <div class="contact__info">
+      <app-section-heading
+        align="left"
+        eyebrow="Contacto"
+        title="Conversemos sobre lo que necesitas"
+        subtitle="Escríbenos y te respondemos el mismo día. También puedes visitarnos o llamarnos directamente."
+      />
+
+      <ul class="contact__channels">
+        @for (channel of channels; track channel.id) {
+          <li>
+            <a class="contact__channel" [href]="channel.href">
+              <span class="contact__channel-icon"><app-icon [name]="channel.icon" [size]="18" /></span>
+              <span>
+                <strong>{{ channel.label }}</strong>
+                <span class="contact__channel-value">{{ channel.value }}</span>
+              </span>
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <div class="contact__form-wrap">
+      @if (isSubmitted()) {
+        <div class="contact__success">
+          <app-icon name="check" [size]="28" />
+          <h3>¡Gracias por escribirnos!</h3>
+          <p>Recibimos tu mensaje y te contactaremos muy pronto.</p>
+          <app-button variant="outline" (click)="isSubmitted.set(false)">Enviar otro mensaje</app-button>
+        </div>
+      } @else {
+        <form class="contact__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <div class="field">
+            <label for="name">Nombre completo</label>
+            <input id="name" type="text" formControlName="name" placeholder="Tu nombre" />
+            @if (form.controls.name.invalid && form.controls.name.touched) {
+              <span class="field__error">Cuéntanos tu nombre.</span>
+            }
+          </div>
+
+          <div class="field">
+            <label for="phone">Teléfono / WhatsApp</label>
+            <input id="phone" type="tel" formControlName="phone" placeholder="999 999 999" />
+            @if (form.controls.phone.invalid && form.controls.phone.touched) {
+              <span class="field__error">Ingresa un teléfono válido.</span>
+            }
+          </div>
+
+          <div class="field">
+            <label for="interest">¿En qué te podemos ayudar?</label>
+            <select id="interest" formControlName="interest">
+              @for (interest of interests; track interest) {
+                <option [value]="interest">{{ interest }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="message">Mensaje</label>
+            <textarea id="message" rows="4" formControlName="message" placeholder="Cuéntanos qué necesitas"></textarea>
+            @if (form.controls.message.invalid && form.controls.message.touched) {
+              <span class="field__error">Escribe un breve mensaje.</span>
+            }
+          </div>
+
+          <app-button variant="primary" size="lg" type="submit" fullWidth [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Enviando…' : 'Enviar mensaje' }}
+          </app-button>
+        </form>
+      }
+    </div>
+  </div>
+</app-section>

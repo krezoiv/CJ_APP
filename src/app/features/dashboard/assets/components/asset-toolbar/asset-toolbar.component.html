@@ -1,0 +1,72 @@
+<div class="toolbar">
+  <div class="toolbar__row">
+    <label class="search" for="asset-search">
+      <app-icon name="search" [size]="18" />
+      <input
+        id="asset-search"
+        type="text"
+        placeholder="Buscar por descripción…"
+        [ngModel]="searchTerm"
+        (ngModelChange)="searchTermChange.emit($event)"
+      />
+    </label>
+
+    @if (canManage) {
+      <app-button variant="primary" (click)="addRecord.emit()">
+        <app-icon name="plus" [size]="16" />
+        Nuevo Activo
+      </app-button>
+    }
+  </div>
+
+  <div class="toolbar__filters-row">
+    <div class="filter-field">
+      <span class="filter-field__label">Cliente</span>
+      <app-client-search-select
+        [selectedClientId]="clientFilter?.id ?? null"
+        [selectedClientName]="clientFilter?.name ?? null"
+        placeholder="Filtrar por cliente…"
+        (selectionChange)="clientFilterChange.emit($event)"
+      />
+    </div>
+
+    <div class="filter-field">
+      <span class="filter-field__label">Fecha desde</span>
+      <input
+        type="date"
+        class="date-input"
+        [ngModel]="dateFrom"
+        (ngModelChange)="dateFromChange.emit($event)"
+      />
+    </div>
+
+    <div class="filter-field">
+      <span class="filter-field__label">Fecha hasta</span>
+      <input
+        type="date"
+        class="date-input"
+        [ngModel]="dateTo"
+        (ngModelChange)="dateToChange.emit($event)"
+      />
+    </div>
+  </div>
+
+  <div class="toolbar__filters" role="group" aria-label="Filtrar por estado">
+    @for (option of statusFilterOptions; track option.value) {
+      <button
+        type="button"
+        class="filter-chip"
+        [class.filter-chip--active]="statusFilter === option.value"
+        (click)="statusFilterChange.emit(option.value)"
+      >
+        {{ option.label }}
+      </button>
+    }
+
+    @if (hasActiveFilters) {
+      <button type="button" class="filter-chip filter-chip--clear" (click)="clearFilters.emit()">
+        Limpiar filtros
+      </button>
+    }
+  </div>
+</div>

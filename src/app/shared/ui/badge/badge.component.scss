@@ -1,0 +1,48 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge--brand {
+  background: var(--gradient-brand-soft);
+  color: var(--color-accent-cyan);
+  border: 1px solid rgba(23, 195, 214, 0.28);
+}
+
+.badge--gold {
+  background: rgba(245, 166, 35, 0.14);
+  color: var(--color-accent-gold);
+  border: 1px solid rgba(245, 166, 35, 0.3);
+}
+
+.badge--success {
+  background: rgba(52, 199, 123, 0.14);
+  color: var(--color-accent-green);
+  border: 1px solid rgba(52, 199, 123, 0.3);
+}
+
+.badge--danger {
+  background: rgba(220, 68, 68, 0.1);
+  color: #dc4444;
+  border: 1px solid rgba(220, 68, 68, 0.28);
+}
+
+.badge--neutral-dark {
+  background: var(--color-surface-dark);
+  color: var(--color-text-on-dark-muted);
+  border: 1px solid var(--color-border-dark);
+}
+
+.badge--neutral-light {
+  background: var(--color-bg-light-muted);
+  color: var(--color-text-on-light-muted);
+  border: 1px solid var(--color-border-light);
+}

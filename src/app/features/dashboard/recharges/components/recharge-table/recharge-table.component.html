@@ -1,0 +1,168 @@
+@if (loading) {
+  <div class="table-wrapper table-wrapper--desktop" aria-hidden="true">
+    <table class="recharge-table">
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th class="align-right">Saldo anterior</th>
+          <th class="align-right">Compra</th>
+          <th class="align-right">Acreditado</th>
+          <th class="align-right">Saldo del día</th>
+          <th class="align-right">Saldo final</th>
+          <th class="align-right">Venta</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of skeletonRows; track row) {
+          <tr class="skeleton-row">
+            <td><span class="skeleton skeleton--lg"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+            <td><span class="skeleton skeleton--sm"></span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="loading-note">
+    <app-icon name="clock" [size]="16" />
+    Cargando saldos del día…
+  </p>
+} @else {
+  <div class="table-wrapper table-wrapper--desktop">
+    <table class="recharge-table">
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th class="align-right">Saldo anterior</th>
+          <th class="align-right">Compra</th>
+          <th class="align-right">Acreditado</th>
+          <th class="align-right">Saldo del día</th>
+          <th class="align-right">Saldo final</th>
+          <th class="align-right">Venta</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (balance of balances; track balance.id) {
+          <tr>
+            <td class="recharge-table__type">{{ balance.rechargeTypeName }}</td>
+            <td class="align-right">{{ formatCurrency(balance.previousBalance) }}</td>
+            <td class="align-right">{{ formatCurrency(balance.totalPurchaseAmount) }}</td>
+            <td class="align-right">{{ formatCurrency(balance.totalPurchases) }}</td>
+            <td class="align-right recharge-table__daily">{{ formatCurrency(balance.dailyBalance) }}</td>
+            <td class="align-right">
+              <div class="final-balance-cell">
+                <div class="price-input">
+                  <span>Q</span>
+                  <input
+                    type="text"
+                    inputmode="decimal"
+                    appDecimalInput
+                    [disabled]="!canEditFinalBalance(balance)"
+                    [value]="draftFinalBalance[balance.id] ?? ''"
+                    (input)="onFinalBalanceInput(balance, $any($event.target).value)"
+                    [attr.aria-label]="'Saldo final de ' + balance.rechargeTypeName"
+                  />
+                </div>
+                <app-button size="sm" [disabled]="!canSave(balance)" (click)="save(balance)">Guardar</app-button>
+              </div>
+              @if (finalBalanceError(balance); as error) {
+                <p class="final-balance-error">{{ error }}</p>
+              }
+              @if (dayLockReason === 'closed') {
+                <p class="final-balance-hint">
+                  <app-icon name="lock" [size]="12" />
+                  Día de recargas cerrado — un administrador debe reabrirlo en Gestión de Días de Recargas.
+                </p>
+              } @else if (dayLockReason === 'not_opened') {
+                <p class="final-balance-hint">
+                  <app-icon name="lock" [size]="12" />
+                  Día de recargas sin aperturar — confirma la apertura para poder editar.
+                </p>
+              } @else if (balance.finalBalance !== null && !isAdmin) {
+                <p class="final-balance-hint">
+                  <app-icon name="lock" [size]="12" />
+                  Día cerrado — solo un administrador puede corregirlo.
+                </p>
+              }
+            </td>
+            <td class="align-right recharge-table__sale">
+              {{ balance.sale !== null ? formatCurrency(balance.sale) : '—' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-list">
+    @for (balance of balances; track balance.id) {
+      <div class="recharge-card">
+        <div class="recharge-card__header">
+          <p class="recharge-card__type">{{ balance.rechargeTypeName }}</p>
+          <span class="recharge-card__sale">{{ balance.sale !== null ? formatCurrency(balance.sale) : 'Sin cerrar' }}</span>
+        </div>
+
+        <dl class="recharge-card__grid">
+          <div>
+            <dt>Saldo anterior</dt>
+            <dd>{{ formatCurrency(balance.previousBalance) }}</dd>
+          </div>
+          <div>
+            <dt>Compra</dt>
+            <dd>{{ formatCurrency(balance.totalPurchaseAmount) }}</dd>
+          </div>
+          <div>
+            <dt>Acreditado</dt>
+            <dd>{{ formatCurrency(balance.totalPurchases) }}</dd>
+          </div>
+          <div>
+            <dt>Saldo del día</dt>
+            <dd>{{ formatCurrency(balance.dailyBalance) }}</dd>
+          </div>
+        </dl>
+
+        <label class="recharge-card__final-balance">
+          Saldo final
+          <div class="final-balance-cell">
+            <div class="price-input">
+              <span>Q</span>
+              <input
+                type="text"
+                inputmode="decimal"
+                appDecimalInput
+                [disabled]="!canEditFinalBalance(balance)"
+                [value]="draftFinalBalance[balance.id] ?? ''"
+                (input)="onFinalBalanceInput(balance, $any($event.target).value)"
+                [attr.aria-label]="'Saldo final de ' + balance.rechargeTypeName"
+              />
+            </div>
+            <app-button size="sm" [disabled]="!canSave(balance)" (click)="save(balance)">Guardar</app-button>
+          </div>
+          @if (finalBalanceError(balance); as error) {
+            <p class="final-balance-error">{{ error }}</p>
+          }
+          @if (dayLockReason === 'closed') {
+            <p class="final-balance-hint">
+              <app-icon name="lock" [size]="12" />
+              Día de recargas cerrado — un administrador debe reabrirlo en Gestión de Días de Recargas.
+            </p>
+          } @else if (dayLockReason === 'not_opened') {
+            <p class="final-balance-hint">
+              <app-icon name="lock" [size]="12" />
+              Día de recargas sin aperturar — confirma la apertura para poder editar.
+            </p>
+          } @else if (balance.finalBalance !== null && !isAdmin) {
+            <p class="final-balance-hint">
+              <app-icon name="lock" [size]="12" />
+              Día cerrado — solo un administrador puede corregirlo.
+            </p>
+          }
+        </label>
+      </div>
+    }
+  </div>
+}

@@ -1,0 +1,45 @@
+<div class="ice-cream-inventory">
+  <header class="ice-cream-inventory__header">
+    <div>
+      <h1 class="ice-cream-inventory__title">Heladería · Inventario</h1>
+      <p class="ice-cream-inventory__subtitle">Gestiona los helados disponibles y controla su stock.</p>
+    </div>
+  </header>
+
+  <app-ice-cream-summary [data]="iceCreams()" />
+
+  <app-ice-cream-toolbar
+    [searchTerm]="searchTerm()"
+    [stockFilter]="stockFilter()"
+    [canManage]="isAdmin()"
+    (searchTermChange)="searchTerm.set($event)"
+    (stockFilterChange)="stockFilter.set($event)"
+    (addIceCream)="openCreateForm()"
+  />
+
+  <app-ice-cream-table
+    [iceCreams]="filteredIceCreams()"
+    [loading]="loading()"
+    [hasActiveFilters]="hasActiveFilters()"
+    [canManage]="isAdmin()"
+    (edit)="openEditForm($event)"
+    (delete)="requestDelete($event)"
+    (clearFilters)="clearFilters()"
+    (addIceCream)="openCreateForm()"
+  />
+</div>
+
+<app-ice-cream-form-modal
+  [open]="isFormOpen()"
+  [iceCream]="editingIceCream()"
+  (closed)="closeForm()"
+  (saved)="onIceCreamSaved($event)"
+/>
+
+<app-ice-cream-delete-confirm-modal
+  [open]="isDeleteOpen()"
+  [iceCream]="deletingIceCream()"
+  [isDeleting]="isDeleting()"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>

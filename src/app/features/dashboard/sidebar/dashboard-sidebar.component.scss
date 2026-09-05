@@ -1,0 +1,374 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: block;
+}
+
+.sidebar {
+  // El Sidebar usa sus propios tokens "-dark" directamente (no los "-light"
+  // que sí cambian con el interruptor de modo oscuro/claro) — se mantiene
+  // visualmente igual en ambos modos a propósito, como en la mayoría de
+  // paneles admin (Vercel, Linear, Notion). Alias locales, no valores
+  // hardcodeados, para que un futuro retoque de paleta siga viniendo de
+  // `_tokens.scss` en vez de vivir duplicado aquí.
+  --sidebar-bg: var(--color-bg-dark);
+  --sidebar-border: var(--color-border-dark);
+  --sidebar-border-strong: var(--color-border-dark-strong);
+  --sidebar-text: var(--color-text-on-dark);
+  --sidebar-text-muted: var(--color-text-on-dark-muted);
+  --sidebar-text-subtle: var(--color-text-on-dark-subtle);
+  --sidebar-hover-bg: var(--color-surface-dark-hover);
+  --sidebar-active-bg: var(--gradient-brand-soft);
+  --sidebar-active-icon: var(--color-accent-cyan);
+
+  position: fixed;
+  inset-block: 0;
+  left: 0;
+  width: 17.5rem;
+  z-index: var(--z-modal);
+  display: flex;
+  flex-direction: column;
+  // Bounds the sidebar to the viewport so a long nav list scrolls *inside*
+  // it (see .sidebar__nav) instead of pushing "Cerrar sesión" off-screen —
+  // without this the flex column just grows past the fixed/sticky box and
+  // nothing here ever reflows on page scroll, which is what looked like
+  // "the sidebar doesn't adjust" once enough nav items were added.
+  overflow: hidden;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
+  padding: var(--space-6) var(--space-4);
+  transform: translateX(-100%);
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    width var(--duration-base) var(--ease-out);
+
+  @include bp.respond(lg) {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    transform: none;
+  }
+}
+
+.sidebar--open {
+  transform: translateX(0);
+  box-shadow: var(--shadow-lg);
+}
+
+// El modo contraído (solo logo + íconos) únicamente tiene sentido en
+// escritorio — en móvil el Sidebar ya es un drawer completo controlado por
+// `.sidebar--open`, así que esta regla queda anidada dentro del mismo
+// breakpoint que activa `position: sticky` arriba.
+@include bp.respond(lg) {
+  .sidebar--collapsed {
+    width: 4.75rem;
+    padding-inline: var(--space-3);
+
+    .sidebar__brand {
+      justify-content: center;
+      padding-inline: 0;
+    }
+
+    .sidebar__brand-name,
+    .sidebar__link-label,
+    .sidebar__chevron,
+    .sidebar__submenu-wrapper,
+    .sidebar__draft-dot {
+      display: none;
+    }
+
+    .sidebar__link,
+    .sidebar__logout {
+      justify-content: center;
+      padding-inline: var(--space-2);
+    }
+
+    .sidebar__collapse-toggle app-icon {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.sidebar__brand {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3) var(--space-6);
+}
+
+.sidebar__logo {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.sidebar__brand-name {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-md);
+  color: var(--sidebar-text);
+}
+
+.sidebar__collapse-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-md);
+  color: var(--sidebar-text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+
+  app-icon {
+    transition: transform var(--duration-base) var(--ease-out);
+  }
+
+  &:hover {
+    background: var(--sidebar-hover-bg);
+    color: var(--sidebar-text);
+  }
+}
+
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1;
+  // `min-height: 0` overrides flex's default `min-height: auto` on a
+  // `flex: 1` child, which otherwise refuses to shrink below its content
+  // size — without it `overflow-y: auto` below has nothing to ever kick in.
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: var(--space-1);
+  margin-right: calc(var(--space-1) * -1);
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--sidebar-border-strong) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--sidebar-border-strong);
+    border-radius: var(--radius-full);
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--sidebar-text-subtle);
+  }
+}
+
+.sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--sidebar-text-muted);
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+
+  app-icon {
+    color: var(--sidebar-text-subtle);
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: var(--sidebar-hover-bg);
+    color: var(--sidebar-text);
+    transform: translateX(3px);
+  }
+
+  &:active {
+    transform: translateX(3px) scale(0.98);
+  }
+}
+
+/** A group's own row is a toggle button, not a link — see the template's `@if (item.children)` branch. */
+.sidebar__link--group {
+  justify-content: flex-start;
+}
+
+.sidebar__link-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar__icon {
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.sidebar__link--group:hover .sidebar__icon {
+  transform: scale(1.12);
+}
+
+.sidebar__chevron {
+  margin-left: auto;
+  transform: rotate(-90deg);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.sidebar__link--expanded .sidebar__chevron {
+  transform: rotate(0deg);
+}
+
+/** Resalta cuál es el grupo actualmente abierto — junto con el acordeón exclusivo, deja clarísimo que solo uno puede estar así a la vez. */
+.sidebar__link--expanded {
+  background: var(--sidebar-hover-bg);
+  color: var(--sidebar-text);
+
+  &:hover {
+    transform: none;
+  }
+}
+
+.sidebar__link--active {
+  background: var(--sidebar-active-bg);
+  color: var(--sidebar-text);
+
+  app-icon {
+    color: var(--sidebar-active-icon);
+  }
+}
+
+// Pure-CSS accordion: the wrapper is a single-row grid animating between
+// `0fr` (collapsed) and `1fr` (expanded) — `grid-template-rows` is
+// animatable, unlike `height`/`max-height`, without needing to know the
+// submenu's real height up front. `.sidebar__submenu` (the grid's one
+// child) needs `min-height: 0` for the same reason `.sidebar__nav` does
+// above: a grid/flex child otherwise refuses to shrink below its content
+// size, which would keep the collapsed row from ever reaching 0.
+.sidebar__submenu-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--duration-base) var(--ease-out);
+}
+
+.sidebar__submenu-wrapper--expanded {
+  grid-template-rows: 1fr;
+}
+
+.sidebar__submenu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-height: 0;
+  overflow: hidden;
+  margin: var(--space-1) 0 var(--space-1) var(--space-5);
+  padding-left: var(--space-4);
+  border-left: 1px solid var(--sidebar-border-strong);
+}
+
+.sidebar__link--sub {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--fs-xs);
+  // Entran con un pequeño fade + deslizamiento, escalonado por fila (ver el
+  // `transition-delay` inline en el template) — solo al abrir el grupo; al
+  // cerrarlo, `.sidebar__submenu-wrapper` ya las oculta de golpe vía su
+  // propio `overflow: hidden`, así que no hace falta una transición de
+  // salida independiente aquí.
+  opacity: 0;
+  transform: translateX(-8px);
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    opacity var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-out);
+  border-left: 2px solid transparent;
+
+  &:hover {
+    transform: translateX(1px);
+  }
+}
+
+.sidebar__submenu-wrapper--expanded .sidebar__link--sub {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.sidebar__link--sub.sidebar__link--active {
+  border-left-color: var(--sidebar-active-icon);
+}
+
+/**
+ * "Apertura del Día" — Cuadre Agentes hasta que el día esté aperturado y
+ * los saldos guardados. Selector compuesto con `.sidebar__submenu-wrapper
+ * --expanded .sidebar__link--sub` (misma especificidad, 0-2-0) para que
+ * esta opacidad "apagada" siga ganando sobre el fade-in a opacidad 1 de
+ * ese estado — sin el segundo selector, un enlace deshabilitado dentro de
+ * un grupo ya expandido se vería con opacidad completa en vez de atenuada.
+ */
+.sidebar__link--disabled,
+.sidebar__submenu-wrapper--expanded .sidebar__link--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/** Small "borrador en progreso" nudge — a dot, not a badge with text, so it stays out of the way of the label. */
+.sidebar__draft-dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  margin-left: auto;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-accent-gold);
+}
+
+.sidebar__logout {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+  padding: var(--space-3);
+  border-top: 1px solid var(--sidebar-border);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  // Pedido explícito: el texto de "Cerrar sesión" siempre en rojo, no solo
+  // al pasar el mouse — mismo rojo que `.btn--ghost-danger` ya usa en el
+  // resto de la app, para no inventar un segundo rojo "de peligro".
+  color: #dc4444;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+
+  app-icon {
+    color: #dc4444;
+  }
+
+  &:hover {
+    background: rgba(220, 68, 68, 0.12);
+    color: #c22f2f;
+  }
+}

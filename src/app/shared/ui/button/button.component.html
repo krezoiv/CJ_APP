@@ -1,0 +1,34 @@
+<ng-template #label><ng-content></ng-content></ng-template>
+
+@if (routerLink) {
+  <a
+    class="btn"
+    [class]="'btn--' + variant + ' btn--' + size"
+    [class.btn--full]="fullWidth"
+    [routerLink]="routerLink"
+    [fragment]="fragment"
+  >
+    <ng-container [ngTemplateOutlet]="label"></ng-container>
+  </a>
+} @else if (href) {
+  <a
+    class="btn"
+    [class]="'btn--' + variant + ' btn--' + size"
+    [class.btn--full]="fullWidth"
+    [href]="href"
+    [target]="target ?? null"
+    [rel]="target === '_blank' ? 'noopener noreferrer' : null"
+  >
+    <ng-container [ngTemplateOutlet]="label"></ng-container>
+  </a>
+} @else {
+  <button
+    class="btn"
+    [class]="'btn--' + variant + ' btn--' + size"
+    [class.btn--full]="fullWidth"
+    [type]="type"
+    [disabled]="disabled"
+  >
+    <ng-container [ngTemplateOutlet]="label"></ng-container>
+  </button>
+}

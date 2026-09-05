@@ -1,0 +1,41 @@
+<div class="field field--count">
+  <label for="transaction-count">Cantidad de transacciones</label>
+  <input
+    id="transaction-count"
+    type="text"
+    inputmode="numeric"
+    [appDecimalInput]="0"
+    [value]="transactionAmounts.length"
+    [disabled]="disabled"
+    (change)="onCountInput($any($event.target).value)"
+  />
+</div>
+
+@if (transactionAmounts.length > 0) {
+  <div class="transaction-rows">
+    @for (amount of transactionAmounts; track $index) {
+      <div class="transaction-row">
+        <span class="transaction-row__label">Transacción {{ $index + 1 }}</span>
+        <input
+          type="text"
+          inputmode="decimal"
+          appDecimalInput
+          class="transaction-row__input"
+          [value]="amount"
+          [disabled]="disabled"
+          (change)="onAmountInput($index, $any($event.target).value)"
+          [attr.aria-label]="'Monto de la transacción ' + ($index + 1)"
+        />
+      </div>
+    }
+  </div>
+
+  <div class="transaction-total">
+    <span>Total Transacciones</span>
+    <span class="transaction-total__value">{{ formatCurrency(totalDistributed) }}</span>
+  </div>
+
+  <div class="transaction-status">
+    <app-cuadre-status-indicator [status]="status" [text]="statusText" />
+  </div>
+}

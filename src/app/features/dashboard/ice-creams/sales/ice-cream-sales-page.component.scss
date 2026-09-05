@@ -1,0 +1,18 @@
+.sales__header {
+  margin-bottom: var(--space-6);
+}
+
+.sales__title {
+  font-size: var(--fs-2xl);
+  color: var(--color-text-on-light);
+  margin-bottom: var(--space-2);
+}
+
+.sales__subtitle {
+  font-size: var(--fs-md);
+  color: var(--color-text-on-light-muted);
+}
+
+.sales__receipt {
+  margin-top: var(--space-6);
+}

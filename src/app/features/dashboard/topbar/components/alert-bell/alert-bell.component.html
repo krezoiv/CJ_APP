@@ -1,0 +1,72 @@
+<div class="alert-bell">
+  <button
+    type="button"
+    class="alert-bell__trigger"
+    (click)="togglePanel()"
+    [attr.aria-expanded]="isOpen()"
+    [attr.aria-label]="unreadCount() > 0 ? unreadCount() + ' alertas sin leer' : 'Alertas'"
+  >
+    <app-icon name="bell" [size]="20" />
+    @if (unreadCount() > 0) {
+      <span class="alert-bell__badge">{{ unreadCount() > 99 ? '99+' : unreadCount() }}</span>
+    }
+  </button>
+
+  @if (isOpen()) {
+    <button type="button" class="alert-bell__backdrop" (click)="closePanel()" aria-hidden="true" tabindex="-1"></button>
+
+    <div class="alert-bell__panel">
+      <div class="alert-bell__panel-header">
+        <strong>Alertas</strong>
+        @if (unreadCount() > 0) {
+          <button type="button" class="alert-bell__mark-all" (click)="markAllAsRead()">
+            <app-icon name="check-check" [size]="14" />
+            Marcar todas como leídas
+          </button>
+        }
+      </div>
+
+      <div class="alert-bell__panel-body">
+        @if (isLoading() && items().length === 0) {
+          <p class="alert-bell__empty">Cargando…</p>
+        } @else if (items().length === 0) {
+          <div class="alert-bell__empty-state">
+            <app-icon name="check-circle" [size]="24" />
+            <p>No hay alertas activas.</p>
+          </div>
+        } @else {
+          @for (alert of items(); track alert.key) {
+            <button
+              type="button"
+              class="alert-bell__item"
+              [class.alert-bell__item--unread]="!alert.isRead"
+              (click)="selectAlert(alert)"
+            >
+              <app-badge [tone]="priorityTone[alert.priority]">
+                <app-icon [name]="priorityIcon[alert.priority]" [size]="12" />
+              </app-badge>
+              <span class="alert-bell__item-content">
+                <strong>{{ alert.title }}</strong>
+                <span>{{ alert.description }}</span>
+                @if (isPayable(alert)) {
+                  <span
+                    class="alert-bell__pay-action"
+                    role="button"
+                    tabindex="0"
+                    (click)="markPurchaseAsPaid($event, alert)"
+                    (keydown.enter)="markPurchaseAsPaid($event, alert)"
+                  >
+                    {{ isPaying(alert) ? 'Marcando...' : 'Marcar como pagada' }}
+                  </span>
+                }
+              </span>
+              @if (!alert.isRead) {
+                <span class="alert-bell__dot" aria-hidden="true"></span>
+              }
+            </button>
+          }
+        }
+      </div>
+    </div>
+  }
+</div>

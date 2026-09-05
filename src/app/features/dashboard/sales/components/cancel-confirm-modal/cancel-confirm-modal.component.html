@@ -1,0 +1,19 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__icon">
+        <app-icon name="alert-triangle" [size]="24" />
+      </div>
+
+      <h2 class="modal__title">¿Estás seguro de cancelar esta venta?</h2>
+      <p class="modal__description">
+        Se perderán los productos e información que tienes agregados. El inventario reservado se restaurará.
+      </p>
+
+      <div class="modal__actions">
+        <app-button variant="ghost" (click)="cancelled.emit()">Seguir editando</app-button>
+        <app-button variant="danger" (click)="confirmed.emit()">Cancelar operación</app-button>
+      </div>
+    </div>
+  </div>
+}

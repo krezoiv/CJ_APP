@@ -1,0 +1,30 @@
+<app-section sectionId="quienes-somos" tone="light" spacing="lg">
+  <div class="about__layout">
+    <div class="about__story" appRevealOnScroll>
+      <app-badge tone="neutral-light">Quiénes somos</app-badge>
+      <h2 class="about__title">Más de 10 años siendo el punto de confianza de nuestra comunidad</h2>
+      <p class="about__text">
+        Comercial Jhoel nació como una pequeña librería de barrio y hoy es un punto de servicio integral:
+        útiles escolares, fotocopias, agente bancario y trámites administrativos, todo en un mismo lugar.
+      </p>
+      <p class="about__text">
+        Creemos que la tecnología y los buenos procesos no están reñidos con la cercanía. Por eso seguimos
+        creciendo, sin dejar de conocer a cada cliente por su nombre.
+      </p>
+    </div>
+
+    <div class="about__values">
+      @for (value of values; track value.title; let i = $index) {
+        <div class="value" appRevealOnScroll [revealDelay]="i * 80">
+          <div class="value__icon">
+            <app-icon [name]="value.icon" [size]="22" />
+          </div>
+          <div>
+            <h3 class="value__title">{{ value.title }}</h3>
+            <p class="value__text">{{ value.text }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</app-section>

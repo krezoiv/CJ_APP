@@ -1,0 +1,32 @@
+<div class="sales">
+  <header class="sales__header">
+    <div>
+      <h1 class="sales__title">Heladería · Ventas</h1>
+      <p class="sales__subtitle">Registra las ventas de helados al público.</p>
+    </div>
+  </header>
+
+  <app-ice-cream-sale-product-search (iceCreamSelected)="onIceCreamSelected($event)" />
+
+  <div class="sales__receipt">
+    <app-ice-cream-sale-items-table
+      [items]="draft.items()"
+      (quantityChange)="onQuantityChange($event)"
+      (removeItem)="onRemoveItem($event)"
+    />
+
+    <app-ice-cream-sale-summary
+      [itemCount]="draft.items().length"
+      [total]="draft.total()"
+      [isSaving]="isSaving()"
+      (cancel)="requestCancel()"
+      (save)="saveSale()"
+    />
+  </div>
+</div>
+
+<app-ice-cream-sale-cancel-confirm-modal
+  [open]="isCancelConfirmOpen()"
+  (confirmed)="confirmCancel()"
+  (cancelled)="dismissCancel()"
+/>

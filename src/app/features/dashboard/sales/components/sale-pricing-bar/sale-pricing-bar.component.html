@@ -1,0 +1,47 @@
+<div class="pricing-bar">
+  <div class="pricing-bar__field">
+    <label class="pricing-bar__label">
+      <app-icon name="user" [size]="14" />
+      Cliente (opcional)
+    </label>
+    <app-client-search-select
+      [selectedClientId]="clientId"
+      [selectedClientName]="clientName"
+      placeholder="Buscar cliente…"
+      (selectionChange)="onClientChange($event)"
+    />
+  </div>
+
+  <div class="pricing-bar__field">
+    <label class="pricing-bar__label">
+      <app-icon name="tag" [size]="14" />
+      Lista de precios
+    </label>
+    <div class="pricing-bar__toggle" role="group" aria-label="Lista de precios">
+      <button
+        type="button"
+        class="pricing-bar__toggle-btn"
+        [class.pricing-bar__toggle-btn--active]="priceList === 'PUBLIC'"
+        [disabled]="disabled || (locked && priceList !== 'PUBLIC')"
+        (click)="selectPriceList('PUBLIC')"
+      >
+        Público
+      </button>
+      <button
+        type="button"
+        class="pricing-bar__toggle-btn"
+        [class.pricing-bar__toggle-btn--active]="priceList === 'WHOLESALE'"
+        [disabled]="disabled || (locked && priceList !== 'WHOLESALE')"
+        (click)="selectPriceList('WHOLESALE')"
+      >
+        Mayorista
+      </button>
+    </div>
+    @if (locked) {
+      <span class="pricing-bar__hint">
+        <app-icon name="lock" [size]="12" />
+        Ya hay productos en el recibo — cancela la venta para cambiar la lista de precios.
+      </span>
+    }
+  </div>
+</div>

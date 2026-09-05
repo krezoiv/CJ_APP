@@ -1,0 +1,85 @@
+<div class="reports-page">
+  <header class="reports-page__header">
+    <div>
+      <h1 class="reports-page__title">Reporte de Cuadre de Agentes</h1>
+      <p class="reports-page__subtitle">Consulta, filtra y exporta el historial de cuadres de Agentes Bancarios.</p>
+    </div>
+    <app-button variant="primary" [disabled]="exporting()" (click)="exportPdf()">
+      <app-icon name="download" [size]="16" />
+      {{ exporting() ? 'Generando…' : 'Exportar PDF' }}
+    </app-button>
+  </header>
+
+  <div class="reports-page__filters">
+    <div class="reports-page__filters-title">
+      <app-icon name="filter" [size]="16" />
+      Filtros
+    </div>
+
+    <div class="filters-grid">
+      <div class="field">
+        <label for="areport-start-date">Desde</label>
+        <input
+          id="areport-start-date"
+          type="date"
+          [ngModel]="draftStartDate()"
+          (ngModelChange)="draftStartDate.set($event)"
+        />
+      </div>
+
+      <div class="field">
+        <label for="areport-end-date">Hasta</label>
+        <input
+          id="areport-end-date"
+          type="date"
+          [ngModel]="draftEndDate()"
+          (ngModelChange)="draftEndDate.set($event)"
+          [max]="draftEndDate()"
+        />
+      </div>
+    </div>
+
+    <div class="filters-actions">
+      <app-button variant="ghost" [disabled]="!hasActiveFilters()" (click)="clearFilters()">Limpiar filtros</app-button>
+      <app-button variant="primary" (click)="applyFilters()">Aplicar filtros</app-button>
+    </div>
+  </div>
+
+  <app-report-summary [tiles]="summaryTiles()" [loading]="loadingSummary()" />
+
+  <div class="table-wrapper">
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th class="align-right">Efectivo</th>
+          <th class="align-right">Bancos</th>
+          <th class="align-right">Activos</th>
+          <th class="align-right">Cuentas por Cobrar</th>
+          <th class="align-right">Resultado</th>
+          <th>Usuario</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (!loadingTable()) {
+          @for (row of rows(); track row.id) {
+            <tr>
+              <td>{{ row.date | date: 'dd/MM/yyyy' }}</td>
+              <td class="align-right">{{ formatCurrency(row.totalCash) }}</td>
+              <td class="align-right">{{ formatCurrency(row.totalBanks) }}</td>
+              <td class="align-right">{{ formatCurrency(row.totalAssets) }}</td>
+              <td class="align-right">{{ formatCurrency(row.totalAccountsReceivable) }}</td>
+              <td class="align-right report-table__total">{{ formatCurrency(row.result) }}</td>
+              <td>{{ row.createdByUsername }}</td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+    @if (!loadingTable() && rows().length === 0) {
+      <p class="table-wrapper__empty">No se encontraron registros con los filtros seleccionados.</p>
+    }
+  </div>
+
+  <app-report-pagination [total]="total()" [page]="page()" [limit]="20" (pageChange)="onPageChange($event)" />
+</div>

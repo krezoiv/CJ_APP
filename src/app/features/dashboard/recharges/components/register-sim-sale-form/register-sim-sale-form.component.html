@@ -1,0 +1,64 @@
+<form class="purchase-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <h2 class="purchase-form__title">
+    <app-icon name="shopping-bag" [size]="18" />
+    Vender SIM
+  </h2>
+  <p class="purchase-form__subtitle">Registra la salida de inventario físico de SIM — no afecta el saldo electrónico.</p>
+
+  <div class="field">
+    <label for="sim-sale-type">Producto</label>
+    <select
+      id="sim-sale-type"
+      formControlName="simTypeId"
+      (change)="onTypeChange($any($event.target).value)"
+    >
+      @for (type of types; track type.id) {
+        <option [value]="type.id">{{ type.name }}</option>
+      }
+    </select>
+    <span class="field__hint">Stock disponible: {{ availableStock }}</span>
+  </div>
+
+  <div class="field">
+    <label for="sim-sale-quantity">Cantidad</label>
+    <input
+      id="sim-sale-quantity"
+      type="number"
+      min="1"
+      step="1"
+      formControlName="quantity"
+    />
+    @if (form.controls.quantity.invalid && form.controls.quantity.touched) {
+      <span class="field__error">Ingresa una cantidad entera mayor que cero.</span>
+    }
+    @if (exceedsStock) {
+      <span class="field__error">No hay suficiente stock disponible.</span>
+    }
+  </div>
+
+  <div class="sim-preview">
+    <div class="sim-preview__row">
+      <span>Precio de venta</span>
+      <strong>{{ formatCurrency(previewUnitPrice) }}</strong>
+    </div>
+    <div class="sim-preview__row">
+      <span>Total</span>
+      <strong>{{ formatCurrency(previewTotal) }}</strong>
+    </div>
+  </div>
+
+  <app-button variant="primary" type="submit" fullWidth [disabled]="isSubmitting() || lockReason !== null || exceedsStock">
+    {{ isSubmitting() ? 'Registrando…' : 'Registrar venta' }}
+  </app-button>
+  @if (lockReason === 'closed') {
+    <p class="purchase-form__lock-hint">
+      <app-icon name="lock" [size]="12" />
+      Día de recargas cerrado.
+    </p>
+  } @else if (lockReason === 'not_opened') {
+    <p class="purchase-form__lock-hint">
+      <app-icon name="lock" [size]="12" />
+      Día de recargas sin aperturar.
+    </p>
+  }
+</form>

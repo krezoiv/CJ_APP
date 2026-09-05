@@ -1,0 +1,29 @@
+<app-section tone="dark" spacing="md">
+  <app-badge tone="brand">Catálogo</app-badge>
+  <h1 class="catalog-page__title">Explora todo lo que tenemos para ti</h1>
+  <p class="catalog-page__subtitle">
+    Estamos publicando nuestro catálogo completo en línea. Mientras tanto, revisa las categorías
+    disponibles y escríbenos por WhatsApp para consultar precios y disponibilidad al instante.
+  </p>
+  <app-button variant="secondary" size="lg" [href]="site.whatsappHref" target="_blank">
+    <app-icon name="whatsapp" [size]="18" />
+    Consultar por WhatsApp
+  </app-button>
+</app-section>
+
+<app-section tone="light" spacing="lg">
+  <div class="catalog-page__grid">
+    @for (category of categories$ | async; track category.id) {
+      <app-card>
+        <div class="category-card">
+          <div class="category-card__icon">
+            <app-icon [name]="category.icon" [size]="28" />
+          </div>
+          <h2 class="category-card__title">{{ category.name }}</h2>
+          <p class="category-card__description">{{ category.description }}</p>
+          <span class="category-card__count">{{ category.itemCount }}</span>
+        </div>
+      </app-card>
+    }
+  </div>
+</app-section>

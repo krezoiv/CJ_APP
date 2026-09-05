@@ -1,0 +1,58 @@
+<header class="navbar" [class.navbar--scrolled]="isScrolled()">
+  <app-container wide>
+    <div class="navbar__row">
+      <a class="navbar__brand" routerLink="/" fragment="inicio" (click)="closeMenu()">
+        <img class="navbar__logo" src="assets/images/logo.png" alt="{{ site.name }}" width="40" height="40" />
+        <span class="navbar__brand-name">{{ site.name }}</span>
+      </a>
+
+      <nav class="navbar__links" aria-label="Navegación principal">
+        @for (link of navLinks; track link.label) {
+          <a class="navbar__link" [routerLink]="link.path" [fragment]="link.fragment">{{ link.label }}</a>
+        }
+      </nav>
+
+      <div class="navbar__actions">
+        <a class="navbar__login" [routerLink]="accountLink().path">
+          <app-icon [name]="accountLink().icon" [size]="18" />
+          {{ accountLink().label }}
+        </a>
+        <app-button variant="primary" size="sm" routerLink="/catalogo">Ver catálogo</app-button>
+      </div>
+
+      <button
+        class="navbar__toggle"
+        type="button"
+        (click)="toggleMenu()"
+        [attr.aria-expanded]="isMenuOpen()"
+        aria-label="Abrir menú de navegación"
+      >
+        <app-icon [name]="isMenuOpen() ? 'close' : 'menu'" [size]="24" />
+      </button>
+    </div>
+  </app-container>
+
+  @if (isMenuOpen()) {
+    <div class="navbar__mobile">
+      <app-container wide>
+        <nav class="navbar__mobile-links" aria-label="Navegación móvil">
+          @for (link of navLinks; track link.label) {
+            <a
+              class="navbar__mobile-link"
+              [routerLink]="link.path"
+              [fragment]="link.fragment"
+              (click)="closeMenu()"
+              >{{ link.label }}</a
+            >
+          }
+          <a class="navbar__mobile-link" [routerLink]="accountLink().path" (click)="closeMenu()">{{
+            accountLink().label
+          }}</a>
+        </nav>
+        <app-button variant="primary" fullWidth routerLink="/catalogo" (click)="closeMenu()"
+          >Ver catálogo</app-button
+        >
+      </app-container>
+    </div>
+  }
+</header>

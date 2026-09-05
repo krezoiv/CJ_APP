@@ -1,0 +1,142 @@
+<div class="reports-page">
+  <header class="reports-page__header">
+    <div>
+      <h1 class="reports-page__title">Reportería de Activos y Cuentas por Cobrar</h1>
+      <p class="reports-page__subtitle">Consulte y exporte la información de activos y cuentas por cobrar.</p>
+    </div>
+    <app-button variant="primary" [disabled]="state.exporting()" (click)="exportPdf()">
+      <app-icon name="download" [size]="16" />
+      {{ state.exporting() ? 'Generando…' : 'Exportar PDF' }}
+    </app-button>
+  </header>
+
+  <div class="reports-page__filters">
+    <div class="reports-page__filters-title">
+      <app-icon name="filter" [size]="16" />
+      Filtros
+    </div>
+
+    <div class="type-checkboxes" role="group" aria-label="Tipo de reporte">
+      <label class="checkbox">
+        <input
+          type="checkbox"
+          [ngModel]="state.draftIncludeAssets()"
+          (ngModelChange)="state.draftIncludeAssets.set($event)"
+        />
+        Activos
+      </label>
+      <label class="checkbox">
+        <input
+          type="checkbox"
+          [ngModel]="state.draftIncludeReceivables()"
+          (ngModelChange)="state.draftIncludeReceivables.set($event)"
+        />
+        Cuentas por Cobrar
+      </label>
+    </div>
+
+    <div class="filters-grid">
+      <div class="field">
+        <label>Cliente</label>
+        <app-report-client-filter
+          [selectedClient]="state.draftClient()"
+          (selectionChange)="onDraftClientChange($event)"
+        />
+      </div>
+
+      <div class="field">
+        <label for="arcreport-start-date">Fecha Desde</label>
+        <input
+          id="arcreport-start-date"
+          type="date"
+          [ngModel]="state.draftStartDate()"
+          (ngModelChange)="state.draftStartDate.set($event)"
+        />
+      </div>
+
+      <div class="field">
+        <label for="arcreport-end-date">Fecha Hasta</label>
+        <input
+          id="arcreport-end-date"
+          type="date"
+          [ngModel]="state.draftEndDate()"
+          (ngModelChange)="state.draftEndDate.set($event)"
+        />
+      </div>
+
+      <div class="field">
+        <label for="arcreport-status">Estado</label>
+        <select id="arcreport-status" [ngModel]="state.draftStatus()" (ngModelChange)="state.draftStatus.set($event)">
+          <option value="all">Todos</option>
+          <option value="active">Activos</option>
+          <option value="inactive">Inactivos</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="arcreport-search">Buscar</label>
+        <input
+          id="arcreport-search"
+          type="text"
+          placeholder="Cliente o descripción…"
+          [ngModel]="state.draftSearch()"
+          (ngModelChange)="state.draftSearch.set($event)"
+        />
+      </div>
+    </div>
+
+    <div class="filters-actions">
+      <app-button variant="ghost" [disabled]="!hasActiveFilters()" (click)="clearFilters()">Limpiar filtros</app-button>
+      <app-button variant="primary" (click)="applyFilters()">Consultar</app-button>
+    </div>
+  </div>
+
+  <app-report-summary [tiles]="summaryTiles()" [loading]="state.loadingSummary()" />
+
+  <div class="table-wrapper">
+    <table class="report-table">
+      <thead>
+        <tr>
+          @if (showTypeColumn()) {
+            <th>Tipo</th>
+          }
+          <th>Cliente</th>
+          <th>Fecha</th>
+          <th class="align-right">Monto</th>
+          <th>Descripción</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (!state.loadingTable()) {
+          @for (row of state.rows(); track row.id) {
+            <tr>
+              @if (showTypeColumn()) {
+                <td>{{ typeLabel(row.type) }}</td>
+              }
+              <td>{{ row.clientName }}</td>
+              <td>{{ row.date | date: 'dd/MM/yyyy' }}</td>
+              <td class="align-right report-table__total">{{ formatCurrency(row.amount) }}</td>
+              <td>{{ row.description || '—' }}</td>
+              <td>
+                <app-badge [tone]="row.isActive ? 'success' : 'danger'">
+                  {{ row.isActive ? 'Activo' : 'Inactivo' }}
+                </app-badge>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+    @if (!state.loadingTable() && state.rows().length === 0) {
+      <p class="table-wrapper__empty">No se encontraron registros con los filtros seleccionados.</p>
+    }
+  </div>
+
+  <app-report-pagination
+    [total]="state.total()"
+    [page]="state.page()"
+    [limit]="20"
+    (pageChange)="onPageChange($event)"
+  />
+</div>

@@ -1,0 +1,22 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__icon">
+        <app-icon name="file-check" [size]="24" />
+      </div>
+
+      <h2 class="modal__title">Confirmar Registro de Saldos</h2>
+      <p class="modal__description">
+        ¿Está seguro de guardar los saldos bancarios correspondientes al día
+        <strong>{{ date }}</strong>?
+      </p>
+
+      <div class="modal__actions">
+        <app-button variant="ghost" [disabled]="isSaving" (click)="cancelled.emit()">Cancelar</app-button>
+        <app-button variant="primary" [disabled]="isSaving" (click)="confirmed.emit()">
+          {{ isSaving ? 'Guardando…' : 'Confirmar y Guardar' }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

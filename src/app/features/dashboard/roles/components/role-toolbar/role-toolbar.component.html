@@ -1,0 +1,32 @@
+<div class="toolbar">
+  <div class="toolbar__row">
+    <label class="search" for="role-search">
+      <app-icon name="search" [size]="18" />
+      <input
+        id="role-search"
+        type="text"
+        placeholder="Buscar por nombre de rol…"
+        [ngModel]="searchTerm"
+        (ngModelChange)="searchTermChange.emit($event)"
+      />
+    </label>
+
+    <app-button variant="primary" (click)="addRole.emit()">
+      <app-icon name="plus" [size]="16" />
+      Agregar rol
+    </app-button>
+  </div>
+
+  <div class="toolbar__filters" role="group" aria-label="Filtrar por estado">
+    @for (option of statusFilterOptions; track option.value) {
+      <button
+        type="button"
+        class="filter-chip"
+        [class.filter-chip--active]="statusFilter === option.value"
+        (click)="statusFilterChange.emit(option.value)"
+      >
+        {{ option.label }}
+      </button>
+    }
+  </div>
+</div>

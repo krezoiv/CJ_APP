@@ -1,0 +1,46 @@
+<div class="banks">
+  <header class="banks__header">
+    <div>
+      <h1 class="banks__title">Bancos</h1>
+      <p class="banks__subtitle">Administra los bancos y cuentas usados por Agentes Bancarios.</p>
+    </div>
+  </header>
+
+  <app-bank-summary [data]="banks()" />
+
+  <app-bank-toolbar
+    [searchTerm]="searchTerm()"
+    [statusFilter]="statusFilter()"
+    [canManage]="isAdmin()"
+    (searchTermChange)="searchTerm.set($event)"
+    (statusFilterChange)="statusFilter.set($event)"
+    (addBank)="openCreateForm()"
+  />
+
+  <app-bank-table
+    [banks]="filteredBanks()"
+    [loading]="loading()"
+    [hasActiveFilters]="hasActiveFilters()"
+    [canManage]="isAdmin()"
+    (edit)="openEditForm($event)"
+    (delete)="requestDelete($event)"
+    (clearFilters)="clearFilters()"
+    (addBank)="openCreateForm()"
+  />
+</div>
+
+<app-bank-form-modal
+  [open]="isFormOpen()"
+  [bank]="editingBank()"
+  [accountTypes]="accountTypeOptions()"
+  (closed)="closeForm()"
+  (saved)="onBankSaved($event)"
+/>
+
+<app-bank-delete-confirm-modal
+  [open]="isDeleteOpen()"
+  [bank]="deletingBank()"
+  [isDeleting]="isDeleting()"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>

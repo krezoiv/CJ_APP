@@ -1,0 +1,45 @@
+<div class="suppliers">
+  <header class="suppliers__header">
+    <div>
+      <h1 class="suppliers__title">Proveedores</h1>
+      <p class="suppliers__subtitle">Gestiona los proveedores a los que les compras productos.</p>
+    </div>
+  </header>
+
+  <app-supplier-summary [data]="suppliers()" />
+
+  <app-supplier-toolbar
+    [searchTerm]="searchTerm()"
+    [statusFilter]="statusFilter()"
+    [canManage]="isAdmin()"
+    (searchTermChange)="searchTerm.set($event)"
+    (statusFilterChange)="statusFilter.set($event)"
+    (addSupplier)="openCreateForm()"
+  />
+
+  <app-supplier-table
+    [suppliers]="filteredSuppliers()"
+    [loading]="loading()"
+    [hasActiveFilters]="hasActiveFilters()"
+    [canManage]="isAdmin()"
+    (edit)="openEditForm($event)"
+    (delete)="requestDelete($event)"
+    (clearFilters)="clearFilters()"
+    (addSupplier)="openCreateForm()"
+  />
+</div>
+
+<app-supplier-form-modal
+  [open]="isFormOpen()"
+  [supplier]="editingSupplier()"
+  (closed)="closeForm()"
+  (saved)="onSupplierSaved($event)"
+/>
+
+<app-supplier-delete-confirm-modal
+  [open]="isDeleteOpen()"
+  [supplier]="deletingSupplier()"
+  [isDeleting]="isDeleting()"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>

@@ -1,0 +1,63 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__icon">
+        <app-icon name="file-check" [size]="24" />
+      </div>
+
+      <h2 class="modal__title">¿Deseas confirmar y guardar esta transacción?</h2>
+
+      <dl class="modal__summary">
+        <div class="modal__summary-row">
+          <dt>Tipo de Transacción</dt>
+          <dd>{{ transactionTypeName }}</dd>
+        </div>
+        <div class="modal__summary-row">
+          <dt>Banco Agente</dt>
+          <dd>{{ transactionBankName }}</dd>
+        </div>
+        @if (clientName) {
+          <div class="modal__summary-row">
+            <dt>Cliente</dt>
+            <dd>{{ clientName }}</dd>
+          </div>
+        }
+        <div class="modal__summary-row modal__summary-row--total">
+          <dt>Monto Total</dt>
+          <dd>{{ formatCurrency(totalAmount) }}</dd>
+        </div>
+      </dl>
+
+      <div class="modal__section">
+        <h3 class="modal__section-title">Desglose de efectivo</h3>
+        <ul class="modal__list">
+          @for (row of cashRows; track row.denomination) {
+            <li>
+              <span>{{ formatDenomination(row.denomination) }} × {{ formatQuantity(row.quantity) }}</span>
+              <span>{{ formatCurrency(row.subtotal) }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <div class="modal__section">
+        <h3 class="modal__section-title">Transacciones ({{ transactionAmounts.length }})</h3>
+        <ul class="modal__list">
+          @for (amount of transactionAmounts; track $index) {
+            <li>
+              <span>Transacción {{ $index + 1 }}</span>
+              <span>{{ formatCurrency(amount) }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <div class="modal__actions">
+        <app-button variant="ghost" [disabled]="isSaving" (click)="cancelled.emit()">Volver</app-button>
+        <app-button variant="primary" [disabled]="isSaving" (click)="confirmed.emit()">
+          {{ isSaving ? 'Guardando…' : 'Confirmar y Guardar' }}
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

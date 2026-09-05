@@ -1,0 +1,58 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.card {
+  height: 100%;
+  border-radius: var(--radius-lg);
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out);
+}
+
+.card--pad-sm {
+  padding: var(--space-4);
+}
+
+.card--pad-md {
+  padding: var(--space-6);
+}
+
+.card--pad-lg {
+  padding: var(--space-8);
+}
+
+.card--light {
+  background: var(--color-surface-light);
+  border: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-sm);
+}
+
+.card--dark {
+  background: var(--color-surface-dark);
+  border: 1px solid var(--color-border-dark);
+}
+
+.card--glass {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-border-dark-strong);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.card--hoverable:hover {
+  transform: translateY(-4px);
+}
+
+.card--light.card--hoverable:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary-300);
+}
+
+.card--dark.card--hoverable:hover,
+.card--glass.card--hoverable:hover {
+  border-color: var(--color-accent-cyan);
+  box-shadow: var(--shadow-glow-primary);
+}

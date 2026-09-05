@@ -1,0 +1,88 @@
+@if (open) {
+  <div class="modal-backdrop">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h2 class="modal__title">{{ isEditMode ? 'Editar presentación' : 'Nueva presentación' }}</h2>
+        <button type="button" class="modal__close" (click)="close()" aria-label="Cerrar">
+          <app-icon name="close" [size]="18" />
+        </button>
+      </div>
+
+      <form class="modal__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        @if (isUnidad) {
+          <p class="field__hint">
+            "Unidad" es la presentación base del producto — su nombre y factor de conversión no se pueden modificar.
+          </p>
+        }
+
+        <div class="field">
+          <label for="presentation-type">Tipo de presentación</label>
+          <select id="presentation-type" formControlName="presentationTypeId">
+            <option value="" disabled>Selecciona una presentación…</option>
+            @for (type of presentationTypes(); track type.id) {
+              <option [value]="type.id">{{ type.name }}</option>
+            }
+          </select>
+          @if (form.controls.presentationTypeId.invalid && form.controls.presentationTypeId.touched) {
+            <span class="field__error">Selecciona un tipo de presentación.</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="presentation-factor">Factor de conversión (unidades base)</label>
+          <input
+            id="presentation-factor"
+            type="text"
+            inputmode="numeric"
+            [appDecimalInput]="0"
+            formControlName="conversionFactor"
+            placeholder="Ej. 12"
+          />
+          @if (form.controls.conversionFactor.invalid && form.controls.conversionFactor.touched) {
+            <span class="field__error">Ingresa un factor mayor a 0.</span>
+          }
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="presentation-cost-price">Precio de costo</label>
+            <input
+              id="presentation-cost-price"
+              type="text"
+              inputmode="decimal"
+              appDecimalInput
+              formControlName="costPrice"
+              placeholder="0.00"
+            />
+          </div>
+
+          <div class="field">
+            <label for="presentation-public-price">Precio público</label>
+            <input
+              id="presentation-public-price"
+              type="text"
+              inputmode="decimal"
+              appDecimalInput
+              formControlName="publicPrice"
+              placeholder="0.00"
+            />
+          </div>
+        </div>
+
+        @if (errorMessage()) {
+          <p class="modal__error">{{ errorMessage() }}</p>
+        }
+
+        <div class="modal__actions">
+          <app-button variant="ghost-danger" type="button" [disabled]="isSubmitting()" (click)="close()">
+            <app-icon name="close" [size]="16" />
+            Cancelar
+          </app-button>
+          <app-button variant="primary" type="submit" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Guardando…' : isEditMode ? 'Guardar cambios' : 'Crear presentación' }}
+          </app-button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

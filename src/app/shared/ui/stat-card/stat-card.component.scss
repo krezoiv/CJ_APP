@@ -1,0 +1,41 @@
+:host {
+  display: block;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+  padding: var(--space-6) var(--space-4);
+}
+
+.stat__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-full);
+  background: var(--gradient-brand-soft);
+  color: var(--color-accent-cyan);
+  margin-bottom: var(--space-1);
+}
+
+.stat__value {
+  font-family: var(--font-heading);
+  font-size: var(--fs-3xl);
+  font-weight: var(--fw-bold);
+  line-height: 1;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.stat__label {
+  font-size: var(--fs-sm);
+  color: currentColor;
+  opacity: 0.72;
+}

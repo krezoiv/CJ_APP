@@ -1,0 +1,46 @@
+<section id="inicio" class="hero">
+  <div class="hero__glow hero__glow--primary" aria-hidden="true"></div>
+  <div class="hero__glow hero__glow--gold" aria-hidden="true"></div>
+  <div class="hero__grid-pattern" aria-hidden="true"></div>
+
+  <app-container wide>
+    <div class="hero__layout">
+      <div class="hero__content">
+        <app-badge tone="brand">Librería · Útiles escolares · Agente bancario</app-badge>
+
+        <h1 class="hero__title">
+          Todo lo que tu negocio y tu familia necesitan, <span class="text-gradient">en un solo lugar de confianza</span>
+        </h1>
+
+        <p class="hero__subtitle">{{ site.description }} Menos vueltas, menos tiempo perdido: resuelve tus
+        compras, tus trámites bancarios y tus pendientes administrativos en una sola visita.</p>
+
+        <div class="hero__actions">
+          <app-button variant="primary" size="lg" routerLink="/catalogo">
+            Ver catálogo completo
+            <app-icon name="arrow-right" [size]="18" />
+          </app-button>
+          <app-button variant="outline" size="lg" [href]="site.whatsappHref" target="_blank">
+            <app-icon name="whatsapp" [size]="18" />
+            Escríbenos por WhatsApp
+          </app-button>
+        </div>
+
+        <div class="hero__trust">
+          <div class="hero__trust-item">
+            <app-icon name="shield-check" [size]="18" />
+            Agente bancario autorizado
+          </div>
+          <div class="hero__trust-item">
+            <app-icon name="clock" [size]="18" />
+            Atención todos los días
+          </div>
+        </div>
+      </div>
+
+      <div class="hero__visual">
+        <app-hero-showcase />
+      </div>
+    </div>
+  </app-container>
+</section>

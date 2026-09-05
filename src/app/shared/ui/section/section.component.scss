@@ -1,0 +1,33 @@
+@use 'mixins' as *;
+
+.section {
+  position: relative;
+  scroll-margin-top: var(--navbar-height, 76px);
+}
+
+.section--spacing-sm {
+  @include section-spacing(sm);
+}
+
+.section--spacing-md {
+  @include section-spacing(md);
+}
+
+.section--spacing-lg {
+  @include section-spacing(lg);
+}
+
+.section--light {
+  background: var(--color-bg-light);
+  color: var(--color-text-on-light);
+}
+
+.section--muted {
+  background: var(--color-bg-light-muted);
+  color: var(--color-text-on-light);
+}
+
+.section--dark {
+  background: var(--color-bg-dark);
+  color: var(--color-text-on-dark);
+}

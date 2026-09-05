@@ -1,0 +1,45 @@
+<div class="clients">
+  <header class="clients__header">
+    <div>
+      <h1 class="clients__title">Clientes</h1>
+      <p class="clients__subtitle">Administra el catálogo de clientes del negocio.</p>
+    </div>
+  </header>
+
+  <app-client-summary [data]="clients()" />
+
+  <app-client-toolbar
+    [searchTerm]="searchTerm()"
+    [statusFilter]="statusFilter()"
+    [canManage]="isAdmin()"
+    (searchTermChange)="searchTerm.set($event)"
+    (statusFilterChange)="statusFilter.set($event)"
+    (addClient)="openCreateForm()"
+  />
+
+  <app-client-table
+    [clients]="filteredClients()"
+    [loading]="loading()"
+    [hasActiveFilters]="hasActiveFilters()"
+    [canManage]="isAdmin()"
+    (edit)="openEditForm($event)"
+    (delete)="requestDelete($event)"
+    (clearFilters)="clearFilters()"
+    (addClient)="openCreateForm()"
+  />
+</div>
+
+<app-client-form-modal
+  [open]="isFormOpen()"
+  [client]="editingClient()"
+  (closed)="closeForm()"
+  (saved)="onClientSaved($event)"
+/>
+
+<app-client-delete-confirm-modal
+  [open]="isDeleteOpen()"
+  [client]="deletingClient()"
+  [isDeleting]="isDeleting()"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>
