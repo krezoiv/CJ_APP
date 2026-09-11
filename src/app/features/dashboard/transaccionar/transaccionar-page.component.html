@@ -80,6 +80,35 @@
             (ngModelChange)="onClientNameInput($event)"
           />
         </div>
+
+        @if (isDepositType()) {
+          <div class="field">
+            <label>Cliente registrado <span class="field__optional">(opcional)</span></label>
+            <app-client-search-select
+              [selectedClientId]="draft.clientId()"
+              [selectedClientName]="draft.clientDisplayName()"
+              placeholder="Buscar cliente registrado…"
+              (selectionChange)="onRegisteredClientChange($event)"
+            />
+          </div>
+
+          @if (isAdmin()) {
+            <div class="field">
+              <label class="checkbox" [class.checkbox--disabled]="!canSendToAccountsReceivable()">
+                <input
+                  type="checkbox"
+                  [ngModel]="draft.sendToAccountsReceivable()"
+                  [disabled]="!canSendToAccountsReceivable()"
+                  (ngModelChange)="onSendToAccountsReceivableChange($event)"
+                />
+                Enviar a cuentas por cobrar
+              </label>
+              @if (!canSendToAccountsReceivable()) {
+                <span class="field__hint">Selecciona un cliente registrado para habilitar esta opción.</span>
+              }
+            </div>
+          }
+        }
       </div>
     </section>
 
@@ -126,6 +155,8 @@
     [transactionTypeName]="draft.transactionTypeName()"
     [transactionBankName]="selectedBankName()"
     [clientName]="draft.clientName()"
+    [registeredClientName]="draft.clientId() ? draft.clientDisplayName() : null"
+    [sendToAccountsReceivable]="draft.sendToAccountsReceivable()"
     [totalAmount]="draft.totalAmount()"
     [cashCounts]="draft.cashCounts()"
     [transactionAmounts]="draft.transactionAmounts()"

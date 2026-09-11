@@ -22,6 +22,18 @@
             <dd>{{ clientName }}</dd>
           </div>
         }
+        @if (registeredClientName) {
+          <div class="modal__summary-row">
+            <dt>Cliente registrado</dt>
+            <dd>{{ registeredClientName }}</dd>
+          </div>
+        }
+        @if (sendToAccountsReceivable) {
+          <div class="modal__summary-row">
+            <dt>Cuentas por Cobrar</dt>
+            <dd>Se generará un cargo por {{ formatCurrency(totalAmount) }}</dd>
+          </div>
+        }
         <div class="modal__summary-row modal__summary-row--total">
           <dt>Monto Total</dt>
           <dd>{{ formatCurrency(totalAmount) }}</dd>

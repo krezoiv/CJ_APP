@@ -23,6 +23,9 @@ export class SaveConfirmModalComponent {
   @Input() transactionTypeName = '';
   @Input() transactionBankName = '';
   @Input() clientName = '';
+  /** The registered client's own name (distinct from the free-text `clientName` above) — only ever set for a "Depósito" with a registered client picked. */
+  @Input() registeredClientName: string | null = null;
+  @Input() sendToAccountsReceivable = false;
   @Input() totalAmount = 0;
   @Input() cashCounts: Record<string, number> = {};
   @Input() transactionAmounts: number[] = [];

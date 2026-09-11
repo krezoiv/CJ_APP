@@ -13,6 +13,9 @@ interface PersistedBankDepositDraft {
   cashCounts: Record<string, number>;
   transactionAmounts: number[];
   clientName: string;
+  clientId: string | null;
+  clientDisplayName: string | null;
+  sendToAccountsReceivable: boolean;
 }
 
 const STORAGE_PREFIX = 'cj_bank_deposit_draft:';
@@ -49,8 +52,23 @@ export class BankDepositDraftStore {
   readonly cashCounts = signal<Record<string, number>>(emptyCashCounts());
   /** One entry per sub-transaction row — length is "cantidad de transacciones". */
   readonly transactionAmounts = signal<number[]>([]);
-  /** Free text, never required to save — see `RegisterBankDepositInput.clientName`'s own doc comment. */
+  /** Free text, never required to save — see `RegisterBankDepositInput.clientName`'s own doc comment. Independent of `clientId` below: both can be set at once, though the backend resolves the display name from the real client whenever `clientId` is present. */
   readonly clientName = signal('');
+
+  /**
+   * A REGISTERED client — only ever offered in the UI for a "Depósito"
+   * (see `TransaccionarPageComponent`'s template), set via
+   * `ClientSearchSelectComponent`, same component Ventas'
+   * `SalePricingBarComponent` already reuses. `clientDisplayName` mirrors
+   * `selectedClientName`'s own purpose on that component: shown immediately
+   * on restore from `sessionStorage`, before the full client list has
+   * loaded.
+   */
+  readonly clientId = signal<string | null>(null);
+  readonly clientDisplayName = signal<string | null>(null);
+
+  /** "Enviar a cuentas por cobrar" — only meaningful (and only ever shown enabled) while `clientId` is set; cleared automatically whenever the registered client is cleared, see `setRegisteredClient`. The backend re-validates all of this regardless — see `RegisterBankDepositOperationUseCase`. */
+  readonly sendToAccountsReceivable = signal(false);
 
   readonly totalCash = computed(() =>
     round2(
@@ -108,7 +126,8 @@ export class BankDepositDraftStore {
       this.totalAmount() > 0 ||
       this.totalCash() > 0 ||
       this.transactionAmounts().length > 0 ||
-      this.clientName().trim() !== '',
+      this.clientName().trim() !== '' ||
+      this.clientId() !== null,
   );
 
   readonly hasActiveDraft = computed(
@@ -164,6 +183,21 @@ export class BankDepositDraftStore {
     this.persist();
   }
 
+  /** `client: null` (cleared from `ClientSearchSelectComponent`) also clears `sendToAccountsReceivable` — the checkbox never makes sense without a registered client, so there's nothing stale left checked once the client it referred to is gone. */
+  setRegisteredClient(client: { id: string; name: string } | null): void {
+    this.clientId.set(client?.id ?? null);
+    this.clientDisplayName.set(client?.name ?? null);
+    if (!client) {
+      this.sendToAccountsReceivable.set(false);
+    }
+    this.persist();
+  }
+
+  setSendToAccountsReceivable(value: boolean): void {
+    this.sendToAccountsReceivable.set(value);
+    this.persist();
+  }
+
   /** The only sanctioned way to clear a draft — called after a confirmed save, when going back to the type dashboard, or on logout. */
   reset(): void {
     this.transactionTypeId.set('');
@@ -173,6 +207,9 @@ export class BankDepositDraftStore {
     this.cashCounts.set(emptyCashCounts());
     this.transactionAmounts.set([]);
     this.clientName.set('');
+    this.clientId.set(null);
+    this.clientDisplayName.set(null);
+    this.sendToAccountsReceivable.set(false);
     this.clearStorage();
   }
 
@@ -189,6 +226,9 @@ export class BankDepositDraftStore {
       cashCounts: this.cashCounts(),
       transactionAmounts: this.transactionAmounts(),
       clientName: this.clientName(),
+      clientId: this.clientId(),
+      clientDisplayName: this.clientDisplayName(),
+      sendToAccountsReceivable: this.sendToAccountsReceivable(),
     };
     try {
       sessionStorage.setItem(key, JSON.stringify(payload));
@@ -217,6 +257,9 @@ export class BankDepositDraftStore {
       this.cashCounts.set({ ...emptyCashCounts(), ...(parsed.cashCounts ?? {}) });
       this.transactionAmounts.set(Array.isArray(parsed.transactionAmounts) ? parsed.transactionAmounts : []);
       this.clientName.set(parsed.clientName ?? '');
+      this.clientId.set(parsed.clientId ?? null);
+      this.clientDisplayName.set(parsed.clientDisplayName ?? null);
+      this.sendToAccountsReceivable.set(parsed.sendToAccountsReceivable ?? false);
     } catch {
       sessionStorage.removeItem(key);
     }

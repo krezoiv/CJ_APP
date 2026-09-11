@@ -26,6 +26,8 @@ export interface BankDepositOperation {
   operationDate: string;
   /** Free text, typed by whoever registers the deposit — never looked up against the clients table. */
   clientName: string | null;
+  /** A REGISTERED client (the same `clients` table Cuentas por Cobrar uses) — `null` unless one was linked. Independent of `clientName`; see "Enviar a cuentas por cobrar" on the Depósito form. */
+  clientId: string | null;
   transactionTypeId: string;
   transactionTypeName: string;
   userId: string;
@@ -51,6 +53,7 @@ export interface BankDepositOperationSummary {
   transactionCount: number;
   operationDate: string;
   clientName: string | null;
+  clientId: string | null;
   transactionTypeId: string;
   transactionTypeName: string;
   userId: string;
@@ -75,6 +78,10 @@ export interface RegisterBankDepositInput {
   cashDetails: BankDepositCashDetailInput[];
   transactionAmounts: number[];
   clientName?: string | null;
+  /** A REGISTERED client id — only ever sent for a "Depósito" (the form's own "Cliente registrado" picker doesn't render for any other tipo). The backend re-validates it exists+active regardless of what was already checked client-side. */
+  clientId?: string | null;
+  /** "Enviar a cuentas por cobrar" — requires `clientId`, only ever offered checked for a "Depósito", and only enabled for an admin account. The backend re-validates all three independently — see `RegisterBankDepositOperationUseCase`. */
+  sendToAccountsReceivable?: boolean;
 }
 
 /** `GET /bank-deposits/monthly-count` — backs the Resumen dashboard's "Bancos" tile. `count` excludes anuladas and always covers the 1st of the current month through today; it resets on its own the moment the calendar rolls into a new month, there's nothing to reset client-side. */

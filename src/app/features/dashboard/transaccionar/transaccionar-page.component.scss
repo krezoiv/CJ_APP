@@ -188,6 +188,42 @@
       border-color: var(--color-primary-500);
     }
   }
+
+  // "Enviar a cuentas por cobrar" — overrides the generic column-stacked
+  // `.field label` above with an inline checkbox + text row, same pattern
+  // already established in Reportería's own filter checkboxes.
+  .checkbox {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: var(--fw-medium);
+    color: var(--color-text-on-light);
+    cursor: pointer;
+
+    input[type='checkbox'] {
+      width: 1.1rem;
+      height: 1.1rem;
+      accent-color: var(--color-primary-500);
+      cursor: pointer;
+      box-shadow: none;
+      padding: 0;
+    }
+
+    &.checkbox--disabled {
+      color: var(--color-text-on-light-subtle);
+      cursor: not-allowed;
+
+      input[type='checkbox'] {
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .field__hint {
+    font-size: var(--fs-xs);
+    color: var(--color-text-on-light-subtle);
+  }
 }
 
 .transaccionar__footer {
