@@ -7,8 +7,12 @@ import {
   ApiSuccessResponse,
   RechargeDailyBalance,
   RechargeDayStatus,
+  RechargePurchase,
   RechargeSale,
   RechargeSalesSummary,
+  RechargesDailyStats,
+  RechargesWeeklyStats,
+  RechargesYearlyStats,
   RechargeType,
   RegisterRechargeFinalBalanceInput,
   RegisterRechargePurchaseInput,
@@ -47,6 +51,21 @@ export class RechargesService {
   registerPurchase(input: RegisterRechargePurchaseInput): Observable<RechargeDailyBalance> {
     return this.http
       .post<ApiSuccessResponse<RechargeDailyBalance>>(`${BASE_URL}/purchases`, input)
+      .pipe(map((response) => response.data));
+  }
+
+  /** `date` defaults to today server-side when omitted — pass the operation-date picker's value to browse another day. */
+  getPurchases(date?: string): Observable<RechargePurchase[]> {
+    const params = date ? new HttpParams().set('date', date) : undefined;
+    return this.http
+      .get<ApiSuccessResponse<RechargePurchase[]>>(`${BASE_URL}/purchases`, { params })
+      .pipe(map((response) => response.data));
+  }
+
+  /** "Revertir compra" — admin-only server-side; never a physical delete/edit, marks the purchase `ANULADA` and compensates the balance atomically. */
+  voidPurchase(id: string, reason: string): Observable<RechargePurchase> {
+    return this.http
+      .post<ApiSuccessResponse<RechargePurchase>>(`${BASE_URL}/purchases/${id}/void`, { reason })
       .pipe(map((response) => response.data));
   }
 
@@ -113,6 +132,27 @@ export class RechargesService {
   closeDay(date?: string): Observable<RechargeDayStatus> {
     return this.http
       .post<ApiSuccessResponse<RechargeDayStatus>>(`${BASE_URL}/day-status/close`, date ? { date } : {})
+      .pipe(map((response) => response.data));
+  }
+
+  /** Open to any authenticated account — backs "Recargas del mes" en Gráficas → Indicadores de Recargas, siempre el mes actual del servidor. */
+  getDailyStats(): Observable<RechargesDailyStats> {
+    return this.http
+      .get<ApiSuccessResponse<RechargesDailyStats>>(`${BASE_URL}/daily-stats`)
+      .pipe(map((response) => response.data));
+  }
+
+  /** Open to any authenticated account — backs "Recargas por semana". */
+  getWeeklyStats(): Observable<RechargesWeeklyStats> {
+    return this.http
+      .get<ApiSuccessResponse<RechargesWeeklyStats>>(`${BASE_URL}/weekly-stats`)
+      .pipe(map((response) => response.data));
+  }
+
+  /** Open to any authenticated account — backs "Recargas por mes" (anual). */
+  getYearlyStats(): Observable<RechargesYearlyStats> {
+    return this.http
+      .get<ApiSuccessResponse<RechargesYearlyStats>>(`${BASE_URL}/yearly-stats`)
       .pipe(map((response) => response.data));
   }
 }

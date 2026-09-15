@@ -1,0 +1,13 @@
+<app-line-chart
+  title="Compras por semana"
+  subtitle="Acumulado semanal del mes en curso"
+  icon="bar-chart"
+  valueLabel="comprado"
+  [formatValue]="formatCurrency"
+  [points]="points()"
+  [loading]="loading()"
+  [loadError]="loadError()"
+  emptyTitle="Sin compras registradas este mes"
+  emptyDescription="Aquí verás el acumulado semanal en cuanto haya compras registradas."
+  (retry)="fetch()"
+/>

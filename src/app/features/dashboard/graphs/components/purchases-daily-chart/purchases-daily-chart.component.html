@@ -1,0 +1,13 @@
+<app-line-chart
+  title="Compras del mes"
+  subtitle="Comportamiento diario de compras"
+  icon="trending-up"
+  valueLabel="comprado"
+  [formatValue]="formatCurrency"
+  [points]="points()"
+  [loading]="loading()"
+  [loadError]="loadError()"
+  emptyTitle="Sin compras registradas este mes"
+  emptyDescription="Aquí verás el comportamiento diario en cuanto haya compras registradas."
+  (retry)="fetch()"
+/>

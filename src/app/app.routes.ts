@@ -64,6 +64,33 @@ export const routes: Routes = [
         title: 'Proveedores — Sistema',
       },
       {
+        path: 'administrar-facturas-compras',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./features/dashboard/purchases-admin/purchases-admin-page.component').then(
+            (m) => m.PurchasesAdminPageComponent,
+          ),
+        title: 'Administrar Facturas de Compras — Sistema',
+      },
+      {
+        path: 'administrar-facturas-ventas',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./features/dashboard/sales-admin/sales-admin-page.component').then(
+            (m) => m.SalesAdminPageComponent,
+          ),
+        title: 'Administrar Facturas de Ventas — Sistema',
+      },
+      {
+        path: 'administrar-ventas-sim',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./features/dashboard/recharges-sim-sales-admin/recharges-sim-sales-admin-page.component').then(
+            (m) => m.RechargesSimSalesAdminPageComponent,
+          ),
+        title: 'Administrar Ventas de SIM — Sistema',
+      },
+      {
         path: 'usuarios',
         canActivate: [adminGuard],
         loadComponent: () =>
@@ -76,6 +103,15 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/dashboard/roles/roles-page.component').then((m) => m.RolesPageComponent),
         title: 'Roles — Sistema',
+      },
+      {
+        path: 'atajos-teclado',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./features/dashboard/keyboard-shortcuts/keyboard-shortcuts-page.component').then(
+            (m) => m.KeyboardShortcutsPageComponent,
+          ),
+        title: 'Atajos de Teclado — Sistema',
       },
       {
         path: 'gestion-dias-cerrados',
@@ -167,6 +203,14 @@ export const routes: Routes = [
             (m) => m.PresentationUnitsPageComponent
           ),
         title: 'Presentaciones y Medidas — Sistema',
+      },
+      {
+        path: 'gestion-caja-recargas',
+        loadComponent: () =>
+          import('./features/dashboard/recharge-cash-box/recharge-cash-box-page.component').then(
+            (m) => m.RechargeCashBoxPageComponent
+          ),
+        title: 'Gestión Caja Recargas — Sistema',
       },
       {
         path: 'finanzas',
@@ -333,6 +377,42 @@ export const routes: Routes = [
             (m) => m.IceCreamReportPageComponent
           ),
         title: 'Reportería de Heladería — Sistema',
+      },
+      {
+        path: 'graficas-indicadores-ventas',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./features/dashboard/graphs/sales-indicators/sales-indicators-page.component').then(
+            (m) => m.SalesIndicatorsPageComponent
+          ),
+        title: 'Indicadores de Ventas — Sistema',
+      },
+      {
+        path: 'graficas-indicadores-compras',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./features/dashboard/graphs/purchases-indicators/purchases-indicators-page.component').then(
+            (m) => m.PurchasesIndicatorsPageComponent
+          ),
+        title: 'Indicadores de Compras — Sistema',
+      },
+      {
+        path: 'graficas-indicadores-recargas',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./features/dashboard/graphs/recharges-indicators/recharges-indicators-page.component').then(
+            (m) => m.RechargesIndicatorsPageComponent
+          ),
+        title: 'Indicadores de Recargas — Sistema',
+      },
+      {
+        path: 'graficas-indicadores-transacciones',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./features/dashboard/graphs/transaction-indicators/transaction-indicators-page.component').then(
+            (m) => m.TransactionIndicatorsPageComponent
+          ),
+        title: 'Indicadores de Transacciones — Sistema',
       },
       {
         path: 'agentes-bancarios-bancos',

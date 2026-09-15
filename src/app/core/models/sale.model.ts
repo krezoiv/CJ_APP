@@ -6,6 +6,7 @@ export interface SaleItem {
   quantity: number;
   unitPrice: number;
   total: number;
+  presentationName: string;
 }
 
 /** 'PUBLIC' (default) or 'WHOLESALE' — chosen once at the start of a sale, locked once the receipt has any line item. */
@@ -32,6 +33,12 @@ export interface Sale {
   items: SaleItem[];
   createdAt: string;
   updatedAt: string;
+  /** Free-text folio — never enforced as unique, purely a search aid. `null` for sales registered before this field existed. */
+  invoiceNumber: string | null;
+  isVoided: boolean;
+  voidedAt: string | null;
+  voidedByUsername: string | null;
+  voidReason: string | null;
 }
 
 /**
@@ -51,4 +58,63 @@ export interface CreateSaleInput {
   items: CreateSaleItemInput[];
   clientId?: string;
   priceList?: PriceListType;
+  invoiceNumber?: string;
+}
+
+export interface SalesDailyStat {
+  /** `yyyy-MM-dd` */
+  date: string;
+  amount: number;
+}
+
+/** `GET /sales/daily-stats` — backs "Ventas del mes" en Gráficas → Indicadores de Ventas. Monto total vendido (`SUM(total)`), solo ventas CONFIRMED no anuladas. Siempre el mes actual del servidor. */
+export interface SalesDailyStats {
+  /** `yyyy-MM` */
+  month: string;
+  days: SalesDailyStat[];
+}
+
+export interface SalesWeeklyStat {
+  weekNumber: number;
+  /** "Semana N" */
+  label: string;
+  /** `yyyy-MM-dd` */
+  startDate: string;
+  /** `yyyy-MM-dd` */
+  endDate: string;
+  amount: number;
+}
+
+/** `GET /sales/weekly-stats` — backs "Ventas por semana". Buckets fijos de 7 días desde el día 1 del mes, nunca semana ISO. */
+export interface SalesWeeklyStats {
+  /** `yyyy-MM` */
+  month: string;
+  weeks: SalesWeeklyStat[];
+}
+
+export interface SalesMonthlyStat {
+  /** `yyyy-MM` */
+  month: string;
+  label: string;
+  amount: number;
+}
+
+/** `GET /sales/yearly-stats` — backs "Ventas por mes" (anual). Enero hasta el mes actual, acumulativo — nunca se reinicia dentro del año. */
+export interface SalesYearlyStats {
+  year: number;
+  months: SalesMonthlyStat[];
+}
+
+export type SaleStatusFilter = 'ACTIVE' | 'VOIDED';
+
+/** Filters for "Administrar Facturas de Ventas" — matches `GET /sales`'s own query params exactly. */
+export interface ListSalesFilters {
+  clientId?: string;
+  startDate?: string;
+  endDate?: string;
+  /** Matches against client name OR invoice number. */
+  search?: string;
+  status?: SaleStatusFilter;
+  page?: number;
+  limit?: number;
 }

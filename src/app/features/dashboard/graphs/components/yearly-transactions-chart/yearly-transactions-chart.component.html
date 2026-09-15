@@ -1,0 +1,12 @@
+<app-line-chart
+  title="Transacciones por mes"
+  subtitle="Meses transcurridos del año actual"
+  icon="trending-up"
+  valueLabel="transacciones"
+  [points]="points()"
+  [loading]="loading()"
+  [loadError]="loadError()"
+  emptyTitle="Sin transacciones registradas este año"
+  emptyDescription="Aquí verás el comportamiento mensual en cuanto haya operaciones registradas."
+  (retry)="fetch()"
+/>

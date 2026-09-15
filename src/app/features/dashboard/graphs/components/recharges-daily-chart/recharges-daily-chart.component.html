@@ -1,0 +1,13 @@
+<app-line-chart
+  title="Recargas del mes"
+  subtitle="Venta diaria combinada (Claro + Tigo)"
+  icon="trending-up"
+  valueLabel="en recargas"
+  [formatValue]="formatCurrency"
+  [points]="points()"
+  [loading]="loading()"
+  [loadError]="loadError()"
+  emptyTitle="Sin cuadres cerrados este mes"
+  emptyDescription="Aquí verás la venta diaria en cuanto haya cuadres de recargas cerrados."
+  (retry)="fetch()"
+/>

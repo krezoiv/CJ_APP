@@ -1,0 +1,12 @@
+<app-line-chart
+  title="Transacciones del mes"
+  subtitle="Comportamiento diario de transacciones"
+  icon="trending-up"
+  valueLabel="transacciones"
+  [points]="points()"
+  [loading]="loading()"
+  [loadError]="loadError()"
+  emptyTitle="Sin transacciones registradas este mes"
+  emptyDescription="Aquí verás el comportamiento diario en cuanto haya operaciones registradas."
+  (retry)="fetch()"
+/>

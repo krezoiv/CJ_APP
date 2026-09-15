@@ -16,8 +16,28 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
       { label: 'Tipo de Transacción', icon: 'arrow-left-right', path: 'tipo-transaccion' },
       { label: 'Clientes', icon: 'users', path: 'clientes' },
       { label: 'Presentaciones y Medidas', icon: 'layers', path: 'presentaciones-medidas' },
+      { label: 'Gestión Caja Recargas', icon: 'wallet', path: 'gestion-caja-recargas' },
+      {
+        label: 'Administrar Facturas de Compras',
+        icon: 'shopping-bag',
+        path: 'administrar-facturas-compras',
+        roles: ['SUPER_ADMIN', 'ADMIN'],
+      },
+      {
+        label: 'Administrar Facturas de Ventas',
+        icon: 'file-check',
+        path: 'administrar-facturas-ventas',
+        roles: ['SUPER_ADMIN', 'ADMIN'],
+      },
+      {
+        label: 'Administrar Ventas de SIM',
+        icon: 'shield-check',
+        path: 'administrar-ventas-sim',
+        roles: ['SUPER_ADMIN', 'ADMIN'],
+      },
       { label: 'Usuarios', icon: 'users', path: 'usuarios', roles: ['SUPER_ADMIN', 'ADMIN'] },
       { label: 'Roles', icon: 'shield-check', path: 'roles', roles: ['SUPER_ADMIN', 'ADMIN'] },
+      { label: 'Atajos de Teclado', icon: 'keyboard', path: 'atajos-teclado', roles: ['SUPER_ADMIN', 'ADMIN'] },
       {
         label: 'Gestión de Días Cerrados',
         icon: 'lock',
@@ -83,6 +103,18 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
       { label: 'Reporte de Recargas', icon: 'smartphone', path: 'reportes-recargas' },
       { label: 'Reporte de Cuadre de Agentes', icon: 'bank', path: 'reportes-cuadre-agentes' },
       { label: 'Reporte de Transacciones', icon: 'bank', path: 'reportes-transacciones' },
+    ],
+  },
+  {
+    label: 'Gráficas',
+    icon: 'bar-chart',
+    path: 'graficas',
+    roles: ['SUPER_ADMIN', 'ADMIN'],
+    children: [
+      { label: 'Indicadores de Ventas', icon: 'receipt', path: 'graficas-indicadores-ventas' },
+      { label: 'Indicadores de Compras', icon: 'arrow-down-circle', path: 'graficas-indicadores-compras' },
+      { label: 'Indicadores de Recargas', icon: 'smartphone', path: 'graficas-indicadores-recargas' },
+      { label: 'Indicadores de Transacciones', icon: 'trending-up', path: 'graficas-indicadores-transacciones' },
     ],
   },
   {

@@ -1,0 +1,103 @@
+<app-card padding="lg" class="chart-card">
+  <div class="chart-card__header">
+    <div class="chart-card__identity">
+      <div class="chart-card__icon">
+        <app-icon [name]="icon" [size]="18" />
+      </div>
+      <div>
+        <h2 class="chart-card__title">{{ title }}</h2>
+        @if (subtitle) {
+          <p class="chart-card__subtitle">{{ subtitle }}</p>
+        }
+      </div>
+    </div>
+
+    @if (!loading && !loadError && hasActivity()) {
+      <div class="chart-card__stats">
+        @if (maxPoint(); as max) {
+          <span class="stat-pill stat-pill--max">
+            <app-icon name="arrow-up-circle" [size]="13" />
+            Pico {{ max.label }} · {{ formatValue(max.value) }}
+          </span>
+        }
+        @if (minPoint(); as min) {
+          <span class="stat-pill stat-pill--min">
+            <app-icon name="arrow-down-circle" [size]="13" />
+            Mínimo {{ min.label }} · {{ formatValue(min.value) }}
+          </span>
+        }
+      </div>
+    }
+  </div>
+
+  @if (loading) {
+    <div class="chart-card__skeleton" aria-hidden="true">
+      <span class="skeleton-bar"></span>
+    </div>
+  } @else if (loadError) {
+    <div class="chart-card__error">
+      <app-icon name="alert-triangle" [size]="20" />
+      <p>No se pudieron cargar las estadísticas.</p>
+      <button type="button" class="chart-card__retry" (click)="onRetry()">Reintentar</button>
+    </div>
+  } @else if (!hasActivity()) {
+    <app-empty-state icon="trending-up" [title]="emptyTitle" [description]="emptyDescription" />
+  } @else {
+    <div class="chart-card__plot" [style.aspect-ratio]="aspectRatio">
+      <svg [attr.viewBox]="viewBox" preserveAspectRatio="xMidYMid meet" class="chart-svg">
+        <defs>
+          <linearGradient [attr.id]="gradientId" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--color-primary-500)" stop-opacity="0.22" />
+            <stop offset="100%" stop-color="var(--color-primary-500)" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+
+        <g class="chart-svg__grid">
+          @for (tick of yAxisTicks(); track tick) {
+            <line [attr.x1]="plotLeft" [attr.x2]="plotRight" [attr.y1]="tickY(tick)" [attr.y2]="tickY(tick)" class="grid-line" />
+            <text x="0" [attr.y]="tickY(tick) + 3" class="axis-label axis-label--y">{{ tick }}</text>
+          }
+        </g>
+
+        <path [attr.d]="areaPath()" class="chart-svg__area" [attr.fill]="'url(#' + gradientId + ')'" />
+        <path [attr.d]="linePath()" class="chart-svg__line" />
+
+        @for (point of labelPoints(); track point.point.label; let i = $index) {
+          <text [attr.x]="point.x" [attr.y]="xAxisLabelY" class="axis-label axis-label--x" text-anchor="middle">{{ point.point.label }}</text>
+        }
+
+        @for (point of chartPoints(); track point.point.label; let i = $index) {
+          <circle
+            [attr.cx]="point.x"
+            [attr.cy]="point.y"
+            [attr.r]="point.isMax || point.isMin ? 4 : 2.5"
+            [class.chart-svg__point--max]="point.isMax"
+            [class.chart-svg__point--min]="point.isMin"
+            [class.chart-svg__point--hover]="hoveredIndex() === i"
+            [class.chart-svg__point--visible]="point.isMax || point.isMin || hoveredIndex() === i"
+            class="chart-svg__point"
+          />
+          <circle
+            [attr.cx]="point.x"
+            [attr.cy]="point.y"
+            r="10"
+            class="chart-svg__hit-area"
+            (mouseenter)="onPointHover(i)"
+            (mouseleave)="onPointLeave()"
+          />
+        }
+
+        @if (todayMarker(); as today) {
+          <polygon [attr.points]="todayMarkerPoints(today.x, today.y)" class="chart-svg__today-marker" />
+        }
+      </svg>
+
+      @if (hoveredPoint(); as hovered) {
+        <div class="chart-tooltip" [style.left.%]="leftPercent(hovered.x)" [style.top.%]="topPercent(hovered.y)">
+          <span class="chart-tooltip__date">{{ hovered.point.tooltipLabel }}</span>
+          <span class="chart-tooltip__value">{{ formatValue(hovered.point.value) }} {{ valueLabel }}</span>
+        </div>
+      }
+    </div>
+  }
+</app-card>

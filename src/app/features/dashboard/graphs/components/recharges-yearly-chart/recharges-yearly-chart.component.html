@@ -1,0 +1,13 @@
+<app-line-chart
+  title="Recargas por mes"
+  subtitle="Meses transcurridos del año actual"
+  icon="trending-up"
+  valueLabel="en recargas"
+  [formatValue]="formatCurrency"
+  [points]="points()"
+  [loading]="loading()"
+  [loadError]="loadError()"
+  emptyTitle="Sin cuadres cerrados este año"
+  emptyDescription="Aquí verás el comportamiento mensual en cuanto haya cuadres de recargas cerrados."
+  (retry)="fetch()"
+/>

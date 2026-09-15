@@ -1,9 +1,19 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { ApiSuccessResponse, CreateSaleInput, PaginatedResponse, PriceListType, Sale } from '../models';
+import {
+  ApiSuccessResponse,
+  CreateSaleInput,
+  ListSalesFilters,
+  PaginatedResponse,
+  PriceListType,
+  Sale,
+  SalesDailyStats,
+  SalesWeeklyStats,
+  SalesYearlyStats,
+} from '../models';
 
 const BASE_URL = `${environment.apiUrl}/sales`;
 
@@ -20,10 +30,18 @@ export class SalesService {
     return this.http.post<ApiSuccessResponse<Sale>>(BASE_URL, input).pipe(map((response) => response.data));
   }
 
-  /** A USER account only ever gets their own sales back — the backend decides that, not this call. */
-  getSales(): Observable<PaginatedResponse<Sale>> {
+  /** A USER account only ever gets their own sales back — the backend decides that, not this call. An admin (e.g. "Administrar Facturas de Ventas") sees every sale, filtered by whatever `filters` carries. */
+  getSales(filters?: ListSalesFilters): Observable<PaginatedResponse<Sale>> {
+    let params = new HttpParams();
+    if (filters) {
+      for (const [key, value] of Object.entries(filters)) {
+        if (value !== undefined && value !== null && value !== '') {
+          params = params.set(key, String(value));
+        }
+      }
+    }
     return this.http
-      .get<ApiSuccessResponse<PaginatedResponse<Sale>>>(BASE_URL)
+      .get<ApiSuccessResponse<PaginatedResponse<Sale>>>(BASE_URL, { params })
       .pipe(map((response) => response.data));
   }
 
@@ -57,10 +75,10 @@ export class SalesService {
     );
   }
 
-  /** "Guardar venta" — stock was already reserved as items were added; this only finalizes the targeted tab's receipt. */
-  confirmSale(draftKey: string): Observable<Sale> {
+  /** "Guardar venta" — stock was already reserved as items were added; this only finalizes the targeted tab's receipt. `invoiceNumber` is optional. */
+  confirmSale(draftKey: string, invoiceNumber?: string): Observable<Sale> {
     return this.http
-      .post<ApiSuccessResponse<Sale>>(`${BASE_URL}/confirm`, { draftKey })
+      .post<ApiSuccessResponse<Sale>>(`${BASE_URL}/confirm`, { draftKey, invoiceNumber })
       .pipe(map((response) => response.data));
   }
 
@@ -88,5 +106,33 @@ export class SalesService {
   /** Reconstructs the receipt PDF purely from the already-persisted sale — never re-runs the save. */
   exportSalePdf(id: string): Observable<Blob> {
     return this.http.get(`${BASE_URL}/${id}/pdf`, { responseType: 'blob' });
+  }
+
+  /** "Anular venta" — admin-only server-side; never a physical delete/edit, marks the sale `ANULADA` and reverses its exact inventory effect atomically. */
+  voidSale(id: string, reason: string): Observable<Sale> {
+    return this.http
+      .post<ApiSuccessResponse<Sale>>(`${BASE_URL}/${id}/void`, { reason })
+      .pipe(map((response) => response.data));
+  }
+
+  /** Open to any authenticated account — backs "Ventas del mes" en Gráficas → Indicadores de Ventas, siempre el mes actual del servidor. */
+  getDailyStats(): Observable<SalesDailyStats> {
+    return this.http
+      .get<ApiSuccessResponse<SalesDailyStats>>(`${BASE_URL}/daily-stats`)
+      .pipe(map((response) => response.data));
+  }
+
+  /** Open to any authenticated account — backs "Ventas por semana". */
+  getWeeklyStats(): Observable<SalesWeeklyStats> {
+    return this.http
+      .get<ApiSuccessResponse<SalesWeeklyStats>>(`${BASE_URL}/weekly-stats`)
+      .pipe(map((response) => response.data));
+  }
+
+  /** Open to any authenticated account — backs "Ventas por mes" (anual). */
+  getYearlyStats(): Observable<SalesYearlyStats> {
+    return this.http
+      .get<ApiSuccessResponse<SalesYearlyStats>>(`${BASE_URL}/yearly-stats`)
+      .pipe(map((response) => response.data));
   }
 }

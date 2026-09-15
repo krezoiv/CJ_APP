@@ -7,6 +7,7 @@ export interface PurchaseItem {
   costPrice: number;
   publicPrice: number;
   total: number;
+  presentationName: string;
 }
 
 export type PurchasePaymentType = 'CONTADO' | 'CREDITO';
@@ -29,6 +30,12 @@ export interface Purchase {
   paymentStatus: PurchasePaymentStatus;
   paidAt: string | null;
   paidByUsername: string | null;
+  /** Free-text folio from the supplier's own invoice — never enforced as unique, purely a search aid. `null` for purchases registered before this field existed. */
+  invoiceNumber: string | null;
+  isVoided: boolean;
+  voidedAt: string | null;
+  voidedByUsername: string | null;
+  voidReason: string | null;
 }
 
 /**
@@ -67,6 +74,83 @@ export interface CreatePurchaseInput {
   paymentType: PurchasePaymentType;
   /** `yyyy-MM-dd` — required when `paymentType` is `'CREDITO'`, omitted for `'CONTADO'`. */
   paymentDueDate?: string;
+  /** Free-text folio from the supplier's own invoice — optional. */
+  invoiceNumber?: string;
+}
+
+export interface ImportPurchaseSkippedRow {
+  row: number;
+  identifier: string;
+  reason: string;
+}
+
+/** `POST /purchases/import`'s response shape ("Cargar stock inicial") — mirrors `ImportPurchaseResultResponseDto` on the backend exactly. */
+export interface ImportPurchaseResult {
+  totalRows: number;
+  productsAffected: number;
+  purchasesCreated: number;
+  transfersToVitrina: number;
+  skipped: ImportPurchaseSkippedRow[];
+  /** The row's purchase already succeeded — only its follow-up relocation to Vitrina failed. */
+  transferWarnings: ImportPurchaseSkippedRow[];
+}
+
+export interface PurchasesDailyStat {
+  /** `yyyy-MM-dd` */
+  date: string;
+  amount: number;
+}
+
+/** `GET /purchases/daily-stats` — backs "Compras del mes" en Gráficas → Indicadores de Compras. Monto total comprado (`SUM(total)`), no anuladas. Siempre el mes actual del servidor. */
+export interface PurchasesDailyStats {
+  /** `yyyy-MM` */
+  month: string;
+  days: PurchasesDailyStat[];
+}
+
+export interface PurchasesWeeklyStat {
+  weekNumber: number;
+  /** "Semana N" */
+  label: string;
+  /** `yyyy-MM-dd` */
+  startDate: string;
+  /** `yyyy-MM-dd` */
+  endDate: string;
+  amount: number;
+}
+
+/** `GET /purchases/weekly-stats` — backs "Compras por semana". Buckets fijos de 7 días desde el día 1 del mes, nunca semana ISO. */
+export interface PurchasesWeeklyStats {
+  /** `yyyy-MM` */
+  month: string;
+  weeks: PurchasesWeeklyStat[];
+}
+
+export interface PurchasesMonthlyStat {
+  /** `yyyy-MM` */
+  month: string;
+  label: string;
+  amount: number;
+}
+
+/** `GET /purchases/yearly-stats` — backs "Compras por mes" (anual). Enero hasta el mes actual, acumulativo — nunca se reinicia dentro del año. */
+export interface PurchasesYearlyStats {
+  year: number;
+  months: PurchasesMonthlyStat[];
+}
+
+export type PurchaseStatusFilter = 'ACTIVE' | 'VOIDED';
+
+/** Filters for "Administrar Facturas de Compras" — matches `GET /purchases`'s own query params exactly. */
+export interface ListPurchasesFilters {
+  supplierId?: string;
+  startDate?: string;
+  endDate?: string;
+  /** Matches against supplier name OR invoice number. */
+  search?: string;
+  status?: PurchaseStatusFilter;
+  page?: number;
+  limit?: number;
 }
 
 /**

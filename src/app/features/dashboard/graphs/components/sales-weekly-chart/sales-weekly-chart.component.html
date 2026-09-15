@@ -1,0 +1,13 @@
+<app-line-chart
+  title="Ventas por semana"
+  subtitle="Acumulado semanal del mes en curso"
+  icon="bar-chart"
+  valueLabel="vendido"
+  [formatValue]="formatCurrency"
+  [points]="points()"
+  [loading]="loading()"
+  [loadError]="loadError()"
+  emptyTitle="Sin ventas registradas este mes"
+  emptyDescription="Aquí verás el acumulado semanal en cuanto haya ventas registradas."
+  (retry)="fetch()"
+/>

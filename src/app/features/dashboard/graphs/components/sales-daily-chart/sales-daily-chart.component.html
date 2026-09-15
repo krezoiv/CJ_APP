@@ -1,0 +1,13 @@
+<app-line-chart
+  title="Ventas del mes"
+  subtitle="Comportamiento diario de ventas"
+  icon="trending-up"
+  valueLabel="vendido"
+  [formatValue]="formatCurrency"
+  [points]="points()"
+  [loading]="loading()"
+  [loadError]="loadError()"
+  emptyTitle="Sin ventas registradas este mes"
+  emptyDescription="Aquí verás el comportamiento diario en cuanto haya ventas registradas."
+  (retry)="fetch()"
+/>

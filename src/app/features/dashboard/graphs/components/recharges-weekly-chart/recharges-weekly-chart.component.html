@@ -1,0 +1,13 @@
+<app-line-chart
+  title="Recargas por semana"
+  subtitle="Acumulado semanal del mes en curso"
+  icon="bar-chart"
+  valueLabel="en recargas"
+  [formatValue]="formatCurrency"
+  [points]="points()"
+  [loading]="loading()"
+  [loadError]="loadError()"
+  emptyTitle="Sin cuadres cerrados este mes"
+  emptyDescription="Aquí verás el acumulado semanal en cuanto haya cuadres de recargas cerrados."
+  (retry)="fetch()"
+/>

@@ -1,0 +1,12 @@
+<app-line-chart
+  title="Transacciones por semana"
+  subtitle="Acumulado semanal del mes en curso"
+  icon="bar-chart"
+  valueLabel="transacciones"
+  [points]="points()"
+  [loading]="loading()"
+  [loadError]="loadError()"
+  emptyTitle="Sin transacciones registradas este mes"
+  emptyDescription="Aquí verás el acumulado semanal en cuanto haya operaciones registradas."
+  (retry)="fetch()"
+/>

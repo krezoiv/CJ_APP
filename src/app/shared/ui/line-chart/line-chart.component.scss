@@ -1,0 +1,233 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: block;
+}
+
+.chart-card__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.chart-card__identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.chart-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-md);
+  background: var(--gradient-brand-soft);
+  color: var(--color-primary-600);
+}
+
+.chart-card__title {
+  font-family: var(--font-heading);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-bold);
+  color: var(--color-text-on-light);
+  line-height: 1.2;
+}
+
+.chart-card__subtitle {
+  font-size: var(--fs-xs);
+  color: var(--color-text-on-light-muted);
+}
+
+.chart-card__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+}
+
+.stat-pill--max {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.stat-pill--min {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+// ---- Loading ----------------------------------------------------------
+
+.chart-card__skeleton {
+  height: 8rem;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+
+  @include bp.respond(md) {
+    height: 6rem;
+  }
+}
+
+.skeleton-bar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-bg-light-muted) 25%, var(--color-border-light) 50%, var(--color-bg-light-muted) 75%);
+  background-size: 200% 100%;
+  animation: line-chart-skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes line-chart-skeleton-pulse {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+// ---- Error --------------------------------------------------------------
+
+.chart-card__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 8rem;
+  color: var(--color-text-on-light-muted);
+  font-size: var(--fs-sm);
+  text-align: center;
+}
+
+.chart-card__retry {
+  color: var(--color-primary-600);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// ---- Chart ----------------------------------------------------------------
+
+.chart-card__plot {
+  position: relative;
+  width: 100%;
+}
+
+.chart-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.grid-line {
+  stroke: var(--color-border-light);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.axis-label {
+  font-size: 11px;
+  fill: var(--color-text-on-light-subtle);
+}
+
+.axis-label--y {
+  text-anchor: start;
+}
+
+.chart-svg__area {
+  stroke: none;
+}
+
+.chart-svg__line {
+  fill: none;
+  stroke: var(--color-primary-500);
+  stroke-width: 2.25;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.chart-svg__point {
+  fill: var(--color-primary-500);
+  stroke: var(--color-surface-light);
+  stroke-width: 1.5;
+  opacity: 0;
+  transition: opacity var(--duration-fast, 0.15s) ease-out;
+}
+
+.chart-svg__point--visible {
+  opacity: 1;
+}
+
+.chart-svg__point--max {
+  fill: var(--color-success);
+}
+
+.chart-svg__point--min {
+  fill: var(--color-danger);
+}
+
+.chart-svg__point--hover:not(.chart-svg__point--max):not(.chart-svg__point--min) {
+  fill: var(--color-primary-600);
+}
+
+.chart-svg__hit-area {
+  fill: transparent;
+  cursor: pointer;
+}
+
+.chart-svg__today-marker {
+  fill: var(--color-accent-gold);
+}
+
+// ---- Tooltip ----------------------------------------------------------
+
+.chart-tooltip {
+  position: absolute;
+  transform: translate(-50%, -130%);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-ink-800);
+  color: var(--color-white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.chart-tooltip__date {
+  font-weight: var(--fw-semibold);
+
+  &::first-letter {
+    text-transform: uppercase;
+  }
+}
+
+.chart-tooltip__value {
+  color: rgba(255, 255, 255, 0.8);
+}
